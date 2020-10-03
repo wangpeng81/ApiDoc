@@ -1,0 +1,9 @@
+﻿
+.area-treeview {
+    width: calc(100% - 180px);
+}
+
+.area-tool {
+    width: 180px;
+}
+

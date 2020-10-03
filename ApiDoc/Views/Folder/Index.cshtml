@@ -1,0 +1,79 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+@section StyleSheet
+{
+    <link rel="stylesheet" href="~/css/areas.css" />
+
+}
+ 
+    <div class="absolute-left-58 w-width-180 border-right padding">
+
+        <div id="treeview7"></div>
+
+    </div>
+ 
+
+<main class="absolute-right-58 w-180 "> 
+        <div class="tool-title">文件夹</div>
+        <div class="tool-items">
+            <div onclick="btnAdd()" class="tool-item" ><div class="oi oi-plus tool-item-img"></div>添加文件夹</div>
+            <div onclick="btnUpdate()" class="tool-item"><div class="oi oi-brush tool-item-img"></div>修改文件夹</div>
+            <div onclick="btnDelete()"  class="tool-item"><div class="oi oi-trash tool-item-img"></div>删除文件夹</div>
+        </div> 
+</main>
+
+<div class="modal fade" id="myModalAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel"></h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+
+            </div>
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <input type="text" name="txtFolderName" class="form-control" id="txtFolderName" placeholder="文件夹名称">
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+                <button type="button" id="btn_submit" class="btn btn-primary" onclick="CallBackHandler()"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="myModalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">提示信息</h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+
+            </div>
+            <div class="modal-body">
+
+                请确认是否要删除
+                  
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="DeleteHandler()"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{ 
+    <script src="~/lib/bootstrap/dist/js/bootstrap-treeview.js"></script>
+    <script src="~/js/folder.js"></script>
+    
+}

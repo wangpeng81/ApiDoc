@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ApiDoc</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" /> 
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/font/css/font-awesome.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-theme.css" />
+
+    @RenderSection("StyleSheet", false)
+
+</head>
+<body>
+
+    @RenderBody()
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/bootstrap.bundle.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

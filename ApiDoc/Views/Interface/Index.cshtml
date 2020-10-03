@@ -1,0 +1,141 @@
+﻿@model List<ApiDoc.Models.InterfaceModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+@section StyleSheet
+{
+    <style type="text/css">
+
+        .title thead, .title th {
+            border: 0px;
+        }
+
+        .dg-list {
+            overflow: auto;
+            height: calc(100% - 32px);
+        }
+
+        .datagrid-cell-m {
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .color-get {
+            color: #63aeff;
+        }
+
+        .color-post {
+            color: #4acf94;
+        }
+    </style>
+}
+
+
+<div class="container-fluid absolute-left w-width-180 border-right  p-3">
+    <table id="grid" data-toggle="table">
+    </table>
+
+    <table class="table title m-0 table-sm">
+        <tbody>
+            <tr class="row no-gutters text-center border-top bg-light">
+                <th class="col-auto pl-1 pr-1">@Model.Count</th>
+                <th class="col-auto">
+                    <div class="custom-control custom-checkbox ml-1">
+                        <input type="checkbox" class="custom-control-input" id="checkAll" name="checkAll">
+                        <label class="custom-control-label" for="checkAll"></label>
+                    </div>
+                </th>
+                <th class="col-1">方法</th>
+                <th class="col-5 text-left">标题</th>
+                <th class="col-5 text-left">接口地址</th>
+            </tr>
+        <tbody>
+    </table>
+
+    <div class="dg-list">
+        <table class="table table-hover table-sm ">
+            <tbody>
+                @for (int rowIndex = 1; rowIndex <= Model.Count; rowIndex++)
+                {
+                    var folder = Model[rowIndex - 1];
+                    <tr class="row no-gutters border-bottom border-top-0">
+                        <td class="col-auto pl-1 pr-1">@rowIndex</td>
+                        <td class="col-auto">
+                            <div class="custom-control custom-checkbox ml-1">
+                                <input type="checkbox" class="custom-control-input" id="customCheck_@rowIndex" name="chk" value="@folder.SN">
+                                <label class="custom-control-label" for="customCheck_@rowIndex"></label>
+                            </div>
+                        </td>
+                        @if (folder.Method == "Get")
+                        {
+                            <td class="col-1 datagrid-cell-m color-get">GET</td>
+                        }
+                        else
+                        {
+                            <td class="col-1 datagrid-cell-m color-post">POST</td>
+                        }
+                        <td class="col-5 text-truncate">@folder.Title</td>
+                        <td class="col-5 text-truncate">@folder.Url</td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="absolute-right w-180">
+    <div class="card border-0">
+        <div class="card-header text-center well p-1">查询</div>
+        <div class="card-body p-2">
+            <div class="input-group input-group-sm mb-1">
+                <input id="txtTitle" type="text" class="form-control" placeholder="标题" aria-label="Search" aria-describedby="basic-addon2" autocomplete="off">
+            </div>
+            <div class="input-group input-group-sm">
+                <input id="txtUrl" type="text" class="form-control" placeholder="Url" aria-label="Search" aria-describedby="basic-addon2" autocomplete="off">
+                <div class="input-group-append" onclick="btnSearch_Click(@ViewData["FKSN"])">
+                    <span class="input-group-text" id="basic-addon2"><i class="fa fa-search"></i></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card border-0">
+        <div class="card-header text-center well p-1">工具箱</div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item pl-2" onclick="btnAdd_Click(@ViewData["FKSN"])"><a class="card-link" href="#"><i class="fa fa-plus fa-fw"></i>&nbsp; 添加接口</a></li>
+            <li class="list-group-item pl-2" onclick="btnUpdate_Click()"><a class="card-link" href="#"><i class="fa fa-pencil fa-fw"></i>&nbsp; 修改接口</a></li>
+            <li class="list-group-item pl-2" onclick="btnDelete_Click(@ViewData["FKSN"])"><a class="card-link" href="#"><i class="fa fa-trash fa-fw"></i>&nbsp; 删除接口</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="modal fade" id="myModalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">提示信息</h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+
+            </div>
+            <div class="modal-body">
+
+                请确认是否要删除
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-close" aria-hidden="true"></span>关闭</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="btnSaveFlowStepDelete()"><span class="fa fa-save" aria-hidden="true"></span>确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <script src="~/js/interface.js"></script>
+
+}
+
