@@ -13,7 +13,7 @@
 
 </head>
 <body>
-
+    <input type="hidden" id="txtHost" value="@Url.Content("~")" />
     <nav class="navbar sticky-top navbar-expand-sm navbar-light border-bottom box-shadow mb-3 theme-color" style="padding-left:0px;">
         <a class="navbar-brand text-right w-240 font-weight-bold" style="color:var(--white); " asp-area="" asp-controller="Home" asp-action="Index">ApiDoc 官方文档</a>
 
@@ -25,8 +25,8 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link text-white" asp-area="" asp-controller="Folder" asp-action="Index"><i class="fa fa-folder"></i>&nbsp;目录</a> 
-                    </li> 
+                        <a class="nav-link text-white" asp-area="" asp-controller="Folder" asp-action="Index"><i class="fa fa-folder"></i>&nbsp;目录</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -34,16 +34,9 @@
     @RenderBody()
     <script src="~/js/jquery.min.js"></script>
     <script src="~/js/bootstrap.bundle.js"></script>
+    <script src="~/js/url.js"></script>
 
     @RenderSection("Scripts", required: false)
-
-    <script type="text/javascript">
-        $(function () {
-          var rootUrl = @Url.Content("~");
-            alert(rootUrl);
-        });
-
-    </script>
-
+ 
 </body>
 </html>

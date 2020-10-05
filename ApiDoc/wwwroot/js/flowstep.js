@@ -1,8 +1,4 @@
-﻿var urlFlowStepSave = "/Interface/StepSave";
-var urlFlowStepList = "/Interface/FlowStepList";
-var urlFlowStepDelete = "/Interface/DeleteFlowStep";
-var urlFlowStepSaveCmdText = "/Interface/SaveCmdText";
-
+﻿
 var selectFlowStep = null;
 
 $(function () {

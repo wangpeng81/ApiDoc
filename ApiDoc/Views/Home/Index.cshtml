@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "";
 }
 
 @section StyleSheet
@@ -33,15 +33,29 @@
     </div>
 
 </div>
+<input type="hidden" />
 
+<div class="modal fade bd-example-modal-xl" id="myModalInterface" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-title bg-light text-right">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-close" aria-hidden="true"></span></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="myIframe" src="" frameborder="0" scrolling="yes" style="width:100%;height: 100%;"></iframe>
+            </div>
+            
+        </div>
+    </div>
+</div>
 
 @section Scripts
 {
-    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap-treeview.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap-closable-tab.js"></script>
+    <script src="~/js/bootstrap.bundle.js"></script>
+    <script src="~/js/bootstrap-treeview.js"></script>
+    <script src="~/js/bootstrap-closable-tab.js"></script>
     <script src="~/js/home.js"></script>
-   
+
 }
 
 

@@ -2,8 +2,6 @@
 var selectedNode; 
 var vDo;
 
-var urlAll = "Folder/All?root=false"; 
-
 function genID(length){
     return Number(Math.random().toString().substr(3, length) + Date.now()).toString(36);
 }
@@ -34,11 +32,32 @@ function LoadTreeView(result) {
         }
     }) 
 }
+
+//添加+修改=接口
+function showInterface(SN,fksn) {
+    var model = $("#myModalInterface");
+    var height = window.screen.availHeight;
+    model.find(".modal-body").height(height - 170);
+
+    var iframe = $("#myIframe"); 
+
+    if (SN > 0) {
+        iframe.attr('src', urlRoot + '/Interface/Add?SN=' + SN);
+    }
+    else {
+        iframe.attr('src', urlRoot + '/Interface/Add?fksn=' + fksn);
+    }
+    
+    model.modal('show');
+}
+
  
 $(function () {
 
    
-    $.get(urlAll, LoadTreeView);
+    var url = urlFolderAll + "?root=false"; 
+   
+    $.get(url, LoadTreeView);
  
 })
  

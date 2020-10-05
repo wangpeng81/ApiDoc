@@ -2,9 +2,6 @@
 var selectedNode; 
 var vDo;
 
-var urlAll = "~/Folder/All?root=true";
-var urlDelFolder = "~/Folder/DeleteFolder";
-
 //----------Add
 function btnAdd() {
 
@@ -31,7 +28,7 @@ function CallBackHandler() {
     } 
 
     var txtFolderName = $("#txtFolderName").val(); 
-    var url = "/Folder/SaveFolder?FolderName=" + txtFolderName + "&&";
+    var url = urlFolderSave + "?FolderName=" + txtFolderName + "&&";
 
     if (vDo == "add") {
         url += "SN=0" + "&&ParentSN=" + sn ;
@@ -85,7 +82,7 @@ function DeleteHandler() {
     var nodeId = selectedNode.nodeId;
     var SN = selectedNode.data.sn;
 
-    var url = urlDelFolder + "?SN=" + SN;
+    var url = urlFolderDel + "?SN=" + SN;
 
     $.get(url, function (result) {
 
@@ -161,12 +158,17 @@ $(function () {
             tags: ['0']
         }
     ];
+
+    var url = urlFolderAll + "?root=true";
      
-    $.get(urlAll, function (result) {
+    $.get(url, function (result) {
          
         treeview = $('#treeview7').treeview({
             color: "#428bca",
             showBorder: false,
+            selectedIcon: 'fa fa-check',
+            selectedBackColor: '#f8f9fa',
+            selectedColor: '#8cbe00', 
             data: result 
         });
 

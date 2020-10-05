@@ -1,10 +1,7 @@
-﻿var urlSave = "~/Interface/Save";
-var url = "~/Interface/Index?"
-var urlDelete = "~/Interface/Delete";
-
+﻿
 
 function openwindow(url, name, iWidth, iHeight) {
-    var url;                                 //转向网页的地址;
+    var url = "~/Interface/Index?"
     var name;                           //网页名称，可为空;
     var iWidth;                          //弹出窗口的宽度;
     var iHeight;                        //弹出窗口的高度;
@@ -25,28 +22,13 @@ function btnSearch_Click(fksn)
 
 }
 function btnAdd_Click(fksn) {
-
-    //var height = 600;
-    //var url1 = "Add?fksn=" + fksn;
-    //var width = window.screen.availWidth - 40;
-    //var height = window.screen.availHeight - 80;
-
-    //if (window.showModalDialog == undefined) {
-       
-    //    openwindow(url1, '_blank', width, height);
-
-    //    //window.open(url1, '_blank', 'channelmode=yes,directories=no,fullscreen=true,location=0,menubar=no,status=no,top=0,left=0');
-    //}
-    //else {
-    //    var rv = window.showModalDialog(url1, width, height, "", "", "", "", false);
-    //}
-
-    var nodeID = window.parent.genID(3);
-    var closableTab = window.parent.closableTab;
-    var tabItem = { id: nodeID, title: "添加接口", url: "Interface/Add?fksn=" + fksn };
-
-    closableTab.addTab(tabItem);
-
+ 
+    //var nodeID = window.parent.genID(3);
+    //var closableTab = window.parent.closableTab;
+    //var tabItem = { id: nodeID, title: "添加接口", url: "Interface/Add?fksn=" + fksn }; 
+    //closableTab.addTab(tabItem);
+    window.parent.showInterface(0, fksn);
+    
 }
 
 function btnUpdate_Click() {
@@ -58,11 +40,13 @@ function btnUpdate_Click() {
         if (array.length > 0) {
             var id = array[0];
 
-            var nodeID = window.parent.genID(3);
-            var closableTab = window.parent.closableTab;
-            var tabItem = { id: nodeID, title: "修改接口", url: "Interface/Add?SN=" + id };
+            //var nodeID = window.parent.genID(3);
+            //var closableTab = window.parent.closableTab;
+            //var tabItem = { id: nodeID, title: "修改接口", url: window.location + "/Interface/Add?SN=" + id };
 
-            closableTab.addTab(tabItem);
+            window.parent.showInterface(id,0);
+
+            //closableTab.addTab(tabItem);
         }
     }
    
@@ -93,7 +77,7 @@ function DeleteHandler(fksn) {
         var array = list.split(',');
 
         var data = { "ids": arrayList };
-        $.post(urlDelete, data
+        $.post(urlInterfaceDelete, data
             , function (data) { 
                 btnSearch_Click(fksn);
             })
@@ -120,7 +104,7 @@ function btnSave_Click() {
     var vReturnType = $("#cbxReturnType").val();
     var vMethod = $("#cbxMethod").val();
     var vFKSN = $("#txtFKSN").val();
-    $.post(urlSave, {
+    $.post(urlInterfaceSave, {
         SN: vSN,
         Title: vTitle,
         Url: vUrl,

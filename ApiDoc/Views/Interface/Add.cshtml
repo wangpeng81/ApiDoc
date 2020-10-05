@@ -15,7 +15,7 @@
         }
     </style>
 }
-<div class="container-fluid py-3">
+<div class="container-fluid py-3 pr-0">
 
     <input type="hidden" id="txtSN" value="@Model.SN" />
     <input type="hidden" id="txtFKSN" value="@Model.FKSN" />
@@ -27,10 +27,10 @@
         </div>
     </div>
 
-    <div class="container-fluid row pr-0">
+    <div class="row pr-0 mr-0 border-bottom">
 
         <!-- base info -->
-        <div class="col-9 pl-0 ">
+        <div class="col-9 pl-3 ">
             <div class="btn-toolbar mt-0 mb-2 " role="toolbar" aria-label="Toolbar with button groups">
                 <div class="btn-group btn-group-sm border-bottom" role="group" aria-label="First group">
                     <button type="button" class="btn btn-info">基础信息</button>
@@ -89,7 +89,7 @@
         </div>
 
         <!-- param -->
-        <div id="myParam" class="col-3 p-0">
+        <div id="myParam" class="col-3 p-0 pr-3">
             <div class="btn-toolbar w-100" role="toolbar" aria-label="Toolbar with button groups">
                 <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Second group">
                     <button type="button" class="btn btn-info">参数</button>
@@ -99,7 +99,7 @@
                     <button type="button" class="btn btn-default" onclick=""><i class="fa fa-refresh"></i></button>
                 </div>
             </div>
-            <div class="bg-light" style="height:calc(100% - 40px);">a</div>
+            <div class="bg-light" style="height:calc(100% - 40px);"></div>
         </div>
     </div>
 
@@ -112,7 +112,7 @@
             <button type="button" class="btn btn-default" onclick="btnShowFlowStepDelete()"><i class="fa fa-trash-o"></i></button>
         </div>
     </div>
-    <div id="myStepList">
+    <div id="myStepList" class="pr-3">
         @*@await Html.PartialAsync("FlowStepList.cshtml");*@
     </div>
 

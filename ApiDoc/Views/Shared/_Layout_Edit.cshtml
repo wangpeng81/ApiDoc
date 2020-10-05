@@ -13,10 +13,12 @@
 
 </head>
 <body>
-
+    <input type="hidden" id="txtHost" value="@Url.Content("~")" />
     @RenderBody()
     <script src="~/js/jquery.min.js"></script>
     <script src="~/js/bootstrap.bundle.js"></script>
+    <script src="~/js/url.js"></script>
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>
