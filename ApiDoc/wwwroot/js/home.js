@@ -24,12 +24,13 @@ function LoadTreeView(result) {
     treeview.on('nodeSelected', function (event, data) {
 
         selectedNode = data;
+ 
+            //var tabItem = { id: data.nodeId, title: data.data.folderName, url: "Interface/Index?fksn=" + data.data.sn };
 
-        if (data.data.sn > 0) {
-            var tabItem = { id: data.nodeId, title: data.data.folderName, url: "Interface/Index?fksn=" + data.data.sn };
-
-            closableTab.addTab(tabItem);
-        }
+            // closableTab.addTab(tabItem);
+            var iframe = $("#myIframeList"); 
+            iframe.attr('src', urlRoot + '/Interface/Index?fksn=' + data.data.sn);
+        
     }) 
 }
 
@@ -55,7 +56,7 @@ function showInterface(SN,fksn) {
 $(function () {
 
    
-    var url = urlFolderAll + "?root=false"; 
+    var url = urlFolderAll + "?root=true"; 
    
     $.get(url, LoadTreeView);
  
