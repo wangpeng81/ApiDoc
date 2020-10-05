@@ -1,6 +1,6 @@
-﻿var urlSave = "/Interface/Save";
-var url = "/Interface/Index?"
-var urlDelete = "/Interface/Delete";
+﻿var urlSave = "~/Interface/Save";
+var url = "~/Interface/Index?"
+var urlDelete = "~/Interface/Delete";
 
 
 function openwindow(url, name, iWidth, iHeight) {

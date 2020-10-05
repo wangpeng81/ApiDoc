@@ -2,8 +2,8 @@
 var selectedNode; 
 var vDo;
 
-var urlAll = "/Folder/All?root=true";
-var urlDelFolder = "/Folder/DeleteFolder";
+var urlAll = "~/Folder/All?root=true";
+var urlDelFolder = "~/Folder/DeleteFolder";
 
 //----------Add
 function btnAdd() {

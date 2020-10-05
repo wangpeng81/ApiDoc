@@ -25,8 +25,8 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link text-white" asp-area="" asp-controller="Folder" asp-action="Index"><i class="fa fa-folder"></i>&nbsp;目录</a>
-                    </li>
+                        <a class="nav-link text-white" asp-area="" asp-controller="Folder" asp-action="Index"><i class="fa fa-folder"></i>&nbsp;目录</a> 
+                    </li> 
                 </ul>
             </div>
         </div>
@@ -36,5 +36,14 @@
     <script src="~/js/bootstrap.bundle.js"></script>
 
     @RenderSection("Scripts", required: false)
+
+    <script type="text/javascript">
+        $(function () {
+          var rootUrl = @Url.Content("~");
+            alert(rootUrl);
+        });
+
+    </script>
+
 </body>
 </html>
