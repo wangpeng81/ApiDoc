@@ -4,6 +4,7 @@ using ApiDoc.Models.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -11,6 +12,7 @@ using System.IO;
 using System.IO.Pipelines;
 using System.Net.Http;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ApiDoc.Middleware
@@ -133,10 +135,12 @@ namespace ApiDoc.Middleware
 
                     if (response.Method.ToLower() == "get")
                     {
+                        //cmd.Parameters.AddWithValue("SN", 1);
                         foreach (string key in context.Request.Query.Keys)
                         {
-                            object value = context.Request.Query[key];
-                            cmd.Parameters.AddWithValue(key, value);
+                            StringValues value = new StringValues();
+                            bool value1 = context.Request.Query.TryGetValue(key, out value);
+                            cmd.Parameters.AddWithValue(key, value[0]);
                         }
                     }
                     else if (response.Method.ToLower() == "post")
@@ -168,7 +172,7 @@ namespace ApiDoc.Middleware
             }
             else
             {
-                await context.Response.WriteAsync(path + "没有任何步骤，请维护");
+                await context.Response.WriteAsync(path + "没有任何步骤，请维护", UTF8Encoding.UTF8);
             }
         }
 
@@ -239,7 +243,7 @@ namespace ApiDoc.Middleware
                 tran.Commit();
             }
 
-            await context.Response.WriteAsync(json); 
+            await context.Response.WriteAsync(json, UTF8Encoding.UTF8); 
         }
         private async Task InvokeException(string exception) {
 
@@ -247,7 +251,8 @@ namespace ApiDoc.Middleware
             returnValue.DataType = 1;
             returnValue.Exception = exception;
             string json = JsonHelper.SerializeJSON<DataResult>(returnValue);
-            await this.context.Response.WriteAsync(json);
+            await this.context.Response.WriteAsync(json, UTF8Encoding.UTF8);
         }
+ 
     }
 }
