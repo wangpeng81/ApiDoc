@@ -1,13 +1,15 @@
-﻿using System; 
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Xml.Serialization;
+
 namespace ApiDoc.Models.Responses
-{ 
-    public class DataResult
+{
+    [Serializable]
+     public class XmlDataResult
     {
-        public DataResult()
-        {
-            
-        }
         private int dataType = 0;
+        [XmlAttribute]
         public int DataType
         {
             get { return dataType; }
@@ -15,6 +17,7 @@ namespace ApiDoc.Models.Responses
         }
 
         private string exception = "";
+        [XmlAttribute]
         public string Exception
         {
             get { return exception; }
@@ -22,11 +25,11 @@ namespace ApiDoc.Models.Responses
         }
 
         private object result;
+        [XmlAttribute]
         public object Result
         {
             get { return result; }
             set { result = value; }
         }
-
     }
 }

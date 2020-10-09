@@ -7,7 +7,10 @@ using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
+using System.IO.Pipelines;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ApiDoc.Middleware
@@ -95,6 +98,8 @@ namespace ApiDoc.Middleware
                 cmd.Transaction = tran;
             }
 
+            string excCmdText = ""; //存储异常的存储过程名
+
             DataResult returnValue = new DataResult();
             if (response.Steps.Count > 0)
             {
@@ -111,10 +116,16 @@ namespace ApiDoc.Middleware
                             break;
                     }
 
-                    if (flow.CommandText == "")
+                    if (excCmdText != "")
                     {
-                        string msg = flow.StepName + " 没有数据库语句，请维护";
-                        await InvokeException(returnValue,msg);
+                        excCmdText += ",";
+                    }
+                    excCmdText += flow.CommandText;
+                     
+                    if (flow.CommandText == "")
+                    { 
+                        string msg1 = flow.StepName + " 没有数据库语句，请维护";
+                        await InvokeException(msg1);
                         return;
                     }
                     cmd.CommandText = flow.CommandText;
@@ -129,49 +140,31 @@ namespace ApiDoc.Middleware
                         }
                     }
                     else if (response.Method.ToLower() == "post")
-                    {
-
+                    {  
+                        try
+                        {
+                            var reader = new StreamReader(context.Request.Body);
+                            var contentFromBody = reader.ReadToEnd();
+                            if (contentFromBody != "")
+                            {
+                                Dictionary<string, object> dict = JsonHelper.DeserializeJSON<Dictionary<string, object>>(contentFromBody);
+                                foreach (KeyValuePair<string, object> kv in dict)
+                                {
+                                    cmd.Parameters.AddWithValue(kv.Key, kv.Value);
+                                }
+                            }
+                        }
+                        catch (System.Exception ex)
+                        { 
+                            throw ex;
+                        }
+                      
                     }
                 }
                 #endregion
 
-                #region 数据结果集类型
-                try
-                {
-                    switch (response.ExecuteType)
-                    {
-                        case "Scalar":
-                            returnValue = new DataResult();
-                            returnValue.Result = cmd.ExecuteScalar();
-                            break;
-                        case "Int":
-                            returnValue = new IntDataResult();
-                            returnValue.Result = cmd.ExecuteNonQuery();
-                            break;
-                        case "DataSet":
-                            returnValue = new DSDataResult();
-                            DataSet ds = new DataSet();
-                            sqlDA.Fill(ds);
-                            returnValue.Result = ds;
-                            break;
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    string msg = ex.Message;
-                    await InvokeException(returnValue, msg);
-                    return;
-                }
-                
-                #endregion
-
-                if (response.IsTransaction)
-                {
-                    tran.Commit();
-                }
-
-                string resultValue = JsonHelper.SerializeJSON<DataResult>(returnValue);
-                await context.Response.WriteAsync(resultValue);
+                //执行语句　
+                await ExecSql(response, tran, sqlDA, cmd, excCmdText);　　
             }
             else
             {
@@ -179,8 +172,78 @@ namespace ApiDoc.Middleware
             }
         }
 
-        private async Task InvokeException(DataResult returnValue, string exception) {
+        private async Task ExecSql(DBInterfaceModel response, SqlTransaction tran, SqlDataAdapter sqlDA, SqlCommand cmd, string excCmdText)
+        {
+            string json = "";
+            try
+            {
+                XmlHelper xmlHelp = new XmlHelper();
 
+                switch (response.ExecuteType)
+                {
+                    case "Scalar":
+                        object obj = cmd.ExecuteScalar();
+                        //DataResult dataResult = new DataResult(); 
+                        //dataResult.Result = obj;
+                        if (response.SerializeType == "Xml")
+                        {
+                            json = xmlHelp.SerializeXML(obj);
+                        }
+                        else
+                        {
+                            json = JsonHelper.SerializeJSON(obj);
+                        } 
+                        break;
+                    case "Int":
+                        int iResult = cmd.ExecuteNonQuery();
+                        //IntDataResult intdataResult = new IntDataResult(); 
+                        //intdataResult.Result = iResult; 
+                        if (response.SerializeType == "Xml")
+                        {
+                            json = xmlHelp.SerializeXML(iResult);
+                        }
+                        else
+                        {
+                            json = JsonHelper.SerializeJSON(iResult); 
+                        }
+
+                        break;
+                    case "DataSet":
+                       
+                        DataSet ds = new DataSet();
+                        sqlDA.Fill(ds);
+                     
+                        if (response.SerializeType == "Xml")
+                        {
+                            XmlDSDataResult xmlResult = new XmlDSDataResult(); 
+                            json = xmlHelp.SerializeXML(ds);
+                        }
+                        else
+                        {
+                            //DSDataResult dsDataResult = new DSDataResult();
+                            //dsDataResult.Result = ds;
+                            json = JsonHelper.SerializeJSON(ds); 
+                        } 
+                        break;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                string msg = excCmdText + ex.Message; 
+                await InvokeException(msg);
+                return ;
+            }
+
+            if (response.IsTransaction)
+            {
+                tran.Commit();
+            }
+
+            await context.Response.WriteAsync(json); 
+        }
+        private async Task InvokeException(string exception) {
+
+            DataResult returnValue = new DataResult();
             returnValue.DataType = 1;
             returnValue.Exception = exception;
             string json = JsonHelper.SerializeJSON<DataResult>(returnValue);

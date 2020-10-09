@@ -40,6 +40,7 @@ namespace ApiDoc.Controllers
             dbInter.SerializeType = model.SerializeType;
             dbInter.Method = model.Method;
             dbInter.IsTransaction = model.IsTransaction;
+            dbInter.ExecuteType = model.ExecuteType;
 
             //步骤
             dbInter.Steps = this.flowStepDAL.Query(SN);

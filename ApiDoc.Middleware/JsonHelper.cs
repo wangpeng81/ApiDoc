@@ -1,5 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;  
+﻿using ApiDoc.Models.Responses;
+using Newtonsoft.Json;
+using System;
+using System.Globalization;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace ApiDoc.Middleware
 {
@@ -13,6 +18,7 @@ namespace ApiDoc.Middleware
         /// <returns></returns>
         static public string SerializeJSON<T>(T data)
         {
+           
             return JsonConvert.SerializeObject(data);
         }
 
@@ -27,6 +33,12 @@ namespace ApiDoc.Middleware
             return JsonConvert.DeserializeObject<T>(json);
         }
 
+        static public object DeserializeJSON(string json)
+        {
+            return JsonConvert.DeserializeObject(json);
+        }
+
+       
         /// <summary>
         /// 日期转换为时间戳（时间戳单位秒）
         /// </summary>

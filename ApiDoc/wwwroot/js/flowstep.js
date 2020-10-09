@@ -24,6 +24,7 @@ function onStepClick(json) {
     selectFlowStep = json;
 }
 
+//弹出主信息窗口
 function btnShowFlowStep(FKSN) { 
 
     if (FKSN == 0) {
@@ -52,6 +53,7 @@ function btnShowFlowStep(FKSN) {
     $("#myStep").modal('show');
 }
 
+//保存主信息窗口
 function btnSaveFlowStep() {
 
     var vSN = $('#txtStepSN').val();
@@ -73,13 +75,14 @@ function btnSaveFlowStep() {
 
 }
 
-//------------------------------------删除
+//弹出删除步骤提示
 function btnShowFlowStepDelete() {
     if (selectFlowStep != null) {
         $("#myModalDelete").modal('show');
     }
 }
 
+//删除步骤
 function btnSaveFlowStepDelete() {
     if (selectFlowStep != null) {
         $.post(urlFlowStepDelete, selectFlowStep,
@@ -90,7 +93,7 @@ function btnSaveFlowStepDelete() {
     }
 }
 
-//--------------------------------------------------保存SQL
+//保存SQL
 function btnSaveCmdText(SN) {
 
     var cbx = $('#cbxCommandType');
@@ -107,7 +110,7 @@ function btnSaveCmdText(SN) {
         function (data) {
 
             if (data > 0) {
-                alert("保存成功!")
+                $('#mySuccess').toast('show');
             }
            
         });
