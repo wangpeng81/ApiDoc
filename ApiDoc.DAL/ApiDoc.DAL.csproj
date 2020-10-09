@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="log4net.AspNetCore" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="3.0.3" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ApiDoc.IDAL\ApiDoc.IDAL.csproj" />
+    <ProjectReference Include="..\ApiDoc.Models\ApiDoc.Models.csproj" />
+  </ItemGroup>
+
+</Project>

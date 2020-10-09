@@ -30,11 +30,18 @@
     <div class="row pr-0 mr-0 border-bottom">
 
         <!-- base info -->
-        <div class="col-9 pl-3 ">
+        <div class="col-9 pl-3">
             <div class="btn-toolbar mt-0 mb-2 " role="toolbar" aria-label="Toolbar with button groups">
                 <div class="btn-group btn-group-sm border-bottom" role="group" aria-label="First group">
-                    <button type="button" class="btn btn-info">基础信息</button>
+                    <button type="button" class="btn btn-info">基础操作</button>
                     <button type="button" class="btn btn-default" onclick="btnSave_Click()"><i class="fa fa-save"></i></button>
+
+                </div>
+                <div class="btn-group btn-group-sm border-bottom ml-2" role="group" aria-label="First group">
+                    <button type="button" class="btn btn-info">路由操作</button>
+                    <button type="button" class="btn btn-default" onclick="btnUpLoad_Click()"><i class="fa fa-upload"></i></button>
+                    <button type="button" class="btn btn-default" onclick="btnDownLoad_Click()"><i class="fa fa-trash-o"></i></button>
+                    <button type="button" class="btn btn-default" onclick="btnShow_CS_Click()"><i class="fa fa-link"></i></button>
                 </div>
             </div>
             <div class="input-group input-group-sm mb-3">
@@ -43,18 +50,29 @@
                 </div>
                 <input type="text" class="form-control" id="txtTitle" value="@Model.Title">
             </div>
+
+            <!-- Url -->
             <div class="input-group input-group-sm mb-3">
                 <div class="input-group-prepend">
                     <div class="input-group-text w-lab">Url</div>
                 </div>
-                <input type="text" class="form-control" id="txtUrl" value="@Model.Url">
+                @if (Model.Url == "")
+                {
+                    <input type="text" class="form-control" id="txtUrl" />
+                }
+                else
+                {
+                    <input type="text" class="form-control" id="txtUrl" value="@Model.Url" disabled="disabled" />
+                }
             </div>
+
+            <!-- 数据格式 -->
             <div class="input-group input-group-sm mb-3">
                 <div class="input-group-prepend">
-                    <div class="input-group-text w-lab">返回类型</div>
+                    <div class="input-group-text w-lab">数据格式</div>
                 </div>
-                <select class="custom-select mr-sm" id="cbxReturnType">
-                    @if (Model.ReturnType == "Json")
+                <select class="custom-select mr-sm" id="cbxSerializeType">
+                    @if (Model.SerializeType == "Json")
                     {
                         <option value="Json" selected>Json</option>
                         <option value="Xml">Xml</option>
@@ -65,9 +83,29 @@
                         <option value="Xml" selected>Xml</option>
                     }
                 </select>
-
-
             </div>
+
+            <!-- 结果集类型 -->
+            <div class="input-group input-group-sm mb-3">
+                <div class="input-group-prepend">
+                    <div class="input-group-text w-lab">结果集类型</div>
+                </div>
+                <select class="custom-select mr-sm" id="cbxExecuteType">
+                    @foreach (string value in (List<string>)ViewData["ExecuteType"])
+                    {
+                        if (Model.ExecuteType == value)
+                        {
+                            <option value="@value" selected>@value</option>
+                        }
+                        else
+                        {
+                            <option value="@value">@value</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <!-- 发送方法 -->
             <div class="input-group input-group-sm mb-3">
                 <div class="input-group-prepend">
                     <div class="input-group-text w-lab">发送方法</div>
@@ -85,6 +123,17 @@
                     }
 
                 </select>
+            </div>
+
+            <!-- 事物 -->
+            <div class="input-group input-group-sm mb-3">
+                <div class="input-group-prepend">
+                    <div class="input-group-text w-lab"></div>
+                </div>
+                <div class="custom-control custom-checkbox ml-1 col-auto">
+                    <input id="txtStepIsTransaction" type="checkbox" class="custom-control-input" checked="@Model.IsTransaction">
+                    <label class="custom-control-label" for="txtStepIsTransaction">事物</label>
+                </div>
             </div>
         </div>
 
@@ -112,8 +161,7 @@
             <button type="button" class="btn btn-default" onclick="btnShowFlowStepDelete()"><i class="fa fa-trash-o"></i></button>
         </div>
     </div>
-    <div id="myStepList" class="pr-3">
-        @*@await Html.PartialAsync("FlowStepList.cshtml");*@
+    <div id="myStepList" class="pr-3"> 
     </div>
 
 </div>
@@ -143,10 +191,6 @@
                     <div class="col-7">
                         <input type="number" class="form-control" id="txtStepOrder">
                     </div>
-                    <div class="custom-control custom-checkbox ml-1 col-auto">
-                        <input type="checkbox" class="custom-control-input" id="txtStepIsTransaction">
-                        <label class="custom-control-label" for="txtStepIsTransaction">事物</label>
-                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -157,20 +201,15 @@
     </div>
 </div>
 
+<!-- 删除提示 -->
 <div class="modal fade" id="myModalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">提示信息</h4>
-
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-
+                <h4 class="modal-title" id="myModalLabel">提示信息</h4> 
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> 
             </div>
-            <div class="modal-body">
-
-                请确认是否要删除
-
-            </div>
+            <div class="modal-body"> 请确认是否要删除 </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-close" aria-hidden="true"></span>关闭</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="btnSaveFlowStepDelete(@ViewData["FKSN"])"><span class="fa fa-save" aria-hidden="true"></span>确认</button>
@@ -179,11 +218,30 @@
     </div>
 </div>
 
+<!-- 测试 -->
+<div class="modal fade bd-example-modal-lg" id="myModalCS" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content"> 
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="txtInput">输入值:</label>
+                    <textarea id="txtInput" class="form-control bg-light" style="min-width: 90%" rows="5"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="txtResult">结果值:</label>
+                    <textarea id="txtResult" class="form-control bg-light" style="min-width: 90%" rows="5"></textarea>
+                </div> 
+            </div>
+            <div class="modal-footer"> 
+                <button type="button" class="btn btn-primary" onclick="btnSendCS()"><span class="fa fa-save" aria-hidden="true"></span>测试</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts
 {
     <script src="~/js/interface.js"></script>
-    <script src="~/js/flowstep.js"></script>
-    <script src="~/js/flowstep_action.js"></script>
+    <script src="~/js/flowstep.js"></script> 
 }
 

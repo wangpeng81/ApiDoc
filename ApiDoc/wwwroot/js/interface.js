@@ -1,5 +1,8 @@
 ﻿
 
+//import { data } from "jquery";
+
+
 function openwindow(url, name, iWidth, iHeight) {
     var url = "~/Interface/Index?"
     var name;                           //网页名称，可为空;
@@ -18,9 +21,12 @@ function btnSearch_Click(fksn)
 {
     var vTitle = $('#txtTitle').val();
     var vUrl = $('#txtUrl').val(); 
+    var url = urlRoot + "/Interface/Index?";
     window.location = url + "title=" + vTitle + "&Url=" + vUrl + "&FKSN=" + fksn;
 
 }
+
+//添加接口基础信息
 function btnAdd_Click(fksn) {
  
     //var nodeID = window.parent.genID(3);
@@ -45,13 +51,13 @@ function btnUpdate_Click() {
             //var tabItem = { id: nodeID, title: "修改接口", url: window.location + "/Interface/Add?SN=" + id };
 
             window.parent.showInterface(id,0);
-
-            //closableTab.addTab(tabItem);
+             
         }
     }
    
 }
 
+//删除步骤接口
 function btnDelete_Click() { 
 
     var model = $("#myModalDelete");
@@ -84,7 +90,7 @@ function DeleteHandler(fksn) {
     }
 }
 
-
+//选择步骤项
 function OnCollapse_Click(id)
 {
     //$(id).rotate({ animateTo: 180 });
@@ -101,21 +107,96 @@ function btnSave_Click() {
     var vSN = objSN.val();
     var vTitle = $("#txtTitle").val();
     var vUrl = $("#txtUrl").val();
-    var vReturnType = $("#cbxReturnType").val();
+    var vSerializeType = $("#cbxSerializeType").val();
     var vMethod = $("#cbxMethod").val();
     var vFKSN = $("#txtFKSN").val();
+    var vExecuteType = $("#cbxExecuteType").val();
+    var vIsTransaction = document.getElementById("txtStepIsTransaction").checked;
+
     $.post(urlInterfaceSave, {
         SN: vSN,
         Title: vTitle,
         Url: vUrl,
         Method: vMethod,
         FKSN: vFKSN,
-        ReturnType: vReturnType
+        SerializeType: vSerializeType,
+        IsTransaction: vIsTransaction,
+        ExecuteType: vExecuteType
     }, function (data) {
 
             $('#mySuccess').toast('show');
             $("#txtSN").val(data.sn);
     })
+}
+
+//上传接口到路由
+function btnUpLoad_Click() {
+
+    var SN = $("#txtSN").val();
+    var url = urlRouteUpLoad + "?SN=" + SN;
+    $.get(url, function (myResponse) {
+
+        if (myResponse.dataType == 0) {
+            //成功
+            alert("上传成功");
+        }
+        else {
+            alert( myResponse.exception );
+        }
+    });
+}
+
+//删除接口路由信息
+function btnDownLoad_Click() {
+ 
+    var vUrl = $("#txtUrl").val();
+    var url = urlRouteDelete + "?Url=" + vUrl;
+    $.get(url, function (myResponse) {
+
+        if (myResponse.dataType == 0) {
+            //成功
+            alert("删除成功");
+        }
+        else {
+            alert(myResponse.exception);
+        }
+    });
+
+}
+
+//弹出测试窗口
+function btnShow_CS_Click() {
+
+    $("#txtResult").val("");
+    var model = $("#myModalCS");
+    model.modal('show');
+        
+}
+
+//测试
+function btnSendCS() {
+
+    var url = window.location.protocol + "//" + window.location.host + $("#txtUrl").val();
+    var txtInput = $("#txtInput").val();
+    var txtResult = $("#txtResult");
+    var method = $("#cbxMethod").val();
+  
+    if (method == "Post") {
+       
+        var data = $.parseJSON(txtInput);
+        $.post(url, data, function (result) {
+            txtResult.val(result);
+        });
+
+    }
+    else if (method == "Get") {
+
+        url = url + "?" + txtInput;
+        $.get(url, function (result) {
+            txtResult.val(result);
+        });
+
+    }
 }
 
 $(function () {

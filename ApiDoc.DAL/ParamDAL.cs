@@ -1,4 +1,5 @@
-﻿using ApiDoc.DAL.Interface;
+﻿ 
+using ApiDoc.IDAL;
 using ApiDoc.Models;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,7 +12,7 @@ namespace ApiDoc.DAL
 {
     public class ParamDAL : BaseDAL, IParamDAL
     {
-        public ParamDAL(ILogger<BaseDAL> logger):base(logger)
+        public ParamDAL(ILogger<BaseDAL> logger, IDbHelper db) : base(logger, db)
         { 
 
         }
@@ -21,10 +22,9 @@ namespace ApiDoc.DAL
             List<ParamModel> list = new List<ParamModel>();
 
             try
-            {
-                DbHelper db = new DbHelper();
+            { 
                 string strSql = "select * from api_interface_param where FKSN=" + fksn.ToString() + " order by StepOrder";
-                DataTable dt = db.CreateSqlDataTable(strSql);
+                DataTable dt = db.FillTable(strSql);
 
                 foreach (DataRow dataRow in dt.Rows)
                 {

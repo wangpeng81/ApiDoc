@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ApiDoc.DAL.Interface
+namespace ApiDoc.IDAL
 {
-    public interface IParamDAL : IBaseDAL
+    public interface IFolderDAL : IBaseDAL
     {
-        List<ParamModel> Query(int fksn);
-
+        List<TreeViewItem> All();
     }
 }

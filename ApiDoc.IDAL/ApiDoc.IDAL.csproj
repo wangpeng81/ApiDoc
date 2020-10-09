@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ApiDoc.Models\ApiDoc.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Data.SqlClient">
+      <HintPath>..\ApiDoc\PackAges\System.Data.SqlClient.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

@@ -12,8 +12,11 @@ namespace ApiDoc.Models
     { 
         public string Title { get; set; }
         public string Url { get; set; }
-        public string Method { get; set; }
+        public string Method { get; set; } //Get,Post
         public int FKSN { get; set; } 
-        public string ReturnType { get; set; }  
+        public string SerializeType { get; set; }    // 数据格式:xml , json 
+        public string ExecuteType { get; set; } //结果集: Int, Scalar, DataSet
+        public bool IsTransaction { get; set; }
+
     }
 }

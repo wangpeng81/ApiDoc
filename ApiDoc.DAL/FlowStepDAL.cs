@@ -1,9 +1,11 @@
-﻿using ApiDoc.DAL.Interface;
+﻿ 
+using ApiDoc.IDAL;
 using ApiDoc.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,7 +13,7 @@ namespace ApiDoc.DAL
 {
     public class FlowStepDAL: BaseDAL, IFlowStepDAL
     { 
-        public FlowStepDAL(ILogger<BaseDAL> logger) : base(logger)
+        public FlowStepDAL(ILogger<BaseDAL> logger, IDbHelper db) : base(logger, db)
         {
 
         }
@@ -21,11 +23,10 @@ namespace ApiDoc.DAL
             List<FlowStepModel> list = new List<FlowStepModel>();
 
             try
-            {
-                DbHelper db = new DbHelper();
+            { 
                 string tableName = base.GetTable(typeof(FlowStepModel));
                 string strSql = string.Format("select * from {0} where FKSN= {1} order by StepOrder", tableName, fksn);
-                DataTable dt = db.CreateSqlDataTable(strSql);
+                DataTable dt = db.FillTable(strSql);
 
                 foreach (DataRow dataRow in dt.Rows)
                 {
@@ -48,8 +49,7 @@ namespace ApiDoc.DAL
                 if (CommandText == null)
                 {
                     CommandText = "";
-                }
-                DbHelper db = new DbHelper();
+                } 
                 string strSql = "update api_flow_step  set CommandType = @CommandType, CommandText =@CommandText where SN = @SN";
 
                 DbParameters p = new DbParameters();
@@ -69,13 +69,8 @@ namespace ApiDoc.DAL
 
         private FlowStepModel CreateObj(DataRow dataRow)
         {
-            FlowStepModel info = new FlowStepModel();
-            info.FKSN = int.Parse(dataRow["FKSN"].ToString());
-            info.SN = int.Parse(dataRow["SN"].ToString());
-            info.StepName = dataRow["StepName"].ToString();
-            info.StepOrder = int.Parse(dataRow["StepOrder"].ToString()); 
-            info.CommandText = dataRow["CommandText"].ToString();
-            info.CommandType = dataRow["CommandType"].ToString();
+            FlowStepModel info = new FlowStepModel(); 
+            base.CreateModel(info, dataRow);
             return info;
         }
     }

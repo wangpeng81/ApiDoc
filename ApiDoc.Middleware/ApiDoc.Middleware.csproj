@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ApiDoc.IDAL\ApiDoc.IDAL.csproj" />
+    <ProjectReference Include="..\ApiDoc.Models\ApiDoc.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\ApiDoc\PackAges\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SqlClient">
+      <HintPath>..\ApiDoc\PackAges\System.Data.SqlClient.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

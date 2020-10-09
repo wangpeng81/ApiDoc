@@ -1,10 +1,10 @@
-﻿  using System;
-  using System.Collections.Generic;
-  using System.Data;
-  using System.Data.SqlClient;
-  using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Text;
 
-namespace ApiDoc.DAL
+namespace ApiDoc.IDAL
 {
     public class DbParameters
     {
@@ -132,8 +132,7 @@ namespace ApiDoc.DAL
         public void Clear()
         {
             li.Clear();
-        } 
+        }
 
     }
 }
- 

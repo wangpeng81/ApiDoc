@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ApiDoc.DAL
+namespace ApiDoc.IDAL
 {
     public interface IBaseDAL
     {

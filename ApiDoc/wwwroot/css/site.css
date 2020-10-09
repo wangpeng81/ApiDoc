@@ -40,6 +40,11 @@ a .navbar-brand {
     background-color: var(--themecolor);
 }
 
+.theme-text-color {
+    color: var(--themecolor);
+}
+
+
 .absolute-left-58 {
     left: 0;
     top: 58px;

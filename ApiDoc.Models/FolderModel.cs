@@ -10,6 +10,7 @@ namespace ApiDoc.Models
     public class FolderModel : BaseModel
     { 
         public string FolderName { get; set; }
-        public int ParentSN { get; set; }  
+        public int ParentSN { get; set; }
+        public string RoutePath { get; set; } //路由路径
     }
 }

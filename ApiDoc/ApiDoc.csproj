@@ -12,6 +12,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="PackAges\Newtonsoft.Json.dll" />
+    <None Remove="PackAges\System.Data.SqlClient.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="PackAges\Newtonsoft.Json.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PackAges\System.Data.SqlClient.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="wwwroot\js\bootstrap.bundle.js.map" />
     <None Include="wwwroot\js\bootstrap.bundle.min.js.map" />
     <None Include="wwwroot\js\bootstrap.js.map" />
@@ -27,10 +41,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.0.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.0.1" />
     <PackageReference Include="log4net.AspNetCore" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="3.0.3" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ApiDoc.DAL\ApiDoc.DAL.csproj" />
+    <ProjectReference Include="..\ApiDoc.IDAL\ApiDoc.IDAL.csproj" />
+    <ProjectReference Include="..\ApiDoc.Middleware\ApiDoc.Middleware.csproj" />
+    <ProjectReference Include="..\ApiDoc.Models\ApiDoc.Models.csproj" />
   </ItemGroup>  
 
   <ItemGroup>

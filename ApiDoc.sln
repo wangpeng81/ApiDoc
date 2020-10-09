@@ -3,7 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30330.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiDoc", "ApiDoc\ApiDoc.csproj", "{A389BA23-363C-4C18-9700-BBACBC7A6368}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDoc", "ApiDoc\ApiDoc.csproj", "{A389BA23-363C-4C18-9700-BBACBC7A6368}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDoc.Models", "ApiDoc.Models\ApiDoc.Models.csproj", "{DE099733-F387-4DD5-B2FC-45A1455C2C7E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDoc.DAL", "ApiDoc.DAL\ApiDoc.DAL.csproj", "{897EB8E6-29F3-480D-A3D3-0222F9917C59}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDoc.Middleware", "ApiDoc.Middleware\ApiDoc.Middleware.csproj", "{C68FE59A-21DD-476C-99D2-5B6CA0ED2739}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDoc.IDAL", "ApiDoc.IDAL\ApiDoc.IDAL.csproj", "{25E575BF-DC4D-42E2-8FE4-5F29817F4513}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +23,22 @@ Global
 		{A389BA23-363C-4C18-9700-BBACBC7A6368}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A389BA23-363C-4C18-9700-BBACBC7A6368}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A389BA23-363C-4C18-9700-BBACBC7A6368}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE099733-F387-4DD5-B2FC-45A1455C2C7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE099733-F387-4DD5-B2FC-45A1455C2C7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE099733-F387-4DD5-B2FC-45A1455C2C7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE099733-F387-4DD5-B2FC-45A1455C2C7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{897EB8E6-29F3-480D-A3D3-0222F9917C59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{897EB8E6-29F3-480D-A3D3-0222F9917C59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{897EB8E6-29F3-480D-A3D3-0222F9917C59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{897EB8E6-29F3-480D-A3D3-0222F9917C59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C68FE59A-21DD-476C-99D2-5B6CA0ED2739}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C68FE59A-21DD-476C-99D2-5B6CA0ED2739}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C68FE59A-21DD-476C-99D2-5B6CA0ED2739}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C68FE59A-21DD-476C-99D2-5B6CA0ED2739}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25E575BF-DC4D-42E2-8FE4-5F29817F4513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25E575BF-DC4D-42E2-8FE4-5F29817F4513}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25E575BF-DC4D-42E2-8FE4-5F29817F4513}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25E575BF-DC4D-42E2-8FE4-5F29817F4513}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

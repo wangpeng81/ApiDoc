@@ -34,18 +34,19 @@ function btnShowFlowStep(FKSN) {
             $('#txtStepName').val(selectFlowStep.StepName);
             $('#txtStepFKSN').val(selectFlowStep.FKSN);
             $('#txtStepOrder').val(selectFlowStep.StepOrder); 
-            $('#txtStepIsTransaction').attr('checked', selectFlowStep.IsTransaction);
+            
         }
         else {
+            alert("请选择步骤数据");
             return;
         }
     }
-    else {
+    else { //添加
+
         $('#txtStepSN').val(0);
         $('#txtStepName').val(""); 
         $('#txtStepFKSN').val(FKSN);
-        $('#txtStepOrder').val(1);
-        $('#txtStepIsTransaction').attr('checked', true);
+        $('#txtStepOrder').val(1); 
     }
 
     $("#myStep").modal('show');
@@ -56,15 +57,13 @@ function btnSaveFlowStep() {
     var vSN = $('#txtStepSN').val();
     var vStepName = $('#txtStepName').val();
     var fksn = $('#txtStepFKSN').val();
-    var vStepOrder = $('#txtStepOrder').val();
-    var vIsTransaction = document.getElementById("txtStepIsTransaction").checked;
+    var vStepOrder = $('#txtStepOrder').val(); 
 
     var data = {
         SN: vSN,
         StepName: vStepName,
         FKSN: fksn,
-        StepOrder: vStepOrder,
-        IsTransaction: vIsTransaction
+        StepOrder: vStepOrder  
     };
     $.post(urlFlowStepSave, data ,
         function (data) {

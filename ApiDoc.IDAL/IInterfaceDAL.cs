@@ -2,7 +2,7 @@
 using ApiDoc.Models;
 using System.Collections.Generic;
 
-namespace ApiDoc.DAL
+namespace ApiDoc.IDAL
 {
     public interface IInterfaceDAL : IBaseDAL
     {

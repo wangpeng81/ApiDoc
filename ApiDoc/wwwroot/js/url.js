@@ -11,3 +11,6 @@ var urlFlowStepSave = urlRoot + "/Interface/StepSave";
 var urlFlowStepList = urlRoot + "/Interface/FlowStepList";
 var urlFlowStepDelete = urlRoot + "/Interface/DeleteFlowStep";
 var urlFlowStepSaveCmdText = urlRoot + "/Interface/SaveCmdText";
+
+var urlRouteUpLoad = urlRoot + "/RouteValue/UpLoad";
+var urlRouteDelete = urlRoot + "/RouteValue/Delete";

@@ -1,31 +1,30 @@
-﻿using ApiDoc.Models;
+﻿using ApiDoc.IDAL;
+using ApiDoc.Models;
 using ApiDoc.Models.Attributes;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ApiDoc.DAL
 {
-    public class BaseDAL : IBaseDAL 
+    public class BaseDAL : IBaseDAL
     {
         protected readonly ILogger<BaseDAL> _logger;
+        protected readonly IDbHelper db;
 
-        public BaseDAL(ILogger<BaseDAL> logger)
+        public BaseDAL(ILogger<BaseDAL> logger, IDbHelper db)
         {
             _logger = logger;
+            this.db = db;
         }
 
         public int Delete(BaseModel model)
         {
             string tableName = this.GetTabeName(model);
-            string cmdText = "delete from " + tableName + " where SN =" + model.SN.ToString();
-            DbHelper db = new DbHelper();
+            string cmdText = "delete from " + tableName + " where SN =" + model.SN.ToString(); 
             int iResult = db.ExecuteSql(cmdText);
             return iResult;
         }
@@ -36,9 +35,8 @@ namespace ApiDoc.DAL
             {
                 Type T = model.GetType();
                 string tableName = this.GetTabeName(model);
-                string cmdText = "select * from " + tableName + " where SN=" + model.SN.ToString();
-                DbHelper db = new DbHelper();
-                DataTable dt = db.CreateSqlDataTable(cmdText);
+                string cmdText = "select * from " + tableName + " where SN=" + model.SN.ToString(); 
+                DataTable dt = db.FillTable(cmdText);
                 if (dt.Rows.Count > 0)
                 {
                     DataRow dataRow = dt.Rows[0];
@@ -109,10 +107,8 @@ namespace ApiDoc.DAL
                     object value = pro.GetValue(model); 
                     paras.Add(pro.Name, value);
                 } 
-            }
-
-            DbHelper db = new DbHelper();
-            object result = db.CreateSqlScalar(sql.ToString(), paras);
+            } 
+            object result = db.ExecuteScalar(sql.ToString(), paras);
 
             int SN = int.Parse(result.ToString());
             return SN; 
@@ -154,10 +150,24 @@ namespace ApiDoc.DAL
             { 
                 object value = pro.GetValue(model);
                 paras.Add(pro.Name, value); 
-            }
-            DbHelper db = new DbHelper();
+            } 
             int iResult = db.ExecuteSql(sql.ToString(), paras);
             return iResult;
+        }
+
+        protected void CreateModel(BaseModel model, DataRow dataRow)
+        {
+            Type T = model.GetType(); 
+            PropertyInfo[] propertys = T.GetProperties();
+            DataTable dt = dataRow.Table;
+            foreach (PropertyInfo pro in propertys)
+            {
+                if (dt.Columns.Contains(pro.Name))
+                {
+                    object value = dataRow[pro.Name];
+                    pro.SetValue(model, value);
+                }
+            }
         }
  
         private string GetTabeName(BaseModel model)

@@ -13,12 +13,9 @@ namespace ApiDoc.Models
     { 
         public string StepName { get; set; }
         public int StepOrder { get; set; } 
-        public int FKSN { get; set; }
-        public bool IsTransaction { get; set; }
+        public int FKSN { get; set; }  
+        public string CommandText { get; set; } 
+        public string CommandType { get; set; } //执行语句的类型 Text,StoredProcedure 
 
-        public string CommandText { get; set; }
-
-        //执行语句的类型
-        public string CommandType { get; set; }
     }
 }

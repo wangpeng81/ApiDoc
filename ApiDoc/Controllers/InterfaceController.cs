@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using ApiDoc.BLL;
-using ApiDoc.DAL;
-using ApiDoc.DAL.Interface;
-using ApiDoc.Models;
-using Microsoft.AspNetCore.Components.Web;
+using System.Diagnostics; 
+using System.Threading.Tasks; 
+using ApiDoc.DAL; 
+using ApiDoc.IDAL;
+using ApiDoc.Middleware;
+using ApiDoc.Models; 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -17,17 +15,23 @@ namespace ApiDoc.Controllers
     {
         private readonly IInterfaceDAL infterfaceDAL;
         private readonly IFlowStepDAL flowStepDAL;
+        private readonly DBRouteValueDictionary routeDict;
 
-        public InterfaceController(IInterfaceDAL infterfaceDAL, IFlowStepDAL flowStepDAL)
+        public InterfaceController(IInterfaceDAL infterfaceDAL, 
+            IFlowStepDAL flowStepDAL, 
+            DBRouteValueDictionary _routeDict)
         {
             this.infterfaceDAL = infterfaceDAL;
             this.flowStepDAL = flowStepDAL;
+            this.routeDict = _routeDict;
         }
 
         public IActionResult Index(string title,string url, int fksn)
         { 
          
             ViewData.Add("FKSN", fksn);
+            ViewData.Add("keyTitle", title);
+            ViewData.Add("keyUrl", url);
 
             List<InterfaceModel> list = this.infterfaceDAL.All(title,url, fksn);
             return View(list);
@@ -35,6 +39,13 @@ namespace ApiDoc.Controllers
 
         public IActionResult Add(int FKSN, int SN)
         {
+            List<string> list = new List<string>();
+            list.Add("Int");
+            list.Add("Scalar");
+            list.Add("DataSet");
+
+            ViewData.Add("ExecuteType", list); //执行集合类型
+
             InterfaceModel model = new InterfaceModel();
             model.SN = SN;
             model.FKSN = FKSN;
@@ -65,18 +76,16 @@ namespace ApiDoc.Controllers
 
         [HttpPost]
         public InterfaceModel Save(InterfaceModel model)
-        {
-            
+        { 
             if (model.SN > 0)
-            {
-                this.infterfaceDAL.Update(model);
+            {  
+                this.infterfaceDAL.Update(model); 
             }
             else
             {
                 int SN = this.infterfaceDAL.Insert(model);
-                model.SN = SN;
-            }
-
+                model.SN = SN; 
+            } 
             return model;
         }
 
@@ -125,6 +134,8 @@ namespace ApiDoc.Controllers
         }
 
         #endregion
+
+        
     }
 }
 

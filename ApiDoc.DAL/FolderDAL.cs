@@ -1,4 +1,5 @@
-﻿using ApiDoc.Models;
+﻿using ApiDoc.IDAL;
+using ApiDoc.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace ApiDoc.DAL
 {
     public class FolderDAL : BaseDAL, IFolderDAL
     { 
-        public FolderDAL(ILogger<InterfaceDAL> logger):base(logger)
+        public FolderDAL(ILogger<BaseDAL> logger, IDbHelper db) :base(logger, db)
         {
           
         }
@@ -20,11 +21,9 @@ namespace ApiDoc.DAL
             List<TreeViewItem> list = new List<TreeViewItem>();
 
             try
-            {
-               
-                DbHelper db = new DbHelper();
+            { 
                 string strSql = "select SN,FolderName,ParentSN from api_folder";
-                DataTable dt = db.CreateSqlDataTable(strSql);
+                DataTable dt = db.FillTable(strSql);
 
                 DataRow[] rows = dt.Select("ParentSN=0");
                 if (rows.Length > 0)
@@ -38,8 +37,7 @@ namespace ApiDoc.DAL
                 }
             }
             catch (Exception ex)
-            {
-                _logger.LogError("DbCommand->FolderInfo=>Insert(s) 出错\r\n" + ex.Message);
+            { 
                 throw ex;
             }
             return list;
@@ -86,10 +84,9 @@ namespace ApiDoc.DAL
         }
 
         private void DeleteChildFolder(int SN)
-        {
-            DbHelper db = new DbHelper();
+        { 
             string strSql = "select SN,FolderName,ParentSN from api_folder";
-            DataTable dt = db.CreateSqlDataTable(strSql);
+            DataTable dt = db.FillTable(strSql);
         }
     }
 }
