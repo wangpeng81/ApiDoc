@@ -8,6 +8,6 @@ namespace ApiDoc.IDAL
 {
     public interface IFolderDAL : IBaseDAL
     {
-        List<TreeViewItem> All();
+        List<TreeViewItem> Query(string folderName);
     }
 }

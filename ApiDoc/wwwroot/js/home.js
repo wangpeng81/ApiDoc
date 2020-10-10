@@ -52,10 +52,15 @@ function showInterface(SN,fksn) {
     model.modal('show');
 }
 
- 
-$(function () {
+//查询
+function btnSearchFolder_Click() {
+    var txtQFolderName = $("#txtQFolderName").val();
+    var url = urlFolderAll + "?root=true&folderName=" + txtQFolderName; 
+    $.get(url, LoadTreeView);
+}
 
-   
+$(function () {
+     
     var url = urlFolderAll + "?root=true"; 
    
     $.get(url, LoadTreeView);

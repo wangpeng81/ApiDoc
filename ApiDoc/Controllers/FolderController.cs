@@ -39,7 +39,7 @@ namespace ApiDoc.Controllers
         }
 
         [HttpGet]
-        public List<TreeViewItem> All(bool root)
+        public List<TreeViewItem> All(bool root, string folderName)
         {
             List<TreeViewItem> list = new List<TreeViewItem>();
             if (root)
@@ -53,7 +53,7 @@ namespace ApiDoc.Controllers
                 tviRoot.nodes = rootlist;
                 list.Add(tviRoot);
 
-                List<TreeViewItem> listChild = this.folderDAL.All();
+                List<TreeViewItem> listChild = this.folderDAL.Query(folderName);
                 foreach (TreeViewItem tvi in listChild)
                 {
                     rootlist.Add(tvi);
@@ -61,7 +61,7 @@ namespace ApiDoc.Controllers
             }
             else
             {
-                list = this.folderDAL.All();
+                list = this.folderDAL.Query(folderName);
             }
             
             return list; 

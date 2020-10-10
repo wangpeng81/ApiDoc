@@ -16,13 +16,18 @@ namespace ApiDoc.DAL
           
         }
    
-        public List<TreeViewItem> All()
+        public List<TreeViewItem> Query(string folderName)
         {
             List<TreeViewItem> list = new List<TreeViewItem>();
 
             try
-            { 
-                string strSql = "select * from api_folder";
+            {
+                string strSql = "with temp as";
+                    strSql += "(select * from api_folder where FolderName like '%"+ folderName + "%' or RoutePath like '%"+ folderName + "%' ";
+                    strSql += "union all ";
+                strSql += "select b.* from temp a inner join api_folder b on b.SN = a.ParentSN ) ";
+                strSql += "select * from temp"; 
+
                 DataTable dt = db.FillTable(strSql);
 
                 DataRow[] rows = dt.Select("ParentSN=0");
