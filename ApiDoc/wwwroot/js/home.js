@@ -37,9 +37,10 @@ function LoadTreeView(result) {
 //添加+修改=接口
 function showInterface(SN,fksn) {
     var model = $("#myModalInterface");
-    var height = window.screen.availHeight;
-    model.find(".modal-body").height(height - 170);
-
+    var height = $(window).height();
+    var width = $(window).width();
+    model.find(".modal-content").height(height); 
+    model.find(".modal-content").width(width); 
     var iframe = $("#myIframe"); 
 
     if (SN > 0) {
