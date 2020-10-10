@@ -28,15 +28,19 @@ function CallBackHandler() {
     } 
 
     var txtFolderName = $("#txtFolderName").val(); 
-    var url = urlFolderSave + "?FolderName=" + txtFolderName + "&&";
+    var txtRoutePath = $("#txtRoutePath").val(); 
+
+    var url = urlFolderSave + "?FolderName=" + txtFolderName + "&";
 
     if (vDo == "add") {
-        url += "SN=0" + "&&ParentSN=" + sn ;
+        url += "SN=0" + "&ParentSN=" + sn ;
     }
     else if (vDo == "update") {
 
-        url += "SN=" + sn + "&&ParentSN=" + parentSN;
+        url += "SN=" + sn + "&ParentSN=" + parentSN;
     }
+
+    url += "&RoutePath=" + txtRoutePath;
 
     $.get(url, function (result) {
  
@@ -63,10 +67,11 @@ function btnUpdate() {
 
     vDo = "update";
 
-    var selectedNode = treeview.treeview('getSelected');
+    var selectedNodes = treeview.treeview('getSelected');
+    var selectedNode = selectedNodes[0];
+    $("#txtFolderName").val(selectedNode.data.folderName);
+    $("#txtRoutePath").val(selectedNode.data.routePath);
 
-    $("#txtFolderName").val(selectedNode[0].text);
-     
     $("#myModalAdd").modal('show'); 
      
 }

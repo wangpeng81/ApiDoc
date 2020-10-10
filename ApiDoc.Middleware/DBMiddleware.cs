@@ -134,8 +134,7 @@ namespace ApiDoc.Middleware
                     cmd.Parameters.Clear();
 
                     if (response.Method.ToLower() == "get")
-                    {
-                        //cmd.Parameters.AddWithValue("SN", 1);
+                    { 
                         foreach (string key in context.Request.Query.Keys)
                         {
                             StringValues value = new StringValues();

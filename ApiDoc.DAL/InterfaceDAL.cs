@@ -45,10 +45,20 @@ namespace ApiDoc.DAL
             List<InterfaceModel> list = new List<InterfaceModel>();
 
             try
-            { 
-                string strSql = "select * from api_interface where FKSN=" + fksn.ToString() 
-                             + " and title like '%" + title + "%'"
-                             + " and url like '%" + url + "%'";
+            {
+                string strSql = "with temp as( select * from api_folder where SN =" + fksn.ToString();
+                strSql += " union all ";
+                strSql += "select b.* from temp a inner join api_folder b on b.[ParentSN] = a.SN ) ";
+                strSql += "select b.* from api_interface b inner join temp c on c.SN = b.FKSN";
+                strSql += " and title like '%" + title + "%'";
+                strSql += " and url like '%" + url + "%'";
+
+                //所以数据
+                if (fksn == 0)
+                {
+                    strSql = "select * from api_interface"; 
+                }
+
                 DataTable dt = db.FillTable(strSql);
 
                 foreach (DataRow dataRow in dt.Rows)

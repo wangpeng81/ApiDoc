@@ -22,7 +22,7 @@ namespace ApiDoc.DAL
 
             try
             { 
-                string strSql = "select SN,FolderName,ParentSN from api_folder";
+                string strSql = "select * from api_folder";
                 DataTable dt = db.FillTable(strSql);
 
                 DataRow[] rows = dt.Select("ParentSN=0");
@@ -66,6 +66,7 @@ namespace ApiDoc.DAL
             info.SN = int.Parse(dataRow["SN"].ToString());
             info.ParentSN = int.Parse(dataRow["ParentSN"].ToString());
             info.FolderName = dataRow["FolderName"].ToString();
+            info.RoutePath = dataRow["RoutePath"].ToString();
 
             List<object> tags = new List<object>();
             foreach (DataColumn column in dataRow.Table.Columns)
@@ -73,9 +74,15 @@ namespace ApiDoc.DAL
                 tags.Add(dataRow[column.ColumnName]);
             }
 
+            string text = dataRow["FolderName"].ToString();
+            string RoutePath = dataRow["RoutePath"].ToString();
+            if (RoutePath != "")
+            {
+                text += "-" + RoutePath;
+            }
             TreeViewItem tvItem = new TreeViewItem()
             {
-                text = dataRow["FolderName"].ToString(),
+                text = text,
                 href = "",
                 data = info
             };
