@@ -2,7 +2,8 @@
 var selectFlowStep = null;
 
 $(function () {
-   
+
+    
     var fksn = $('#txtSN').val();
     var data = {  
         FKSN: fksn 
@@ -12,16 +13,34 @@ $(function () {
     $.post(urlFlowStepList, data,
         function (data) {
             $("#myStepList").html(data);
-
-            //加载方法数据
-            InitAction();
-
-        });
+             
+        }); 
 })
 
+
 //选择行
-function onStepClick(json) {
+function onStepSelect_Click(json) {
     selectFlowStep = json;
+}
+
+//选择步骤项
+function OnCollapse_Click(id, sn) {
+
+    $('#' + id).on('show.bs.collapse', function (event, data) {
+
+        var id = "myHis_" + sn;
+        var data = { FKSN: sn};
+
+        $.post(urlFlowStepHisList, data, function (result) {
+
+            $('#myHis_' + sn).html(result);
+
+        });
+        
+    });
+
+    $('#' + id).collapse('show', {data:1});
+
 }
 
 //弹出主信息窗口

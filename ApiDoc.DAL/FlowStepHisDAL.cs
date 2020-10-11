@@ -13,17 +13,17 @@ namespace ApiDoc.DAL
        
         public FlowStepHisDAL(ILogger<BaseDAL> logger, IDbHelper db) : base(logger, db)
         {
-            base.tableName = base.GetTable(typeof(FlowStepHis));
+            base.tableName = base.GetTable(typeof(FlowStepHisModel));
         }
 
-        public List<FlowStepHis> Query(int FKSN)
+        public List<FlowStepHisModel> Query(int FKSN)
         {
-            string cmdText = "select SN,FKSN,FileName,IsEnable from " + base.tableName + " where fksn=" + FKSN + " order by IsEnable desc";
+            string cmdText = "select SN,FKSN,FileName,IsEnable from " + base.tableName + " where fksn=" + FKSN + " order by IsEnable desc,DTime desc";
             DataTable dt = this.db.FillTable(cmdText);
-            List<FlowStepHis> list = new List<FlowStepHis>();
+            List<FlowStepHisModel> list = new List<FlowStepHisModel>();
             foreach (DataRow dataRow in dt.Rows)
             {
-                FlowStepHis model = new FlowStepHis();
+                FlowStepHisModel model = new FlowStepHisModel();
                 base.CreateModel(model, dataRow);
                 list.Add(model);
             }

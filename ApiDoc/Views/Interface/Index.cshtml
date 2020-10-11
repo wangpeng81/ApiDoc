@@ -33,6 +33,19 @@
     </style>
 }
 
+<div id="myDelete" class="toast position-fixed " role="alert" aria-live="assertive" aria-atomic="true" style="top:50%; left:50%; z-index:5;">
+    <div class="toast-body bg-warning text-white">
+        请选择要删除的数据
+    </div>
+</div>
+
+<div id="mySelect" class="toast position-fixed " role="alert" aria-live="assertive" aria-atomic="true" style="top:50%; left:50%; z-index:5;">
+    <div class="toast-body bg-warning text-white">
+        请选择要修改的数据
+    </div>
+</div>
+
+<input type="hidden" id="txtFKSN" value="@ViewData["FKSN"]" />
 
 <div class="container-fluid absolute-left w-width-180 border-right  p-3">
 
@@ -100,49 +113,36 @@
             </div>
         </div>
     </div>
-    @*<div class="card border-0">
-            <div class="card-header text-center well p-1">工具箱</div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item pl-2" onclick="btnShowAdd_Click(@ViewData["FKSN"])"><a class="card-link" href="#"><i class="fa fa-plus fa-fw"></i>&nbsp; 添加接口</a></li>
-                <li class="list-group-item pl-2" onclick="btnShowUpdate_Click()"><a class="card-link" href="#"><i class="fa fa-pencil fa-fw"></i>&nbsp; 修改接口</a></li>
-                <li class="list-group-item pl-2" onclick="btnShowDeleteInter_Click(@ViewData["FKSN"])"><a class="card-link" href="#"><i class="fa fa-trash fa-fw"></i>&nbsp; 删除接口</a></li>
-            </ul>
-        </div>*@
     <div class="tool-title">工具箱</div>
     <div class="tool-items">
-        <div onclick="btnShowAdd_Click(@ViewData["FKSN"])" class="tool-item"><div class="fa fa-plus mr-3"></div>添加文件夹</div>
-        <div onclick="btnShowUpdate_Click()" class="tool-item"><div class="fa fa-edit mr-3"></div>修改文件夹</div>
-        <div onclick="btnShowDeleteInter_Click(@ViewData["FKSN"])" class="tool-item"><div class="fa fa-trash mr-3"></div>删除文件夹</div>
+        <div onclick="btnShowAdd_Click()" class="tool-item"><div class="fa fa-plus mr-3"></div>添加接口</div>
+        <div onclick="btnShowUpdate_Click()" class="tool-item"><div class="fa fa-edit mr-3"></div>修改接口</div>
+        <div onclick="btnShowDeleteInter_Click()" class="tool-item"><div class="fa fa-trash mr-3"></div>删除接口</div>
     </div>
 </div>
 
 
-<!-- 删除窗口 -->
+<!-- 接口删除窗口 -->
 <div class="modal fade" id="myModalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="myModalLabel">提示信息</h4>
-
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-
             </div>
-            <div class="modal-body">
-
-                请确认是否要删除
-
-            </div>
+            <div class="modal-body">请确认是否要删除</div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-close" aria-hidden="true"></span>关闭</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="btnSaveFlowStepDelete()"><span class="fa fa-save" aria-hidden="true"></span>确认</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="btnDeleteIntterface_Click()">确认</button>
             </div>
         </div>
     </div>
 </div>
- 
+
+
 @section Scripts
 {
-    <script src="~/js/interface.js"></script>
+    <script src="~/js/interface-list.js"></script>
 
 }
 

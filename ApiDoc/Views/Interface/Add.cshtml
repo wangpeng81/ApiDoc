@@ -25,6 +25,11 @@
         <div class="toast-body bg-success text-white">
             保存成功
         </div>
+    </div> 
+    <div id="myDelete" class="toast position-fixed " role="alert" aria-live="assertive" aria-atomic="true" style="top:50%; left:50%; z-index:5;">
+        <div class="toast-body bg-warning text-white">
+            请选择要删除的数据
+        </div>
     </div>
 
     <div class="row pr-0 mr-0 border-bottom">
@@ -56,7 +61,7 @@
                 <div class="input-group-prepend">
                     <div class="input-group-text w-lab">Url</div>
                 </div>
-                @if (Model.SN == 0 )
+                @if (Model.SN == 0)
                 {
                     <input type="text" class="form-control" id="txtUrl" value="@ViewData["FullPath"]" />
                 }
@@ -161,13 +166,13 @@
             <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="删除步骤" onclick="btnShowFlowStepDelete()"><i class="fa fa-trash-o"></i></button>
         </div>
     </div>
-    <div id="myStepList" class="pr-3"> 
+    <div id="myStepList" class="pr-3">
     </div>
 
 </div>
 
 
-<!-- 步骤 -->
+<!-- 步骤窗口 -->
 <div class="modal fade" id="myStep" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -201,13 +206,13 @@
     </div>
 </div>
 
-<!-- 删除提示 -->
+<!-- 步骤删除提示 -->
 <div class="modal fade" id="myModalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">提示信息</h4> 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> 
+                <h4 class="modal-title" id="myModalLabel">提示信息</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body"> 请确认是否要删除 </div>
             <div class="modal-footer">
@@ -221,7 +226,7 @@
 <!-- 测试 -->
 <div class="modal fade bd-example-modal-lg" id="myModalCS" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content"> 
+        <div class="modal-content">
             <div class="modal-body">
                 <div class="form-group">
                     <label for="txtInput">输入值:</label>
@@ -230,18 +235,66 @@
                 <div class="form-group">
                     <label for="txtResult">结果值:</label>
                     <textarea id="txtResult" class="form-control bg-light" style="min-width: 90%" rows="5"></textarea>
-                </div> 
+                </div>
             </div>
-            <div class="modal-footer"> 
+            <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="btnSendCS()">测试</button>
             </div>
         </div>
     </div>
 </div>
 
+
+<!-- 历史Sql窗口 -->
+<div class="modal fade" id="myStepHisModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">添加脚本</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <input id="txtStepHisSN" type="hidden" value="0" />
+            <input id="txtStepHisFKSN" type="hidden" value="0" />
+            <div class="modal-body">
+                <div class="form-group">
+                    <input type="file" class="form-control-file" id="txtFile" name="fileTrans">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="btnAddHis_Click()"><i class="fa fa-save"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 历史Sql删除窗口 -->
+<div class="modal fade" id="myHisModalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">提示信息</h4> 
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                请确认是否要删除
+                <input id="txtStepHisFKSN" type="hidden" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="btnDeleteStepHis_Click()">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 @section Scripts
 {
     <script src="~/js/interface.js"></script>
-    <script src="~/js/flowstep.js"></script> 
+    <script src="~/js/flowstep.js"></script>
+    <script src="~/js/flowstep-his.js"></script>
 }
 

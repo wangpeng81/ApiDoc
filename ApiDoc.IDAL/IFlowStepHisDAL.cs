@@ -7,6 +7,6 @@ namespace ApiDoc.IDAL
 {
     public interface IFlowStepHisDAL : IBaseDAL
     {
-        List<FlowStepHis> Query(int FKSN);
+        List<FlowStepHisModel> Query(int FKSN);
     }
 }

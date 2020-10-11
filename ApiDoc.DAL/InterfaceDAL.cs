@@ -57,7 +57,7 @@ namespace ApiDoc.DAL
                 //所以数据
                 if (fksn == 0)
                 {
-                    strSql = "select * from api_interface"; 
+                    strSql = "select * from api_interface where title like '%" + title + "%'" + " and url like '%" + url + "%'"; 
                 }
 
                 DataTable dt = db.FillTable(strSql);

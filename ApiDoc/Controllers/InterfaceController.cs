@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics; 
+using System.Diagnostics;
+using System.Text;
+using System.Text.Unicode;
 using System.Threading.Tasks; 
 using ApiDoc.DAL; 
 using ApiDoc.IDAL;
@@ -17,14 +19,17 @@ namespace ApiDoc.Controllers
     {
         private readonly IInterfaceDAL infterfaceDAL;
         private readonly IFlowStepDAL flowStepDAL;
+        private readonly IFlowStepHisDAL flowStepHisDAL;
         private readonly DBRouteValueDictionary routeDict;
 
         public InterfaceController(IInterfaceDAL infterfaceDAL, 
-            IFlowStepDAL flowStepDAL, 
+            IFlowStepDAL flowStepDAL,
+            IFlowStepHisDAL flowStepHisDAL,
             DBRouteValueDictionary _routeDict)
         {
             this.infterfaceDAL = infterfaceDAL;
             this.flowStepDAL = flowStepDAL;
+            this.flowStepHisDAL = flowStepHisDAL;
             this.routeDict = _routeDict;
         } 
 
@@ -41,10 +46,9 @@ namespace ApiDoc.Controllers
         public IActionResult Add(int FKSN, int SN)
         {
             List<string> list = new List<string>();
-            list.Add("Int");
-            list.Add("Scalar");
             list.Add("DataSet");
-
+            list.Add("Int");
+            list.Add("Scalar"); 
             ViewData.Add("ExecuteType", list); //执行集合类型
            
 
@@ -139,7 +143,51 @@ namespace ApiDoc.Controllers
 
         #endregion
 
-        
+
+        #region 历史His
+
+        [HttpPost]
+        public IActionResult StepHisList(int FKSN)
+        {
+            ViewData.Add("FKSN", FKSN);
+
+            List<FlowStepHisModel> list = this.flowStepHisDAL.Query(FKSN);
+            return PartialView("/Views/Interface/FlowStepHisList.cshtml", list);
+        }
+
+        [HttpPost]
+        public IActionResult StepHisAdd(FlowStepHisModel model)
+        {
+            model.DTime = System.DateTime.Now;
+            this.flowStepHisDAL.Insert(model);
+
+            List<FlowStepHisModel> list = this.flowStepHisDAL.Query(model.FKSN);
+            return PartialView("/Views/Interface/FlowStepHisList.cshtml", list);
+        }
+
+        [HttpPost]
+        public IActionResult StepHisDelete(List<int> ids, int FKSN)
+        {
+            foreach (int SN in ids)
+            {
+                FlowStepHisModel model = new FlowStepHisModel();
+                model.SN = SN;
+                int i = this.flowStepHisDAL.Delete(model); 
+            }
+          
+            List<FlowStepHisModel> list = this.flowStepHisDAL.Query(FKSN);
+            return PartialView("/Views/Interface/FlowStepHisList.cshtml", list);
+        }
+
+        [HttpPost]
+        public int RunProcSql(List<int> ids)
+        {
+
+            return 0;
+        }
+
+        #endregion
+
     }
 }
 
