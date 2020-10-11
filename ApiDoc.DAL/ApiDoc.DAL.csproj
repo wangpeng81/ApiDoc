@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ApiDoc.IDAL\ApiDoc.IDAL.csproj" />
     <ProjectReference Include="..\ApiDoc.Models\ApiDoc.Models.csproj" />
+    <ProjectReference Include="..\ApiDoc.Utility\ApiDoc.Utility.csproj" />
   </ItemGroup>
 
 </Project>

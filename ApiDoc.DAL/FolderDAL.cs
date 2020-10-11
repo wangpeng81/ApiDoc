@@ -13,13 +13,12 @@ namespace ApiDoc.DAL
     { 
         public FolderDAL(ILogger<BaseDAL> logger, IDbHelper db) :base(logger, db)
         {
-          
+           
         }
    
         public List<TreeViewItem> Query(string folderName)
         {
-            List<TreeViewItem> list = new List<TreeViewItem>();
-
+            List<TreeViewItem> list = new List<TreeViewItem>(); 
             try
             {
                 string strSql = "with temp as";

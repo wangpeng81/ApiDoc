@@ -8,6 +8,6 @@ namespace ApiDoc.Models
     {
         [Identity(IsIdentity = true)]
         public int SN { get; set; }
-  
+ 
     }
 }

@@ -48,13 +48,14 @@ function CallBackHandler() {
 
         var tvNode = new Array();
         tvNode[0] = nodeID;
+        var vtext = result.folderName + "-" + result.routePath;
         if (vDo == "add") {
-            tvNode[1] = { node: { text: result.folderName, href: "", data: result } };
+            tvNode[1] = { node: { text: vtext, href: "", data: result } };
             treeview.treeview("addNode", tvNode);
         }
         else if (vDo == "update") {
 
-            tvNode[1] = { text: result.folderName, href: "", data: result };
+            tvNode[1] = { text: vtext, href: "", data: result };
             treeview.treeview("editNode", tvNode);
         }
  
@@ -174,6 +175,7 @@ $(function () {
             selectedIcon: 'fa fa-check',
             selectedBackColor: '#f8f9fa',
             selectedColor: '#8cbe00', 
+            backColor: "#f8f9fa",
             data: result 
         });
 

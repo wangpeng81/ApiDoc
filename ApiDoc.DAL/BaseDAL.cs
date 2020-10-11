@@ -8,13 +8,15 @@ using System.Data;
 using System.Reflection;
 using System.Text;
 
+
 namespace ApiDoc.DAL
 {
     public class BaseDAL : IBaseDAL
     {
+        protected string tableName = "";
         protected readonly ILogger<BaseDAL> _logger;
         protected readonly IDbHelper db;
-
+ 
         public BaseDAL(ILogger<BaseDAL> logger, IDbHelper db)
         {
             _logger = logger;

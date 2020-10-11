@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System; 
 using ApiDoc.IDAL;
 using ApiDoc.Middleware;
 using ApiDoc.Models;
-using Microsoft.AspNetCore.Http;
+using ApiDoc.Models.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiDoc.Controllers

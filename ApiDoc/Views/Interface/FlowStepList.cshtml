@@ -15,34 +15,45 @@
                     <input type="checkbox" class="custom-control-input" id="customCheck" name="example1" onchange=""
                            onclick="onStepClick({ SN: @flowStep.SN, StepName: '@flowStep.StepName', FKSN: @flowStep.FKSN, StepOrder: @flowStep.StepOrder})">
                     <label class="custom-control-label" for="customCheck"></label>
-                </div>
-
-                <div class="mx-3 text-primary"><i class="fa fa-file-code-o mr-1"></i></div>
+                </div> 
                 <div>@flowStep.StepName-@flowStep.StepOrder</div>
             </div>
             <div id="collapse_@flowStep.SN" class="collapse" aria-labelledby="heading_@flowStep.SN" data-parent="#accordion_@flowStep.SN">
-                <div class="container-fluid p-2 ">
-                    <div class="input-group input-group-sm bg-white mb-2">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text w-lab">执行类型</div>
+                <div class="container-fluid row no-gutters p-2 "> 
+                   
+                        <div class="col-10">
+                            <div class="input-group input-group-sm bg-white mb-2">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text w-lab">执行类型</div>
+                                </div>
+                                <select id="cbxCommandType" class="custom-select custom-select-sm ">
+                                    @if (flowStep.CommandType == "Text")
+                                    {
+                                        <option value="Text" selected="selected">Text</option>
+                                        <option value="StoredProcedure">StoredProcedure</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="Text">Text</option>
+                                        <option value="StoredProcedure" selected="selected">StoredProcedure</option>
+                                    }
+                                </select>
+                                <button class="btn btn-sm btn-default  ml-2" data-toggle="tooltip" data-placement="bottom" title="保存Sql" onclick="btnSaveCmdText(@flowStep.SN)"><i class="fa fa-save"></i></button>
+                            </div>
+                            <textarea id="txtCommandText" class="form-control bg-light " rows="10">@flowStep.CommandText</textarea>
                         </div>
-                        <select id="cbxCommandType" class="custom-select custom-select-sm " >
-                            @if (flowStep.CommandType == "Text")
-                            {
-                                <option value="Text" selected="selected">Text</option>
-                                <option value="StoredProcedure">StoredProcedure</option>
-                            }
-                            else
-                            {
-                                <option value="Text">Text</option>
-                                <option value="StoredProcedure" selected="selected">StoredProcedure</option>
-                            }
-                        </select>
-                        <button class="btn btn-sm btn-default  ml-2" onclick="btnSaveCmdText(@flowStep.SN)"><i class="fa fa-save"></i></button>
-                    </div>
-
-                    <textarea id="txtCommandText" class="form-control bg-light" style="min-width: 90%" rows="10" >@flowStep.CommandText</textarea>
-
+                       
+                        <div class="col-2 pl-2">
+                            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                                <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Second group">
+                                    <button type="button" class="btn btn-info">历史版本</button>
+                                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="添加" onclick=""><i class="fa fa-plus"></i></button> 
+                                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="删除" onclick=""><i class="fa fa-trash-o"></i></button>
+                                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="执行" onclick=""><i class="fa fa-code"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    
                 </div>
             </div>
         </div>

@@ -190,7 +190,8 @@ function btnSendCS() {
 
 $(function () {
     var option = { animation: true, delay: 1500 };
-    $('.toast').toast(option);
+    $('.toast').toast(option); 
+    $('[data-toggle="tooltip"]').tooltip()
 });
 
 

@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using ApiDoc.DAL; 
 using ApiDoc.IDAL;
 using ApiDoc.Middleware;
-using ApiDoc.Models; 
+using ApiDoc.Models;
+using ApiDoc.Utility.Filter;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace ApiDoc.Controllers
 {
+    [CustomExceptionFilterAttribute]
     public class InterfaceController : Controller
     {
         private readonly IInterfaceDAL infterfaceDAL;
@@ -24,11 +26,10 @@ namespace ApiDoc.Controllers
             this.infterfaceDAL = infterfaceDAL;
             this.flowStepDAL = flowStepDAL;
             this.routeDict = _routeDict;
-        }
+        } 
 
         public IActionResult Index(string title,string url, int fksn)
         { 
-         
             ViewData.Add("FKSN", fksn);
             ViewData.Add("keyTitle", title);
             ViewData.Add("keyUrl", url);
@@ -45,14 +46,17 @@ namespace ApiDoc.Controllers
             list.Add("DataSet");
 
             ViewData.Add("ExecuteType", list); //执行集合类型
+           
 
             InterfaceModel model = new InterfaceModel();
             model.SN = SN;
             model.FKSN = FKSN;
             if (SN > 0)
             {
-                model =(InterfaceModel)this.infterfaceDAL.Get(model);
+                model =(InterfaceModel)this.infterfaceDAL.Get(model);　
             }
+
+            ViewData.Add("FullPath", this.infterfaceDAL.FullPath(FKSN)); //虚拟路径全称
             return View(model);
         }
 

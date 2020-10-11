@@ -1,5 +1,6 @@
 ﻿using ApiDoc.IDAL;
 using ApiDoc.Models;
+using ApiDoc.Utility.Filter;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -9,13 +10,14 @@ using System.Threading.Tasks;
 
 namespace ApiDoc.DAL
 {
+    
     public class InterfaceDAL : BaseDAL, IInterfaceDAL
     {
         public InterfaceDAL(ILogger<BaseDAL> logger, IDbHelper db) :base(logger, db)
         {
              
         }
- 
+
         public List<InterfaceModel> All()
         {
             List<InterfaceModel> list = new List<InterfaceModel>();
@@ -23,14 +25,13 @@ namespace ApiDoc.DAL
             try
             {
                 string strSql = "select * from api_interface";
-                DataTable dt = db.FillTable(strSql); 
+                DataTable dt = db.FillTable(strSql);
                 foreach (DataRow dataRow in dt.Rows)
                 {
                     InterfaceModel info = new InterfaceModel();
                     base.CreateModel(info, dataRow);
                     list.Add(info);
                 }
-
             }
             catch (Exception ex)
             {
@@ -76,5 +77,40 @@ namespace ApiDoc.DAL
             }
             return list;
         }
+
+        public string FullPath(int fksn)
+        {
+            try
+            {
+                string strSql = "with temp as";
+                strSql += "(select * from api_folder where SN =" + fksn.ToString();
+                strSql += "union all ";
+                strSql += "select b.* from temp a inner join api_folder b on b.SN = a.ParentSN ) ";
+                strSql += "select * from temp";
+
+                DataTable dt = db.FillTable(strSql);
+
+                string path = "";
+                DataRow[] rows = dt.Select("ParentSN=0");
+                if (rows.Length > 0)
+                {
+                    while (rows.Length > 0)
+                    {
+                        DataRow dataRow = rows[0];
+                        path += "/" + dataRow["RoutePath"].ToString();
+
+                        string SN = dataRow["SN"].ToString();
+                        rows = dt.Select("ParentSN=" + SN);
+                    } 
+                }
+
+                return path;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+ 
     }
 }

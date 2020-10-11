@@ -8,6 +8,7 @@
 using System.Data.SqlClient;
 using ApiDoc.IDAL;
 using Microsoft.Extensions.Configuration;
+using ApiDoc.Utility.Filter;
 
 namespace ApiDoc.DAL
 {
@@ -188,18 +189,18 @@ namespace ApiDoc.DAL
                 throw new Exception(ex.Message);
             }
         }
-         
+
         private DataSet GetDataTable(SqlDataAdapter adapter)
         {
             try
-            {
+            { 
                 DataSet dt = new DataSet();
                 adapter.Fill(dt);
 
                 return dt;
             }
             catch (System.Exception ex)
-            { 
+            {
                 throw new Exception(ex.Message);
             }
             finally

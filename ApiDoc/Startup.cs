@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using ApiDoc.DAL; 
 using ApiDoc.Middleware;
+using ApiDoc.Utility.Filter;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

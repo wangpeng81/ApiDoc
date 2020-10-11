@@ -8,5 +8,8 @@ namespace ApiDoc.IDAL
     {
         List<InterfaceModel> All();
         List<InterfaceModel> All(string title, string url, int fksn);
+
+        string FullPath(int fksn);
+
     }
 }

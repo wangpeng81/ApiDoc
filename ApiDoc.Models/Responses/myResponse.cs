@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ApiDoc.Models
+namespace ApiDoc.Models.Responses
 {
     public class myResponse
     {

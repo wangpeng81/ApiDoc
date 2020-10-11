@@ -12,10 +12,12 @@ using System.Threading.Tasks;
 namespace ApiDoc.DAL
 {
     public class FlowStepDAL: BaseDAL, IFlowStepDAL
-    { 
+    {
+        private string tableName;
+
         public FlowStepDAL(ILogger<BaseDAL> logger, IDbHelper db) : base(logger, db)
         {
-
+            this.tableName = base.GetTable(typeof(FlowStepModel));
         }
  
         public List<FlowStepModel> Query(int fksn)
@@ -23,8 +25,7 @@ namespace ApiDoc.DAL
             List<FlowStepModel> list = new List<FlowStepModel>();
 
             try
-            { 
-                string tableName = base.GetTable(typeof(FlowStepModel));
+            {  
                 string strSql = string.Format("select * from {0} where FKSN= {1} order by StepOrder", tableName, fksn);
                 DataTable dt = db.FillTable(strSql);
 
@@ -50,7 +51,7 @@ namespace ApiDoc.DAL
                 {
                     CommandText = "";
                 } 
-                string strSql = "update api_flow_step  set CommandType = @CommandType, CommandText =@CommandText where SN = @SN";
+                string strSql = "update "+this.tableName+"  set CommandType = @CommandType, CommandText =@CommandText where SN = @SN";
 
                 DbParameters p = new DbParameters();
                 p.Add("SN", SN);
