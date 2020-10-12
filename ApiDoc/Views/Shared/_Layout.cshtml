@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using ApiDoc.Models.Components
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -20,13 +22,14 @@
         <div class="container w-240 no-gutters">
             <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                 <ul class="navbar-nav flex-grow-1">
+                    @foreach (NavItem item in (List<NavItem>)ViewData["Nav"])
+                    {
                     <li class="nav-item mr-3">
-                        <a class="nav-link" style="color:var(--themecolor); " asp-area="" asp-controller="Home" asp-action="Index"><i class="fa fa-home"></i>&nbsp;首页</a>
+                        <a class="nav-link" style="color:@item.ActiveColor;" asp-controller="@item.Controller" asp-action="Index">
+                            <i class="fa @item.Icon"></i>&nbsp;@item.Text</a>
                     </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link"  asp-area="" asp-controller="Folder" asp-action="Index"><i class="fa fa-folder"></i>&nbsp;目录</a>
-                    </li>
+                    }
+                    
                 </ul>
             </div>
         </div>

@@ -21,8 +21,8 @@ namespace ApiDoc.DAL
         private string dsn;
 
         public DbHelper(IConfiguration config)
-        {
-            string SqlConnStr = config.GetConnectionString("SqlConnStr");
+        { 
+            string SqlConnStr = config.GetConnectionString("ApiDocConnStr");
             this.dsn = SqlConnStr;
             this.connection = new SqlConnection(SqlConnStr);
             this.cmd = new SqlCommand();

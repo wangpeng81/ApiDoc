@@ -24,7 +24,23 @@
                     <div class="col-10">
                         <div class="input-group input-group-sm bg-white mb-2">
                             <div class="input-group-prepend">
-                                <div class="input-group-text w-lab">执行类型</div>
+                                <div class="input-group-text w-lab">数据库</div>
+                            </div>
+                            <select id="cbxDataBase" class="custom-select custom-select-sm ">
+                                @foreach (string dataBase in (string[])ViewData["DataBase"])
+                                {
+                                    if (flowStep.DataBase == @dataBase)
+                                    {
+                                        <option value="@dataBase" selected="selected">@dataBase</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@dataBase">@dataBase</option>
+                                    }
+                                }
+                            </select>
+                            <div class="input-group-prepend">
+                                <div class="input-group-text w-lab ml-2">执行类型</div>
                             </div>
                             <select id="cbxCommandType" class="custom-select custom-select-sm ">
                                 @if (flowStep.CommandType == "Text")
@@ -38,6 +54,7 @@
                                     <option value="StoredProcedure" selected="selected">StoredProcedure</option>
                                 }
                             </select>
+
                             <button class="btn btn-sm btn-default  ml-2" data-toggle="tooltip" data-placement="bottom" title="保存Sql" onclick="btnSaveCmdText(@flowStep.SN)"><i class="fa fa-save"></i></button>
                         </div>
                         <textarea id="txtCommandText" class="form-control bg-light " rows="10">@flowStep.CommandText</textarea>

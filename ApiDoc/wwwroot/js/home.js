@@ -24,10 +24,7 @@ function LoadTreeView(result) {
     treeview.on('nodeSelected', function (event, data) {
 
         selectedNode = data;
- 
-            //var tabItem = { id: data.nodeId, title: data.data.folderName, url: "Interface/Index?fksn=" + data.data.sn };
-
-            // closableTab.addTab(tabItem);
+  
             var iframe = $("#myIframeList"); 
             iframe.attr('src', urlRoot + '/Interface/Index?fksn=' + data.data.sn);
         

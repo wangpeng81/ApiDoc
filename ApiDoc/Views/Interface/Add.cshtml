@@ -25,7 +25,7 @@
         <div class="toast-body bg-success text-white">
             保存成功
         </div>
-    </div> 
+    </div>
     <div id="myDelete" class="toast position-fixed " role="alert" aria-live="assertive" aria-atomic="true" style="top:50%; left:50%; z-index:5;">
         <div class="toast-body bg-warning text-white">
             请选择要删除的数据
@@ -158,16 +158,19 @@
     </div>
 
     <!--Step -->
-    <div class="btn-toolbar my-2" role="toolbar" aria-label="Toolbar with button groups">
-        <div class="btn-group btn-group-sm mr-2" role="group" aria-label="Second group">
-            <button type="button" class="btn btn-info">接口步骤</button>
-            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="添加步骤" onclick="btnShowFlowStep(@Model.SN)"><i class="fa fa-plus"></i></button>
-            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="修改步骤" onclick="btnShowFlowStep(0)"><i class="fa fa-edit"></i></button>
-            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="删除步骤" onclick="btnShowFlowStepDelete()"><i class="fa fa-trash-o"></i></button>
+    @if (Model.SN > 0)
+    {
+        <div class="btn-toolbar my-2" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group btn-group-sm mr-2" role="group" aria-label="Second group">
+                <button type="button" class="btn btn-info">接口步骤</button>
+                <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="添加步骤" onclick="btnShowFlowStep(@Model.SN)"><i class="fa fa-plus"></i></button>
+                <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="修改步骤" onclick="btnShowFlowStep(0)"><i class="fa fa-edit"></i></button>
+                <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="删除步骤" onclick="btnShowFlowStepDelete()"><i class="fa fa-trash-o"></i></button>
+            </div>
         </div>
-    </div>
-    <div id="myStepList" class="pr-3">
-    </div>
+        <div id="myStepList" class="pr-3">
+        </div> 
+    }
 
 </div>
 

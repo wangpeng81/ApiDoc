@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ApiDoc.Controllers
 {
-    public class FolderController : Controller
+    public class FolderController : BaseController
     { 
         private readonly IFolderDAL folderDAL; 
         public FolderController(IFolderDAL folderDAL)
@@ -21,6 +21,7 @@ namespace ApiDoc.Controllers
 
         public IActionResult Index()
         {
+            ViewData["Nav"] = base.LoadNav("Folder");
             return View();
         }
 

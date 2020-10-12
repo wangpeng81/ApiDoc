@@ -27,6 +27,9 @@ namespace ApiDoc.Middleware
         private readonly DBRouteValueDictionary routeDict;
         private HttpContext context;
 
+        private string ServerIP = "";
+        private string pwd = "";
+
         public DBMiddleware(RequestDelegate _next, 
                             IInterfaceDAL interfaceDAL, 
                             IFlowStepDAL flowStpeDAL,
@@ -38,8 +41,10 @@ namespace ApiDoc.Middleware
             this.dbHelp = dbHelp;
             this.routeDict = _routeDict;
 
-            SqlConnStr = config.GetConnectionString("SqlConnStr");
-            
+            SqlConnStr = config.GetConnectionString("ApiDocConnStr");
+            this.ServerIP = config.GetConnectionString("ServerIP");
+            this.pwd = config.GetConnectionString("pwd");
+
             //加载路由集合
             List< InterfaceModel > dtInterface = interfaceDAL.All();
             foreach (InterfaceModel model in dtInterface)
@@ -67,107 +72,63 @@ namespace ApiDoc.Middleware
             if (this.routeDict.ContainsKey(path))
             {
                 await InvokeDB(context);
-            }
+            } 
             else
             {
                 await next(context); 
             } 
-        }
-
+        } 
         private async Task InvokeDB(HttpContext context)
         {
             this.context = context; 
 
             string path = context.Request.Path.ToString();
-            DBInterfaceModel response = this.routeDict[path];
+            DBInterfaceModel response = this.routeDict[path]; 
 
-            #region init
-
-            SqlConnection connection = new SqlConnection(SqlConnStr);
-            SqlCommand cmd = new SqlCommand();
-            cmd.CommandTimeout = 0;
-            cmd.Connection = connection;
-            SqlDataAdapter sqlDA = new SqlDataAdapter();
-            sqlDA.SelectCommand = cmd;
-
-            #endregion
-
-            SqlTransaction tran = null;
-
-            if (response.IsTransaction)
-            {
-                tran = connection.BeginTransaction();
-                cmd.Transaction = tran;
-            }
-
-            string excCmdText = ""; //存储异常的存储过程名
-
-            DataResult returnValue = new DataResult();
+            string exceMsg = ""; //存储异常的存储过程名  
             if (response.Steps.Count > 0)
             {
-                #region 执行步骤
-                foreach (FlowStepModel flow in response.Steps)
+                SqlConnection connection = new SqlConnection(SqlConnStr);
+                SqlTransaction tran = null;
+                try
                 {
-                    switch (flow.CommandType)
-                    {
-                        case "Text":
-                            cmd.CommandType = CommandType.Text;
-                            break;
-                        case "StoredProcedure":
-                            cmd.CommandType = CommandType.StoredProcedure;
-                            break;
-                    }
+                    connection.Open();
 
-                    if (excCmdText != "")
+                    if (response.IsTransaction)
                     {
-                        excCmdText += ",";
+                        tran = connection.BeginTransaction();
                     }
-                    excCmdText += flow.CommandText;
                      
-                    if (flow.CommandText == "")
-                    { 
-                        string msg1 = flow.StepName + " 没有数据库语句，请维护";
-                        await InvokeException(msg1);
+                    //执行第一步 
+                    string text = this.InvokeFistStep(response, connection, tran, out exceMsg);
+
+                    if (exceMsg != "")
+                    {
+                        tran.Rollback();
+                        await this.InvokeException(exceMsg);
                         return;
                     }
-                    cmd.CommandText = flow.CommandText;
-                    cmd.Parameters.Clear();
 
-                    if (response.Method.ToLower() == "get")
-                    { 
-                        foreach (string key in context.Request.Query.Keys)
-                        {
-                            StringValues value = new StringValues();
-                            bool value1 = context.Request.Query.TryGetValue(key, out value);
-                            cmd.Parameters.AddWithValue(key, value[0]);
-                        }
+                    if (response.IsTransaction)
+                    {
+                        tran.Commit();
                     }
-                    else if (response.Method.ToLower() == "post")
-                    {  
-                        try
-                        {
-                            var reader = new StreamReader(context.Request.Body);
-                            var contentFromBody = reader.ReadToEnd();
-                            if (contentFromBody != "")
-                            {
-                                Dictionary<string, object> dict = JsonHelper.DeserializeJSON<Dictionary<string, object>>(contentFromBody);
-                                foreach (KeyValuePair<string, object> kv in dict)
-                                {
-                                    cmd.Parameters.AddWithValue(kv.Key, kv.Value);
-                                }
-                            }
-                        }
-                        catch (System.Exception ex)
-                        { 
-                            throw ex;
-                        }
-                      
-                    }
+ 
+                    await context.Response.WriteAsync(text);
                 }
-                #endregion
+                catch (System.Exception ex)
+                {
+                    if (response.IsTransaction)
+                    {
+                        tran.Rollback();
+                    }
 
-                //执行语句　
-                await ExecSql(response, tran, sqlDA, cmd, excCmdText);　　
+                    await this.InvokeException(ex.Message);
+                }
+                finally
+                {
+                    connection.Close();
+                } 
             }
             else
             {
@@ -175,75 +136,189 @@ namespace ApiDoc.Middleware
             }
         }
 
-        private async Task ExecSql(DBInterfaceModel response, SqlTransaction tran, SqlDataAdapter sqlDA, SqlCommand cmd, string excCmdText)
+        private string InvokeFistStep(DBInterfaceModel response, SqlConnection connection, SqlTransaction tran, out string exceMsg)
         {
-            string json = "";
-            try
+            exceMsg = "";
+
+            FlowStepModel flow = response.Steps[0];
+            if (flow.CommandText == "")
             {
-                XmlHelper xmlHelp = new XmlHelper();
+                exceMsg = flow.StepName + " 没有数据库语句，请维护";
+                return "";
+            }
 
-                switch (response.ExecuteType)
+            connection.ChangeDatabase(flow.DataBase); 
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandTimeout = 0;
+            cmd.Connection = connection;
+            SqlDataAdapter sqlDA = new SqlDataAdapter();
+            sqlDA.SelectCommand = cmd;
+            cmd.Transaction = tran;
+             
+            //初始化参数
+            switch (flow.CommandType)
+            {
+                case "Text":
+                    cmd.CommandType = CommandType.Text;
+                    break;
+                case "StoredProcedure":
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    break;
+            }
+
+            cmd.CommandText = flow.CommandText;
+            cmd.Parameters.Clear();
+            if (response.Method.ToLower() == "get")
+            {
+                foreach (string key in context.Request.Query.Keys)
                 {
-                    case "Scalar":
-                        object obj = cmd.ExecuteScalar();
-                        //DataResult dataResult = new DataResult(); 
-                        //dataResult.Result = obj;
-                        if (response.SerializeType == "Xml")
-                        {
-                            json = xmlHelp.SerializeXML(obj);
-                        }
-                        else
-                        {
-                            json = JsonHelper.SerializeJSON(obj);
-                        } 
-                        break;
-                    case "Int":
-                        int iResult = cmd.ExecuteNonQuery();
-                        //IntDataResult intdataResult = new IntDataResult(); 
-                        //intdataResult.Result = iResult; 
-                        if (response.SerializeType == "Xml")
-                        {
-                            json = xmlHelp.SerializeXML(iResult);
-                        }
-                        else
-                        {
-                            json = JsonHelper.SerializeJSON(iResult); 
-                        }
-
-                        break;
-                    case "DataSet":
-                       
-                        DataSet ds = new DataSet();
-                        sqlDA.Fill(ds);
-                     
-                        if (response.SerializeType == "Xml")
-                        {
-                            XmlDSDataResult xmlResult = new XmlDSDataResult(); 
-                            json = xmlHelp.SerializeXML(ds);
-                        }
-                        else
-                        {
-                            //DSDataResult dsDataResult = new DSDataResult();
-                            //dsDataResult.Result = ds;
-                            json = JsonHelper.SerializeJSON(ds); 
-                        } 
-                        break;
+                    StringValues value = new StringValues();
+                    bool value1 = context.Request.Query.TryGetValue(key, out value);
+                    cmd.Parameters.AddWithValue(key, value[0]);
                 }
             }
-            catch (System.Exception ex)
-            {
-                string msg = excCmdText + ex.Message; 
-                await InvokeException(msg);
-                return ;
+            else if (response.Method.ToLower() == "post")
+            { 
+                var reader = new StreamReader(context.Request.Body);
+                var contentFromBody = reader.ReadToEnd();
+                if (contentFromBody != "")
+                {
+                    Dictionary<string, object> dict = JsonHelper.DeserializeJSON<Dictionary<string, object>>(contentFromBody);
+                    foreach (KeyValuePair<string, object> kv in dict)
+                    {
+                        cmd.Parameters.AddWithValue(kv.Key, kv.Value);
+                    }
+                }
             }
 
-            if (response.IsTransaction)
-            {
-                tran.Commit();
-            }
+            //执行Sql
+            string result = this.ExecSql(response, connection, sqlDA, cmd); 
+            this.InvokeOtherStep(response, connection, tran);
 
-            await context.Response.WriteAsync(json, UTF8Encoding.UTF8); 
+            return result;
         }
+ 
+        private string InvokeOtherStep(DBInterfaceModel response, SqlConnection connection, SqlTransaction tran)
+        {
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandTimeout = 0;
+            cmd.Connection = connection;
+            SqlDataAdapter sqlDA = new SqlDataAdapter();
+            sqlDA.SelectCommand = cmd;
+            cmd.Transaction = tran;
+
+            string exceMsg = "";
+            for (int i = 1; i < response.Steps.Count; i++)
+            {
+                FlowStepModel flow = response.Steps[i]; 
+                if (flow.CommandText == "")
+                {
+                    exceMsg = flow.StepName + " 没有数据库语句，请维护";
+                    return exceMsg;
+                }
+
+                connection.ChangeDatabase(flow.DataBase);
+                switch (flow.CommandType)
+                {
+                    case "Text":
+                        cmd.CommandType = CommandType.Text;
+                        break;
+                    case "StoredProcedure":
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        break;
+                }
+
+                cmd.CommandText = flow.CommandText;
+                cmd.Parameters.Clear();
+
+                if (response.Method.ToLower() == "get")
+                {
+                    foreach (string key in context.Request.Query.Keys)
+                    {
+                        StringValues value = new StringValues();
+                        bool value1 = context.Request.Query.TryGetValue(key, out value);
+                        cmd.Parameters.AddWithValue(key, value[0]);
+                    }
+                }
+                else if (response.Method.ToLower() == "post")
+                {
+                    try
+                    {
+                        var reader = new StreamReader(context.Request.Body);
+                        var contentFromBody = reader.ReadToEnd();
+                        if (contentFromBody != "")
+                        {
+                            Dictionary<string, object> dict = JsonHelper.DeserializeJSON<Dictionary<string, object>>(contentFromBody);
+                            foreach (KeyValuePair<string, object> kv in dict)
+                            {
+                                cmd.Parameters.AddWithValue(kv.Key, kv.Value);
+                            }
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        throw ex;
+                    }
+                }
+            }
+
+            return exceMsg;
+        }
+
+        private string ExecSql(DBInterfaceModel response, SqlConnection connection, SqlDataAdapter sqlDA, SqlCommand cmd)
+        {
+            string json = ""; 
+            XmlHelper xmlHelp = new XmlHelper();
+
+            switch (response.ExecuteType)
+            {
+                case "Scalar":
+                    object obj = cmd.ExecuteScalar();
+                    //DataResult dataResult = new DataResult(); 
+                    //dataResult.Result = obj;
+                    if (response.SerializeType == "Xml")
+                    {
+                        json = xmlHelp.SerializeXML(obj);
+                    }
+                    else
+                    {
+                        json = JsonHelper.SerializeJSON(obj);
+                    }
+                    break;
+                case "Int":
+                    int iResult = cmd.ExecuteNonQuery();
+                    //IntDataResult intdataResult = new IntDataResult(); 
+                    //intdataResult.Result = iResult; 
+                    if (response.SerializeType == "Xml")
+                    {
+                        json = xmlHelp.SerializeXML(iResult);
+                    }
+                    else
+                    {
+                        json = JsonHelper.SerializeJSON(iResult);
+                    }
+                    break;
+                case "DataSet":
+
+                    DataSet ds = new DataSet();
+                    sqlDA.Fill(ds);
+
+                    if (response.SerializeType == "Xml")
+                    {
+                        XmlDSDataResult xmlResult = new XmlDSDataResult();
+                        json = xmlHelp.SerializeXML(ds);
+                    }
+                    else
+                    {
+                        //DSDataResult dsDataResult = new DSDataResult();
+                        //dsDataResult.Result = ds;
+                        json = JsonHelper.SerializeJSON(ds);
+                    }
+                    break;
+            }
+            return json;
+        }
+
         private async Task InvokeException(string exception) {
 
             DataResult returnValue = new DataResult();
@@ -253,5 +328,6 @@ namespace ApiDoc.Middleware
             await this.context.Response.WriteAsync(json, UTF8Encoding.UTF8);
         }
  
+      
     }
 }

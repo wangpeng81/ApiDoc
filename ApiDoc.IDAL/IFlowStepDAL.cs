@@ -9,6 +9,6 @@ namespace ApiDoc.IDAL
     public interface IFlowStepDAL : IBaseDAL
     {
         List<FlowStepModel> Query(int fksn);
-        int SaveCmdText(int SN, string CommandType, string CommandText);
+        int SaveCmdText(int SN, string CommandType, string CommandText, string DataBase);
     }
 }

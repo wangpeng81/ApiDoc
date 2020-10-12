@@ -8,6 +8,7 @@ function btnAdd() {
     vDo = "add";
     
     $("#txtFolderName").val(""); 
+    $("#txtRoutePath").val(""); 
     $("#myModalAdd").modal('show');
 }
 

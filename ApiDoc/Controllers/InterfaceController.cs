@@ -10,6 +10,7 @@ using ApiDoc.Middleware;
 using ApiDoc.Models;
 using ApiDoc.Utility.Filter;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace ApiDoc.Controllers
@@ -21,16 +22,19 @@ namespace ApiDoc.Controllers
         private readonly IFlowStepDAL flowStepDAL;
         private readonly IFlowStepHisDAL flowStepHisDAL;
         private readonly DBRouteValueDictionary routeDict;
+        private readonly IConfiguration config;
 
         public InterfaceController(IInterfaceDAL infterfaceDAL, 
             IFlowStepDAL flowStepDAL,
             IFlowStepHisDAL flowStepHisDAL,
-            DBRouteValueDictionary _routeDict)
+            DBRouteValueDictionary _routeDict,
+            IConfiguration config)
         {
             this.infterfaceDAL = infterfaceDAL;
             this.flowStepDAL = flowStepDAL;
             this.flowStepHisDAL = flowStepHisDAL;
             this.routeDict = _routeDict;
+            this.config = config;
         } 
 
         public IActionResult Index(string title,string url, int fksn)
@@ -99,10 +103,16 @@ namespace ApiDoc.Controllers
 
         #region Step
 
-        public IActionResult FlowStepList(int FKSN)
+        private IActionResult Redist(int FKSN)
         {
-            List<FlowStepModel> list = this.flowStepDAL.Query(FKSN); 
+            string[] dataBase = this.config.GetSection("DataBase").Get<string[]>();
+            ViewData["DataBase"] = dataBase;
+            List<FlowStepModel> list = this.flowStepDAL.Query(FKSN);
             return PartialView("/Views/Interface/FlowStepList.cshtml", list);
+        }
+        public IActionResult FlowStepList(int FKSN)
+        {  
+            return this.Redist(FKSN); 
         }
 
         [HttpPost]
@@ -117,28 +127,20 @@ namespace ApiDoc.Controllers
                 int SN = this.flowStepDAL.Insert(model);
                 model.SN = SN;
             }
-
-            List<FlowStepModel> list = this.flowStepDAL.Query(model.FKSN); 
-            return PartialView("/Views/Interface/FlowStepList.cshtml", list);
+            return Redist(model.FKSN);
+             
         }
 
         public IActionResult DeleteFlowStep(FlowStepModel model)
         {
-            int resutl = this.flowStepDAL.Delete(model);
-
-            List<FlowStepModel> list = new List<FlowStepModel>();
-            if (resutl > 0)
-            {
-               list = this.flowStepDAL.Query(model.FKSN);
-            }
-         
-            return PartialView("/Views/Interface/FlowStepList.cshtml", list);
+            int resutl = this.flowStepDAL.Delete(model); 
+            return this.Redist(model.FKSN);
         }
 
         [HttpPost]
-        public int SaveCmdText(int SN, string CommandType, string CommandText)
+        public int SaveCmdText(int SN, string CommandType, string CommandText, string DataBase)
         {
-           return this.flowStepDAL.SaveCmdText(SN, CommandType, CommandText);
+           return this.flowStepDAL.SaveCmdText(SN, CommandType, CommandText, DataBase);
         }
 
         #endregion

@@ -9,7 +9,7 @@ using ApiDoc.Models;
 
 namespace ApiDoc.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
 
@@ -20,6 +20,8 @@ namespace ApiDoc.Controllers
 
         public IActionResult Index()
         {
+            ViewData["Nav"] = base.LoadNav("Home");
+
             return View();
         }
 

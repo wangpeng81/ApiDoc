@@ -4,6 +4,13 @@ $(function () {
     $('.toast').toast(option); 
 });
 
+function checkAll(sender, checkName) {
+
+    var objList = document.getElementsByName(checkName)
+    for (var i = 0; i < objList.length; i++) {
+        objList[i].checked = sender.checked;
+    }
+}
 
 function btnSearch_Click() {
     var fksn = $("#txtFKSN").val();

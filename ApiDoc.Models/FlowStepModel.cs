@@ -16,6 +16,6 @@ namespace ApiDoc.Models
         public int FKSN { get; set; }  
         public string CommandText { get; set; } 
         public string CommandType { get; set; } //执行语句的类型 Text,StoredProcedure 
-
+        public string DataBase { get; set; }    //数据库
     }
 }

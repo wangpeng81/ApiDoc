@@ -13,8 +13,7 @@ namespace ApiDoc.DAL
 {
     public class FlowStepDAL: BaseDAL, IFlowStepDAL
     {
-        private string tableName;
-
+     
         public FlowStepDAL(ILogger<BaseDAL> logger, IDbHelper db) : base(logger, db)
         {
             this.tableName = base.GetTable(typeof(FlowStepModel));
@@ -43,7 +42,7 @@ namespace ApiDoc.DAL
             return list;
         }
 
-        public int SaveCmdText(int SN, string CommandType, string CommandText)
+        public int SaveCmdText(int SN, string CommandType, string CommandText, string DataBase)
         {
             try
             {
@@ -51,12 +50,13 @@ namespace ApiDoc.DAL
                 {
                     CommandText = "";
                 } 
-                string strSql = "update "+this.tableName+"  set CommandType = @CommandType, CommandText =@CommandText where SN = @SN";
+                string strSql = "update "+this.tableName+ "  set CommandType = @CommandType, CommandText =@CommandText, [DataBase] = @DataBase where SN = @SN";
 
                 DbParameters p = new DbParameters();
                 p.Add("SN", SN);
                 p.Add("CommandType", CommandType);
                 p.Add("CommandText", CommandText);
+                p.Add("DataBase", DataBase);
                 int iResult = db.ExecuteSql(strSql, p);
                 return iResult;
             }

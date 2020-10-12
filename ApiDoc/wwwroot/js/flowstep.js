@@ -118,11 +118,12 @@ function btnSaveCmdText(SN) {
     var cbx = $('#cbxCommandType');
     var cmdType = $('#cbxCommandType').val();
     var cmdText = $('#txtCommandText').val();
- 
+    var cmdDataBase = $('#cbxDataBase').val();
     var data = {
-        SN: SN, 
+        SN: SN,
         CommandType: cmdType,
-        CommandText: cmdText
+        CommandText: cmdText,
+        DataBase: cmdDataBase
     };
 
     $.post(urlFlowStepSaveCmdText, data,
@@ -131,7 +132,7 @@ function btnSaveCmdText(SN) {
             if (data > 0) {
                 $('#mySuccess').toast('show');
             }
-           
+
         });
 }
  
