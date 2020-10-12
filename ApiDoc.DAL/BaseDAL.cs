@@ -136,7 +136,14 @@ namespace ApiDoc.DAL
                     {
                         sbColumns.Append(","); 
                     }
-                    sbColumns.Append(string.Format("{0} = @{0}", pro.Name)); 
+                    if (pro.Name == "DataBase")
+                    {
+                        sbColumns.Append(string.Format("[{0}] = @{0}", pro.Name));
+                    }
+                    else
+                    { 
+                        sbColumns.Append(string.Format("{0} = @{0}", pro.Name));
+                    }
                 }
                 else
                 {

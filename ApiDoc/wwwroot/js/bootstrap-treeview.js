@@ -763,10 +763,10 @@
 
 	Tree.prototype.template = {
 		list: '<ul class="list-group"></ul>',
-		item: '<li class="list-group-item px-0 py-1"></li>',
-		indent: '<span class="indent"></span>',
-		icon: '<span class="icon"></span>',
-		link: '<a href="#" style="color:inherit;" target="frame"></a>',
+		item: '<li class="list-group-item px-0 py-0 text-nowrap"></li>',
+		indent: '<span class="indent "></span>',
+		icon: '<span class="icon "></span>',
+		link: '<a href="#"  style="color:inherit;" target="frame"></a>',
 		badge: '<span class="badge"></span>'
 	};
 

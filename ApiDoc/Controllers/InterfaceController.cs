@@ -120,6 +120,12 @@ namespace ApiDoc.Controllers
         {
             if (model.SN > 0)
             {
+                FlowStepModel modelOld = new FlowStepModel();
+                modelOld.SN = model.SN; 
+                modelOld = (FlowStepModel)this.flowStepDAL.Get(modelOld);
+                model.CommandText = modelOld.CommandText;
+                model.CommandType = modelOld.CommandType;
+                model.DataBase = modelOld.DataBase;
                 this.flowStepDAL.Update(model);
             }
             else

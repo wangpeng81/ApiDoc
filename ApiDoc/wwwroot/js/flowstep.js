@@ -90,6 +90,7 @@ function btnSaveFlowStep() {
         function (data) {
             $("#myStep").modal('hide');
             $("#myStepList").html(data);
+            selectFlowStep = null;
         });
 
 }

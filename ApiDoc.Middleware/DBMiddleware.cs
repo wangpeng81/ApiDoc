@@ -29,7 +29,7 @@ namespace ApiDoc.Middleware
 
         private string ServerIP = "";
         private string pwd = "";
-
+       
         public DBMiddleware(RequestDelegate _next, 
                             IInterfaceDAL interfaceDAL, 
                             IFlowStepDAL flowStpeDAL,
@@ -44,7 +44,7 @@ namespace ApiDoc.Middleware
             SqlConnStr = config.GetConnectionString("ApiDocConnStr");
             this.ServerIP = config.GetConnectionString("ServerIP");
             this.pwd = config.GetConnectionString("pwd");
-
+ 
             //加载路由集合
             List< InterfaceModel > dtInterface = interfaceDAL.All();
             foreach (InterfaceModel model in dtInterface)
@@ -61,13 +61,19 @@ namespace ApiDoc.Middleware
 
                 routeDict.Add(Url, dbInter);
             }
+
+
         }
 
         public async Task Invoke(HttpContext context)
         {
             string path = context.Request.Path.ToString();
-
-            RouteValueDictionary routeValue = context.Request.RouteValues;
+            switch (path)
+            {
+                case "/CS":
+                    await context.Response.WriteAsync("欢迎浏览ApiDoc", Encoding.GetEncoding("GB2312"));
+                    return; 
+            }
 
             if (this.routeDict.ContainsKey(path))
             {
