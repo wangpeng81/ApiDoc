@@ -150,13 +150,13 @@
             <div class="btn-toolbar w-100" role="toolbar" aria-label="Toolbar with button groups">
                 <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Second group">
                     <button type="button" class="btn btn-info">参数</button>
-                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="添加参数" onclick=""><i class="fa fa-plus"></i></button>
+                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="添加参数" onclick="showParamAdd()"><i class="fa fa-plus"></i></button>
                     <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="修改参数" onclick=""><i class="fa fa-edit"></i></button>
                     <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="删除参数" onclick=""><i class="fa fa-trash-o"></i></button>
                     <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="刷新参数" onclick=""><i class="fa fa-refresh"></i></button>
                 </div>
             </div>
-            <div class="bg-light" style="height:calc(100% - 40px);"></div>
+            <div id="myParamList" class="bg-light" style="height:calc(100% - 40px);"></div>
         </div>
     </div>
 
@@ -172,7 +172,7 @@
             </div>
         </div>
         <div id="myStepList" class="pr-3">
-        </div> 
+        </div>
     }
 
 </div>
@@ -280,7 +280,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">提示信息</h4> 
+                <h4 class="modal-title" id="myModalLabel">提示信息</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
@@ -295,12 +295,73 @@
     </div>
 </div>
 
+<!-- 参数维护窗口 -->
+<div class="modal fade" id="myParamModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">维护参数</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <input id="txtParamSN" type="hidden" value="0" />
+            <div class="modal-body">
+                <div class="form-inline">
+                    <label for="txtParamName" class="col-3 col-form-label">参数名称</label>
+                    <div class="col-9">
+                        <input class="form-control" id="txtParamName">
+                    </div>
+                </div>
+                <div class="form-inline">
+                    <label for="txtParamRemark" class="col-3 col-form-label">参数描述</label>
+                    <div class="col-9">
+                        <input class="form-control" id="txtParamRemark">
+                    </div>
+                </div>
+                <div class="form-inline mt-1">
+                    <label for="cbxParamDataType" class="col-3 col-form-label">数据类型</label>
+                    <div class="col-9">
+                        <select class="custom-select mr-sm" id="cbxParamDataType">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-inline">
+                    <label for="txtParamDefault" class="col-3 col-form-label">默认值</label>
+                    <div class="col-9">
+                        <input class="form-control" id="txtParamDefault">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="btnAddHis_Click()"><i class="fa fa-save"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- 参数删除窗口 -->
+<div class="modal fade" id="myParamModalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">提示信息</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body"> 请确认是否要删除 </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="btnDeleteStepHis_Click()">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts
 {
     <script src="~/js/interface.js"></script>
     <script src="~/js/flowstep.js"></script>
     <script src="~/js/flowstep-his.js"></script>
+    <script src="~/js/interface-param.js"></script>
 }
 

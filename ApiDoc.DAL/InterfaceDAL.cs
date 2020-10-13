@@ -22,8 +22,8 @@ namespace ApiDoc.DAL
         {
             List<InterfaceModel> list = new List<InterfaceModel>();
 
-            try
-            {
+            //try
+            //{
                 string strSql = "select * from api_interface";
                 DataTable dt = db.FillTable(strSql);
                 foreach (DataRow dataRow in dt.Rows)
@@ -32,12 +32,12 @@ namespace ApiDoc.DAL
                     base.CreateModel(info, dataRow);
                     list.Add(info);
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("DbCommand->api_interface=>Insert(s) 出错\r\n" + ex.Message);
-                throw ex;
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.LogError("DbCommand->api_interface=>Insert(s) 出错\r\n" + ex.Message);
+            //    throw ex;
+            //}
             return list;
         }
 

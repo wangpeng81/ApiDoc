@@ -10,9 +10,9 @@ namespace ApiDoc.Models
     public class ParamModel : BaseModel
     {
         public string ParamName { get; set; }
-        public string ParamType { get; set; }
+        public string DataType { get; set; }
         public string DefaultValue { get; set; }
-        public string Description { get; set; }
+        public string Remark { get; set; }
         public int FKSN { get; set; }
     }
 }

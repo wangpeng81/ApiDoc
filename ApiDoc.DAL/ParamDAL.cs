@@ -13,8 +13,8 @@ namespace ApiDoc.DAL
     public class ParamDAL : BaseDAL, IParamDAL
     {
         public ParamDAL(ILogger<BaseDAL> logger, IDbHelper db) : base(logger, db)
-        { 
-
+        {
+            base.tableName = base.GetTable(typeof(ParamModel));
         }
 
         public List<ParamModel> Query(int fksn)
@@ -23,12 +23,14 @@ namespace ApiDoc.DAL
 
             try
             { 
-                string strSql = "select * from api_interface_param where FKSN=" + fksn.ToString() + " order by StepOrder";
+
+                string strSql = string.Format("select * from {0} where FKSN ={1}", base.tableName, fksn);
                 DataTable dt = db.FillTable(strSql);
 
                 foreach (DataRow dataRow in dt.Rows)
                 {
-                    ParamModel info = this.CreateObj(dataRow);
+                    ParamModel info = new ParamModel();
+                    base.CreateModel(info,dataRow);
                     list.Add(info);
                 }
             }
@@ -39,16 +41,6 @@ namespace ApiDoc.DAL
             }
             return list;
         }
-
-        private ParamModel CreateObj(DataRow dataRow)
-        {
-            ParamModel info = new ParamModel();
-            info.FKSN = int.Parse(dataRow["FKSN"].ToString());
-            info.SN = int.Parse(dataRow["SN"].ToString());
-            info.ParamName = dataRow["ParamName"].ToString();
-            info.ParamType = dataRow["ParamType"].ToString();
-            info.DefaultValue = dataRow["DefaultValue"].ToString();
-            return info;
-        }
+ 
     }
 }

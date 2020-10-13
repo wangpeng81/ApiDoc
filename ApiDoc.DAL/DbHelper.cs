@@ -192,25 +192,25 @@ namespace ApiDoc.DAL
 
         private DataSet GetDataTable(SqlDataAdapter adapter)
         {
-            try
-            { 
-                DataSet dt = new DataSet();
-                adapter.Fill(dt);
+            //try
+            //{ 
+            DataSet dt = new DataSet();
+            adapter.Fill(dt);
+            if (adapter.SelectCommand.Connection.State == ConnectionState.Open)
+            {
+                adapter.SelectCommand.Connection.Close();
+            }
+            adapter.Dispose();
+            return dt;
+            //}
+            //catch (System.Exception ex)
+            //{
+            //    throw new Exception(ex.Message);
+            //}
+            //finally
+            //{
 
-                return dt;
-            }
-            catch (System.Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-            finally
-            {
-                if (adapter.SelectCommand.Connection.State == ConnectionState.Open)
-                {
-                    adapter.SelectCommand.Connection.Close();
-                }
-                adapter.Dispose();
-            }
+            //}
         }
 
 

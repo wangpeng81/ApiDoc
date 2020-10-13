@@ -72,7 +72,10 @@ namespace ApiDoc.Middleware
             {
                 case "/CS":
                     await context.Response.WriteAsync("欢迎浏览ApiDoc", Encoding.GetEncoding("GB2312"));
-                    return; 
+                    return;
+                case "/CSDB":
+
+                    return;
             }
 
             if (this.routeDict.ContainsKey(path))

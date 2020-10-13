@@ -2,8 +2,10 @@
 using ApiDoc.Models;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Text;
 
 namespace ApiDoc.DAL
@@ -28,6 +30,11 @@ namespace ApiDoc.DAL
                 list.Add(model);
             }
             return list;
+        }
+ 
+        public int RunProcSql(List<int> ids)
+        {
+            return 0;
         }
     }
 }

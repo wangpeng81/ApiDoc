@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -22,18 +23,21 @@ namespace ApiDoc.Controllers
         private readonly IFlowStepDAL flowStepDAL;
         private readonly IFlowStepHisDAL flowStepHisDAL;
         private readonly DBRouteValueDictionary routeDict;
+        private readonly IParamDAL paramDAL;
         private readonly IConfiguration config;
 
         public InterfaceController(IInterfaceDAL infterfaceDAL, 
             IFlowStepDAL flowStepDAL,
             IFlowStepHisDAL flowStepHisDAL,
             DBRouteValueDictionary _routeDict,
+            IParamDAL paramDAL,
             IConfiguration config)
         {
             this.infterfaceDAL = infterfaceDAL;
             this.flowStepDAL = flowStepDAL;
             this.flowStepHisDAL = flowStepHisDAL;
             this.routeDict = _routeDict;
+            this.paramDAL = paramDAL;
             this.config = config;
         } 
 
@@ -151,7 +155,6 @@ namespace ApiDoc.Controllers
 
         #endregion
 
-
         #region 历史His
 
         [HttpPost]
@@ -194,6 +197,44 @@ namespace ApiDoc.Controllers
             return 0;
         }
 
+
+        #endregion
+
+        #region 参数
+
+        [HttpPost]
+        public IActionResult ParamList(int FKSN)
+        { 
+            List<ParamModel> list = this.paramDAL.Query(FKSN);
+            return PartialView("/Views/Interface/ParamList.cshtml", list);
+        }
+
+        [HttpPost]
+        public IActionResult ParamAdd(ParamModel model)
+        {
+            if (model.SN > 0)
+            {
+                this.paramDAL.Update(model);
+            }
+            else
+            { 
+                this.paramDAL.Insert(model);
+            }
+            return ParamList(model.FKSN);
+        }
+
+        [HttpPost]
+        public IActionResult ParamDelete(List<int> ids, int FKSN)
+        {
+            foreach (int SN in ids)
+            {
+                ParamModel model = new ParamModel();
+                model.SN = SN;
+                int i = this.paramDAL.Delete(model);
+            }
+
+            return ParamList(FKSN);
+        }
         #endregion
 
     }

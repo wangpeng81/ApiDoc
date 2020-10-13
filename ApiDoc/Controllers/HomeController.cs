@@ -16,10 +16,11 @@ namespace ApiDoc.Controllers
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
+          
         }
 
         public IActionResult Index()
-        {
+        { 
             ViewData["Nav"] = base.LoadNav("Home");
 
             return View();

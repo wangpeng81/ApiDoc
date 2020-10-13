@@ -4,6 +4,7 @@ using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace ApiDoc
 {
@@ -17,9 +18,17 @@ namespace ApiDoc
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args)
-        {
+        { 
             IHostBuilder hostBilder = Host.CreateDefaultBuilder(args); 
-            hostBilder
+            hostBilder.ConfigureLogging((context, loggingBuilder)=> {
+
+                loggingBuilder.ClearProviders();
+                loggingBuilder.AddLog4Net(new Log4NetProviderOptions()
+                {
+                    Log4NetConfigFileName = "log4net.config",
+                    Watch = true
+                });
+            })
             .UseServiceProviderFactory(new AutofacServiceProviderFactory())
             .ConfigureWebHostDefaults(webBuilder =>
             {

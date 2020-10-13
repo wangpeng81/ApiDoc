@@ -18,6 +18,10 @@ var urlFlowStepHisList = urlRoot + "/Interface/StepHisList";
 var urlFlowStepHisAdd = urlRoot + "/Interface/StepHisAdd";
 var urlFlowStepHisDelete = urlRoot + "/Interface/StepHisDelete";
 
+//参数 
+var urlParamList = urlRoot + "/Interface/ParamList";
+var urlParamAdd = urlRoot + "/Interface/ParamAdd";
+var urlParamDelete = urlRoot + "/Interface/ParamDelete";
 
 var urlRouteUpLoad = urlRoot + "/RouteValue/UpLoad";
 var urlRouteDelete = urlRoot + "/RouteValue/Delete";

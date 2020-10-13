@@ -5,6 +5,8 @@ using ApiDoc.DAL;
 using ApiDoc.Middleware;
 using ApiDoc.Utility.Filter;
 using Autofac;
+using log4net.Config;
+using log4net.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -18,10 +20,10 @@ using Microsoft.Extensions.PlatformAbstractions;
 namespace ApiDoc
 {
     public class Startup
-    {
+    { 
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            Configuration = configuration; 
         }
 
         public IConfiguration Configuration { get; }
@@ -31,6 +33,10 @@ namespace ApiDoc
         {
             services.AddControllersWithViews();
             services.AddSession();
+            services.AddMvc(options=> {
+                options.Filters.Add<CustomExceptionFilterAttribute>();
+
+            });
 
             // If using Kestrel:
             services.Configure<KestrelServerOptions>(options =>

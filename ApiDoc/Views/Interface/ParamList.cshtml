@@ -1,0 +1,31 @@
+﻿@model List<ApiDoc.Models.ParamModel>
+
+<table class="table table-sm m-0 p-0 no-gutters">
+    <thead>
+        <tr class="row no-gutters fs-14">
+            <th class="col-2  text-center">
+                <div class="custom-control custom-checkbox ml-1">
+                    <input type="checkbox" class="custom-control-input" name="chkHis" id="hisCheckAll" onchange="checkAll(this,'chkParam_')" />
+                    <label class="custom-control-label" for="hisCheckAll"></label>
+                </div>
+            </th>
+            <th class="col-10">参数名称</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var param in Model)
+        {
+            <tr class="row no-gutters fs-14">
+                <td class="col-2 text-center">
+                    <div class="custom-control custom-checkbox ml-1">
+                        <input type="checkbox" class="custom-control-input" id="custCheckParam_@param.SN" name="chkParam_" value="@param.SN">
+                        <label class="custom-control-label" for="custCheckParam_@param.SN"></label>
+                    </div>
+                </td>
+                <td class="col-10">
+                    @param.ParamName
+                </td>
+            </tr> 
+        }
+    </tbody>
+</table>
