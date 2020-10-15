@@ -23,7 +23,7 @@ function btnSaveIntterface_Click() {
         ExecuteType: vExecuteType
     }, function (data) {
 
-            $('#mySuccess').toast('show');
+            $('#myToastSuccess').toast('show');
             $("#txtSN").val(data.sn);
     })
 }

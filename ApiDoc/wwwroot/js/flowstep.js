@@ -23,7 +23,7 @@ function onStepSelect_Click(json) {
     selectFlowStep = json;
 }
 
-//选择步骤项
+//选择步骤项，加载历史sql数据
 function OnCollapse_Click(id, sn) {
 
     $('#' + id).on('show.bs.collapse', function (event, data) {
@@ -57,7 +57,7 @@ function btnShowFlowStep(FKSN) {
             
         }
         else {
-            alert("请选择步骤数据");
+            $('#myToastUpdate').toast("show"); 
             return;
         }
     }
@@ -99,6 +99,9 @@ function btnSaveFlowStep() {
 function btnShowFlowStepDelete() {
     if (selectFlowStep != null) {
         $("#myModalDelete").modal('show');
+    }
+    else {
+        $("#myToastDelete").toast('show'); 
     }
 }
 

@@ -106,7 +106,22 @@ namespace ApiDoc.DAL
                 //取得是否有自动增长的特性 
                 if (pro.Name != strIdentityName)
                 {
-                    object value = pro.GetValue(model); 
+                    object value = pro.GetValue(model);
+                    if (value == null)
+                    {
+                        if (pro.PropertyType.Name == nameof(System.String))
+                        {
+                            value = "";
+                        }
+                        else if (pro.PropertyType.Name == nameof(Int32))
+                        {
+                            value = 0;
+                        }
+                        else if (pro.PropertyType.Name == nameof(DateTime))
+                        {
+                            value = DateTime.Now; 
+                        }
+                    }
                     paras.Add(pro.Name, value);
                 } 
             } 

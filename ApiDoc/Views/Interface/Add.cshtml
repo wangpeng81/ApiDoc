@@ -16,24 +16,27 @@
     </style>
 }
 
-
+<!--message -->
+<div id="myToastUpdate" class="toast position-fixed " role="alert" aria-live="assertive" aria-atomic="true" style="top:50%; left:50%; z-index:5;">
+    <div class="toast-body bg-warning text-white">
+        请选择要修改的数据
+    </div>
+</div> 
+<div id="myToastSuccess" class="toast position-fixed " role="alert" aria-live="assertive" aria-atomic="true" style="top:50%; left:50%; z-index:5;">
+    <div class="toast-body bg-success text-white">
+        保存成功
+    </div>
+</div>
+<div id="myToastDelete" class="toast position-fixed " role="alert" aria-live="assertive" aria-atomic="true" style="top:50%; left:50%; z-index:5;">
+    <div class="toast-body bg-warning text-white">
+        请选择要删除的数据
+    </div>
+</div>
 
 <div class="container-fluid py-3 pr-0">
 
     <input type="hidden" id="txtSN" value="@Model.SN" />
     <input type="hidden" id="txtFKSN" value="@Model.FKSN" />
-
-    <!--message -->
-    <div id="mySuccess" class="toast position-fixed " role="alert" aria-live="assertive" aria-atomic="true" style="top:50%; left:50%; z-index:5;">
-        <div class="toast-body bg-success text-white">
-            保存成功
-        </div>
-    </div>
-    <div id="myDelete" class="toast position-fixed " role="alert" aria-live="assertive" aria-atomic="true" style="top:50%; left:50%; z-index:5;">
-        <div class="toast-body bg-warning text-white">
-            请选择要删除的数据
-        </div>
-    </div>
 
     <div class="row pr-0 mr-0 border-bottom">
 
@@ -150,13 +153,13 @@
             <div class="btn-toolbar w-100" role="toolbar" aria-label="Toolbar with button groups">
                 <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Second group">
                     <button type="button" class="btn btn-info">参数</button>
-                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="添加参数" onclick="showParamAdd()"><i class="fa fa-plus"></i></button>
-                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="修改参数" onclick=""><i class="fa fa-edit"></i></button>
-                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="删除参数" onclick=""><i class="fa fa-trash-o"></i></button>
-                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="刷新参数" onclick=""><i class="fa fa-refresh"></i></button>
+                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="添加参数" onclick="showParamWin(0)"><i class="fa fa-plus"></i></button>
+                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="修改参数" onclick="showParamWin(1)"><i class="fa fa-edit"></i></button>
+                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="删除参数" onclick="showDeleteModal()"><i class="fa fa-trash-o"></i></button>
+                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="刷新参数" onclick="btnSeachParam_Click()"><i class="fa fa-refresh"></i></button>
                 </div>
             </div>
-            <div id="myParamList" class="bg-light" style="height:calc(100% - 40px);"></div>
+            <div id="myParamList" class="bg-light overflow-auto" style="height:270px;"></div>
         </div>
     </div>
 
@@ -222,7 +225,7 @@
             </div>
             <div class="modal-body"> 请确认是否要删除 </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-close" aria-hidden="true"></span>关闭</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="btnSaveFlowStepDelete(@ViewData["FKSN"])"><span class="fa fa-save" aria-hidden="true"></span>确认</button>
             </div>
         </div>
@@ -288,7 +291,7 @@
                 <input id="txtStepHisFKSN" type="hidden" />
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="btnDeleteStepHis_Click()">确认</button>
             </div>
         </div>
@@ -307,26 +310,30 @@
             </div>
             <input id="txtParamSN" type="hidden" value="0" />
             <div class="modal-body">
-                <div class="form-inline">
+                <div class="form-group row">
                     <label for="txtParamName" class="col-3 col-form-label">参数名称</label>
                     <div class="col-9">
                         <input class="form-control" id="txtParamName">
                     </div>
                 </div>
-                <div class="form-inline">
+                <div class="form-group row">
                     <label for="txtParamRemark" class="col-3 col-form-label">参数描述</label>
                     <div class="col-9">
                         <input class="form-control" id="txtParamRemark">
                     </div>
                 </div>
-                <div class="form-inline mt-1">
+                <div class="form-group row">
                     <label for="cbxParamDataType" class="col-3 col-form-label">数据类型</label>
                     <div class="col-9">
                         <select class="custom-select mr-sm" id="cbxParamDataType">
+                              @foreach(string dataType in (List<string>)ViewData["DataType"])
+                              {
+                                  <option value="@dataType">@dataType</option>
+                              }
                         </select>
                     </div>
                 </div>
-                <div class="form-inline">
+                <div class="form-group row">
                     <label for="txtParamDefault" class="col-3 col-form-label">默认值</label>
                     <div class="col-9">
                         <input class="form-control" id="txtParamDefault">
@@ -334,7 +341,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="btnAddHis_Click()"><i class="fa fa-save"></i></button>
+                <button type="button" class="btn btn-primary" onclick="btnSaveParam_Click()"><i class="fa fa-save"></i></button>
             </div>
         </div>
     </div>
@@ -350,8 +357,8 @@
             </div>
             <div class="modal-body"> 请确认是否要删除 </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="btnDeleteStepHis_Click()">确认</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="btnDeleteParam_Click()">确认</button>
             </div>
         </div>
     </div>

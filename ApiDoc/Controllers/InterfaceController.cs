@@ -58,7 +58,15 @@ namespace ApiDoc.Controllers
             list.Add("Int");
             list.Add("Scalar"); 
             ViewData.Add("ExecuteType", list); //执行集合类型
-           
+             
+            //参数类型
+            List<string> DataType = new List<string>();
+            DataType.Add("varchar");
+            DataType.Add("int");
+            DataType.Add("datetime");
+            DataType.Add("float");
+            ViewData.Add("DataType", DataType);
+
 
             InterfaceModel model = new InterfaceModel();
             model.SN = SN;

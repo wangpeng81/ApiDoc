@@ -319,9 +319,16 @@ namespace ApiDoc.Middleware
                     }
                     else
                     {
-                        //DSDataResult dsDataResult = new DSDataResult();
-                        //dsDataResult.Result = ds;
+                        DSDataResult dsDataResult = new DSDataResult();
+                        dsDataResult.Result = ds;
                         json = JsonHelper.SerializeJSON(ds);
+
+                        //json = System.Text.Json.JsonSerializer.Serialize(
+                        //                value: ds,
+                        //                options: new System.Text.Json.JsonSerializerOptions
+                        //                {
+                        //                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                        //                });
                     }
                     break;
             }
