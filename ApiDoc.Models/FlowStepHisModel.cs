@@ -8,7 +8,7 @@ namespace ApiDoc.Models
     /// <summary>
     /// 步骤历史记录
     /// </summary>
-    [Table("api_flow_step_his")]
+   
     public class FlowStepHisModel : BaseModel
     {
         public int FKSN { get; set; }

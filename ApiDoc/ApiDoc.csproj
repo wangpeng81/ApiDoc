@@ -50,7 +50,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ApiDoc.BLL\ApiDoc.BLL.csproj" />
     <ProjectReference Include="..\ApiDoc.DAL\ApiDoc.DAL.csproj" />
+    <ProjectReference Include="..\ApiDoc.IBLL\ApiDoc.IBLL.csproj" />
     <ProjectReference Include="..\ApiDoc.IDAL\ApiDoc.IDAL.csproj" />
     <ProjectReference Include="..\ApiDoc.Middleware\ApiDoc.Middleware.csproj" />
     <ProjectReference Include="..\ApiDoc.Models\ApiDoc.Models.csproj" />

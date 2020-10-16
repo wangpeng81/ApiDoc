@@ -18,20 +18,21 @@ namespace ApiDoc
     {
         protected override void Load(ContainerBuilder builder)
         {
+            string[] dllFiles = new string[] { "ApiDoc.DAL.dll", "ApiDoc.BLL.dll" };
             var basePath = PlatformServices.Default.Application.ApplicationBasePath;
-            var businessDllFile = Path.Combine(basePath, "ApiDoc.DAL.dll");
-            var assemblysBusiness = Assembly.LoadFrom(businessDllFile);
-            builder.RegisterAssemblyTypes(assemblysBusiness)
-            .AsImplementedInterfaces()
-            .InstancePerDependency();
+            foreach(string file in dllFiles)
+            {
+                var businessDALFile = Path.Combine(basePath, file);
+                var assemblysBusiness = Assembly.LoadFrom(businessDALFile);
+                builder.RegisterAssemblyTypes(assemblysBusiness)
+                .AsImplementedInterfaces()
+                .InstancePerDependency();
+            } 
 
             //注册路由集合
             builder.RegisterType<DBRouteValueDictionary>().AsSelf().SingleInstance();
 
             //注册数据库
-            builder.RegisterType<SqlConnection>().As<IDbConnection>();
-            builder.RegisterType<SqlCommand>().As<IDbCommand>();
-            builder.RegisterType<SqlDataAdapter>().As<IDataAdapter>();
 
         }
     }

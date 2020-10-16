@@ -3,17 +3,19 @@ using ApiDoc.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ApiDoc.DAL
 {
+    [Table("api_folder")]
     public class FolderDAL : BaseDAL, IFolderDAL
     { 
         public FolderDAL(ILogger<BaseDAL> logger, IDbHelper db) :base(logger, db)
         {
-           
+            
         }
    
         public List<TreeViewItem> Query(string folderName)

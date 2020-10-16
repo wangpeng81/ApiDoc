@@ -4,6 +4,7 @@ using ApiDoc.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -11,12 +12,13 @@ using System.Threading.Tasks;
 
 namespace ApiDoc.DAL
 {
+    [Table("api_flow_step")]
     public class FlowStepDAL: BaseDAL, IFlowStepDAL
     {
      
         public FlowStepDAL(ILogger<BaseDAL> logger, IDbHelper db) : base(logger, db)
         {
-            this.tableName = base.GetTable(typeof(FlowStepModel));
+            
         }
  
         public List<FlowStepModel> Query(int fksn)
@@ -70,8 +72,7 @@ namespace ApiDoc.DAL
 
         private FlowStepModel CreateObj(DataRow dataRow)
         {
-            FlowStepModel info = new FlowStepModel(); 
-            base.CreateModel(info, dataRow);
+            FlowStepModel info = base.CreateModel<FlowStepModel>(dataRow); 
             return info;
         }
     }

@@ -9,11 +9,11 @@ function genID(length){
 function LoadTreeView(result) {
 
     treeview = $('#treeview7').treeview({
-        color: "#428bca",
+        color: "var(--gray)",
         showBorder: false,
         enableLinks: false,
         backColor: "#f8f9fa",
-        nodeIcon: 'zi zi_floderLine',
+        nodeIcon: '',
         selectedIcon: 'fa fa-check',
         selectedBackColor: '#f8f9fa',
         selectedColor: '#8cbe00', 

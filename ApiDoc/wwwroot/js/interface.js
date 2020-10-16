@@ -36,8 +36,9 @@ function btnUpLoad_Click() {
     $.get(url, function (myResponse) {
 
         if (myResponse.dataType == 0) {
-            //成功
-            alert("上传成功");
+            
+            $("#myToastUpLoad").toast("show");
+
         }
         else {
             alert( myResponse.exception );
@@ -66,6 +67,42 @@ function btnDownLoad_Click() {
 //弹出测试窗口
 function btnShow_CS_Click() {
 
+    var method = $("#cbxMethod").val();
+
+    var paraList = document.getElementsByName("chkParam_");
+    var csJson = ""; 
+    for (var i = 0; i < paraList.length; i++) { 
+        json = paraList[i].value;
+        json = eval("(" + json + ")"); 
+         
+        if (method == "Get") {
+            if (csJson != "") {
+                csJson += "&";
+            }
+            if (json.DataType == "varchar") {
+                csJson += json.ParamName + "= '" + json.DefaultValue + "'";
+            }
+            else if (json.DataType == "int") {
+                csJson += json.ParamName + "= " + json.DefaultValue;
+            }
+            else {
+                csJson += json.ParamName + "= '" + json.DefaultValue + "'";
+            }
+        }
+        else if (method == "Post") {
+            if (csJson != "") {
+                csJson += ",";
+            }
+            csJson += json.ParamName + ": '" + json.DefaultValue + "'"
+        }
+    }
+
+    if (method == "Post")
+    {
+        csJson = "{" + csJson + "}";
+    }
+
+    $("#txtInput").val(csJson); 
     $("#txtResult").val("");
     var model = $("#myModalCS");
     model.modal('show');
@@ -80,13 +117,8 @@ function btnSendCS() {
     var txtResult = $("#txtResult");
     var method = $("#cbxMethod").val();
   
-    if (method == "Post") {
-       
-        //var data = $.parseJSON(txtInput);
-        var vdata = txtInput;
-        //$.post(url, data, function (result) {
-        //    txtResult.val(result);
-        //});
+    if (method == "Post") { 
+        var vdata = txtInput; 
         $.ajax({
             url: url,
             type: "POST",

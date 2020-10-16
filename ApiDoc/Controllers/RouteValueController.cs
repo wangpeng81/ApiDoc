@@ -29,10 +29,8 @@ namespace ApiDoc.Controllers
         {
             myResponse res = new myResponse();
 
-            InterfaceModel model = new InterfaceModel();
-            model.SN = SN;
-            model = (InterfaceModel)this.infterfaceDAL.Get(model);
-
+            InterfaceModel model = this.infterfaceDAL.Get<InterfaceModel>(SN);
+          
             DBInterfaceModel dbInter = new DBInterfaceModel();
             dbInter.SerializeType = model.SerializeType;
             dbInter.Method = model.Method;

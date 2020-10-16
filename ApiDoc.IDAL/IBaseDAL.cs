@@ -12,6 +12,6 @@ namespace ApiDoc.IDAL
         int Update(BaseModel model);
         int Delete(BaseModel model);
 
-        BaseModel Get(BaseModel model);
+        T Get<T>(int SN) where T : class, new();
     }
 }

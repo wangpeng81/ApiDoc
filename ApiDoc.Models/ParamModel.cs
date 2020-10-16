@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ApiDoc.Models
 {
-    [Table("api_interface_param")]
+
     public class ParamModel : BaseModel
     {
         public int FKSN { get; set; }

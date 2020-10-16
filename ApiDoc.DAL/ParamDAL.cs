@@ -4,17 +4,19 @@ using ApiDoc.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ApiDoc.DAL
 {
+    [Table("api_interface_param")]
     public class ParamDAL : BaseDAL, IParamDAL
     {
         public ParamDAL(ILogger<BaseDAL> logger, IDbHelper db) : base(logger, db)
         {
-            base.tableName = base.GetTable(typeof(ParamModel));
+            
         }
 
         public List<ParamModel> Query(int fksn)
@@ -29,8 +31,7 @@ namespace ApiDoc.DAL
 
                 foreach (DataRow dataRow in dt.Rows)
                 {
-                    ParamModel info = new ParamModel();
-                    base.CreateModel(info,dataRow);
+                    ParamModel info =   base.CreateModel<ParamModel>(dataRow);  
                     list.Add(info);
                 }
             }

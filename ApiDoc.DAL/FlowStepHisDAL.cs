@@ -4,18 +4,20 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 
 namespace ApiDoc.DAL
 {
+    [Table("api_flow_step_his")]
     public class FlowStepHisDAL : BaseDAL, IFlowStepHisDAL
     {
        
         public FlowStepHisDAL(ILogger<BaseDAL> logger, IDbHelper db) : base(logger, db)
         {
-            base.tableName = base.GetTable(typeof(FlowStepHisModel));
+             
         }
 
         public List<FlowStepHisModel> Query(int FKSN)
@@ -25,8 +27,7 @@ namespace ApiDoc.DAL
             List<FlowStepHisModel> list = new List<FlowStepHisModel>();
             foreach (DataRow dataRow in dt.Rows)
             {
-                FlowStepHisModel model = new FlowStepHisModel();
-                base.CreateModel(model, dataRow);
+                FlowStepHisModel model = base.CreateModel<FlowStepHisModel>(dataRow); 
                 list.Add(model);
             }
             return list;

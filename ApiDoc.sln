@@ -13,7 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDoc.Middleware", "ApiDoc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDoc.IDAL", "ApiDoc.IDAL\ApiDoc.IDAL.csproj", "{25E575BF-DC4D-42E2-8FE4-5F29817F4513}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiDoc.Utility", "ApiDoc.Utility\ApiDoc.Utility.csproj", "{E0A475F4-BC62-4439-ACCA-25FEF7B58E63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDoc.Utility", "ApiDoc.Utility\ApiDoc.Utility.csproj", "{E0A475F4-BC62-4439-ACCA-25FEF7B58E63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiDoc.IBLL", "ApiDoc.IBLL\ApiDoc.IBLL.csproj", "{69DCA631-5251-4B1B-82A6-9FF16E74EFE7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiDoc.BLL", "ApiDoc.BLL\ApiDoc.BLL.csproj", "{EFB6981C-0C02-45D9-BE85-2CBBE4146F9E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +49,14 @@ Global
 		{E0A475F4-BC62-4439-ACCA-25FEF7B58E63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0A475F4-BC62-4439-ACCA-25FEF7B58E63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0A475F4-BC62-4439-ACCA-25FEF7B58E63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69DCA631-5251-4B1B-82A6-9FF16E74EFE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69DCA631-5251-4B1B-82A6-9FF16E74EFE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69DCA631-5251-4B1B-82A6-9FF16E74EFE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69DCA631-5251-4B1B-82A6-9FF16E74EFE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFB6981C-0C02-45D9-BE85-2CBBE4146F9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFB6981C-0C02-45D9-BE85-2CBBE4146F9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFB6981C-0C02-45D9-BE85-2CBBE4146F9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFB6981C-0C02-45D9-BE85-2CBBE4146F9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

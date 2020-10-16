@@ -5,7 +5,8 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Unicode;
 using System.Threading.Tasks; 
-using ApiDoc.DAL; 
+using ApiDoc.DAL;
+using ApiDoc.IBLL;
 using ApiDoc.IDAL;
 using ApiDoc.Middleware;
 using ApiDoc.Models;
@@ -24,6 +25,7 @@ namespace ApiDoc.Controllers
         private readonly IFlowStepHisDAL flowStepHisDAL;
         private readonly DBRouteValueDictionary routeDict;
         private readonly IParamDAL paramDAL;
+        private readonly IInterfaceBLL interfaceBLL;
         private readonly IConfiguration config;
 
         public InterfaceController(IInterfaceDAL infterfaceDAL, 
@@ -31,6 +33,7 @@ namespace ApiDoc.Controllers
             IFlowStepHisDAL flowStepHisDAL,
             DBRouteValueDictionary _routeDict,
             IParamDAL paramDAL,
+            IInterfaceBLL interfaceBLL,
             IConfiguration config)
         {
             this.infterfaceDAL = infterfaceDAL;
@@ -38,6 +41,7 @@ namespace ApiDoc.Controllers
             this.flowStepHisDAL = flowStepHisDAL;
             this.routeDict = _routeDict;
             this.paramDAL = paramDAL;
+            this.interfaceBLL = interfaceBLL;
             this.config = config;
         } 
 
@@ -73,7 +77,7 @@ namespace ApiDoc.Controllers
             model.FKSN = FKSN;
             if (SN > 0)
             {
-                model =(InterfaceModel)this.infterfaceDAL.Get(model);　
+                model = this.infterfaceDAL.Get<InterfaceModel>(SN);　
             }
 
             ViewData.Add("FullPath", this.infterfaceDAL.FullPath(FKSN)); //虚拟路径全称
@@ -100,16 +104,30 @@ namespace ApiDoc.Controllers
 
         [HttpPost]
         public InterfaceModel Save(InterfaceModel model)
-        { 
+        {
+            int SN = model.SN; 
             if (model.SN > 0)
-            {  
-                this.infterfaceDAL.Update(model); 
+            {
+                this.infterfaceDAL.Update(model);
             }
             else
             {
-                int SN = this.infterfaceDAL.Insert(model);
-                model.SN = SN; 
-            } 
+                SN = this.infterfaceDAL.Insert(model);
+                model.SN = SN;
+            }
+
+            //更新路由
+            DBInterfaceModel dbInter = this.interfaceBLL.GetInterfaceModel(SN); 
+            string url = model.Url;
+            if (this.routeDict.ContainsKey(url))
+            {
+                this.routeDict[url] = dbInter;
+            }
+            else
+            {
+                this.routeDict.Add(url, dbInter);
+            }
+
             return model;
         }
 
@@ -132,9 +150,7 @@ namespace ApiDoc.Controllers
         {
             if (model.SN > 0)
             {
-                FlowStepModel modelOld = new FlowStepModel();
-                modelOld.SN = model.SN; 
-                modelOld = (FlowStepModel)this.flowStepDAL.Get(modelOld);
+                FlowStepModel modelOld = this.flowStepDAL.Get< FlowStepModel>(model.SN);  
                 model.CommandText = modelOld.CommandText;
                 model.CommandType = modelOld.CommandType;
                 model.DataBase = modelOld.DataBase;

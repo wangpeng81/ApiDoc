@@ -4,40 +4,33 @@ using ApiDoc.Utility.Filter;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ApiDoc.DAL
 {
-    
+    [Table("api_interface")]
     public class InterfaceDAL : BaseDAL, IInterfaceDAL
     {
         public InterfaceDAL(ILogger<BaseDAL> logger, IDbHelper db) :base(logger, db)
         {
-             
+            
         }
 
         public List<InterfaceModel> All()
         {
             List<InterfaceModel> list = new List<InterfaceModel>();
+ 
+            string strSql = "select * from api_interface";
+            DataTable dt = db.FillTable(strSql);
+            foreach (DataRow dataRow in dt.Rows)
+            {
+                InterfaceModel info = base.CreateModel<InterfaceModel>(dataRow);
+                list.Add(info);
+            }
 
-            //try
-            //{
-                string strSql = "select * from api_interface";
-                DataTable dt = db.FillTable(strSql);
-                foreach (DataRow dataRow in dt.Rows)
-                {
-                    InterfaceModel info = new InterfaceModel();
-                    base.CreateModel(info, dataRow);
-                    list.Add(info);
-                }
-            //}
-            //catch (Exception ex)
-            //{
-            //    _logger.LogError("DbCommand->api_interface=>Insert(s) 出错\r\n" + ex.Message);
-            //    throw ex;
-            //}
             return list;
         }
 
@@ -64,8 +57,7 @@ namespace ApiDoc.DAL
 
                 foreach (DataRow dataRow in dt.Rows)
                 { 
-                    InterfaceModel info = new InterfaceModel();
-                    base.CreateModel(info, dataRow);
+                    InterfaceModel info = base.CreateModel<InterfaceModel>(dataRow); 
                     list.Add(info);
                 }
 

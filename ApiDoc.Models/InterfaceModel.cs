@@ -6,8 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace ApiDoc.Models
-{
-    [Table("api_interface")]
+{ 
     public class InterfaceModel : BaseModel
     { 
         public string Title { get; set; }

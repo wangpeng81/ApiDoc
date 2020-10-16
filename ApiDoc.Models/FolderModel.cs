@@ -6,7 +6,7 @@ using ApiDoc.Models.Attributes;
 
 namespace ApiDoc.Models
 {
-    [Table("api_folder")] 
+    
     public class FolderModel : BaseModel
     { 
         public string FolderName { get; set; }

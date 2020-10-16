@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ApiDoc.Models
 {
-    [Table("api_flow_step")]
+    
     public class FlowStepModel : BaseModel
     { 
         public string StepName { get; set; }

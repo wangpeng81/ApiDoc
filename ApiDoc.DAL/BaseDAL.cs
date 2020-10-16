@@ -21,28 +21,27 @@ namespace ApiDoc.DAL
         {
             _logger = logger;
             this.db = db;
+            this.GetTableName();
         }
 
         public int Delete(BaseModel model)
-        {
-            string tableName = this.GetTabeName(model);
+        { 
             string cmdText = "delete from " + tableName + " where SN =" + model.SN.ToString(); 
             int iResult = db.ExecuteSql(cmdText);
             return iResult;
         }
 
-        public BaseModel Get(BaseModel model)
+        public T Get<T>(int SN) where T: class, new ()
         {
-            if (model.SN > 0)
-            {
-                Type T = model.GetType();
-                string tableName = this.GetTabeName(model);
-                string cmdText = "select * from " + tableName + " where SN=" + model.SN.ToString(); 
+            T model = new T();
+            if (SN > 0)
+            {  
+                string cmdText = "select * from " + tableName + " where SN=" + SN.ToString(); 
                 DataTable dt = db.FillTable(cmdText);
                 if (dt.Rows.Count > 0)
                 {
-                    DataRow dataRow = dt.Rows[0];
-                    PropertyInfo[] propertys = T.GetProperties();
+                    DataRow dataRow = dt.Rows[0]; 
+                    PropertyInfo[] propertys = model.GetType().GetProperties();
                     foreach (PropertyInfo pro in propertys)
                     {
                         if (dt.Columns.Contains(pro.Name))
@@ -51,16 +50,14 @@ namespace ApiDoc.DAL
                             pro.SetValue(model, value);
                         }
                     }
-                }
-                return model;
+                } 
             }
-            return new BaseModel();
+            return model;
         }
 
         public int Insert(BaseModel model)
         {
-            Type T = model.GetType(); 
-            string tableName = this.GetTabeName(model); 
+            Type T = model.GetType();  
             StringBuilder sql = new StringBuilder("insert into ");
             sql.Append(tableName); 
             sql.Append(" (");
@@ -133,11 +130,9 @@ namespace ApiDoc.DAL
 
         public int Update(BaseModel model)
         {
-            Type T = model.GetType();
-            string tableName = this.GetTabeName(model);
+            Type T = model.GetType(); 
             StringBuilder sql = new StringBuilder("update " + tableName + " set ");
-            
-
+             
             string strIdentityName = "";
             PropertyInfo[] propertys = T.GetProperties();
             StringBuilder sbColumns = new StringBuilder(); 
@@ -179,32 +174,27 @@ namespace ApiDoc.DAL
             return iResult;
         }
 
-        protected void CreateModel(BaseModel model, DataRow dataRow)
+        protected T CreateModel<T>(DataRow dataRow) where T :class, new ()
         {
-            Type T = model.GetType(); 
-            PropertyInfo[] propertys = T.GetProperties();
+            T  obj = new T(); 
+            PropertyInfo[] propertys = obj.GetType().GetProperties();
             DataTable dt = dataRow.Table;
             foreach (PropertyInfo pro in propertys)
             {
                 if (dt.Columns.Contains(pro.Name))
                 {
                     object value = dataRow[pro.Name];
-                    pro.SetValue(model, value);
+                    pro.SetValue(obj, value);
                 }
             }
+            return obj;
         }
- 
-        private string GetTabeName(BaseModel model)
-        {
-            Type T = model.GetType();
-            TableAttribute tableAttribute = Attribute.GetCustomAttribute(T, typeof(TableAttribute)) as TableAttribute;
-            return tableAttribute.Name;
-        }
-
-        protected string GetTable(Type T)
+  
+        private void GetTableName()
         { 
-            TableAttribute tableAttribute = Attribute.GetCustomAttribute(T, typeof(TableAttribute)) as TableAttribute;
-            return tableAttribute.Name;
+            Type t = this.GetType(); 
+            TableAttribute tableAttribute = Attribute.GetCustomAttribute(t, typeof(TableAttribute)) as TableAttribute;
+            this.tableName = tableAttribute.Name;
         }
     }
 }
