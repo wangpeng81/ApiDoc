@@ -5,15 +5,18 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
-using System.Collections.Generic;
+using System.Collections.Generic; 
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.IO.Pipelines;
 using System.Net.Http;
 using System.Reflection;
-using System.Text;
+using System.Text;  
 using System.Threading.Tasks;
+
+using System;
+using Newtonsoft.Json;
 
 namespace ApiDoc.Middleware
 {
@@ -191,8 +194,8 @@ namespace ApiDoc.Middleware
                 var reader = new StreamReader(context.Request.Body);
                 var contentFromBody = reader.ReadToEnd();
                 if (contentFromBody != "")
-                {
-                    Dictionary<string, object> dict = JsonHelper.DeserializeJSON<Dictionary<string, object>>(contentFromBody);
+                { 
+                    Dictionary<string, object> dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(contentFromBody);
                     foreach (KeyValuePair<string, object> kv in dict)
                     {
                         cmd.Parameters.AddWithValue(kv.Key, kv.Value);
@@ -257,7 +260,7 @@ namespace ApiDoc.Middleware
                         var contentFromBody = reader.ReadToEnd();
                         if (contentFromBody != "")
                         {
-                            Dictionary<string, object> dict = JsonHelper.DeserializeJSON<Dictionary<string, object>>(contentFromBody);
+                            Dictionary<string, object> dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(contentFromBody);
                             foreach (KeyValuePair<string, object> kv in dict)
                             {
                                 cmd.Parameters.AddWithValue(kv.Key, kv.Value);
@@ -279,58 +282,30 @@ namespace ApiDoc.Middleware
             string json = ""; 
             XmlHelper xmlHelp = new XmlHelper();
 
+            object objResutl = new object();
             switch (response.ExecuteType)
             {
                 case "Scalar":
-                    object obj = cmd.ExecuteScalar();
-                    //DataResult dataResult = new DataResult(); 
-                    //dataResult.Result = obj;
-                    if (response.SerializeType == "Xml")
-                    {
-                        json = xmlHelp.SerializeXML(obj);
-                    }
-                    else
-                    {
-                        json = JsonHelper.SerializeJSON(obj);
-                    }
+                    objResutl = cmd.ExecuteScalar(); 
                     break;
                 case "Int":
-                    int iResult = cmd.ExecuteNonQuery();
-                    //IntDataResult intdataResult = new IntDataResult(); 
-                    //intdataResult.Result = iResult; 
-                    if (response.SerializeType == "Xml")
-                    {
-                        json = xmlHelp.SerializeXML(iResult);
-                    }
-                    else
-                    {
-                        json = JsonHelper.SerializeJSON(iResult);
-                    }
+                    objResutl = cmd.ExecuteNonQuery();  
                     break;
                 case "DataSet":
 
                     DataSet ds = new DataSet();
                     sqlDA.Fill(ds);
-
-                    if (response.SerializeType == "Xml")
-                    {
-                        XmlDSDataResult xmlResult = new XmlDSDataResult();
-                        json = xmlHelp.SerializeXML(ds);
-                    }
-                    else
-                    {
-                        DSDataResult dsDataResult = new DSDataResult();
-                        dsDataResult.Result = ds;
-                        json = JsonHelper.SerializeJSON(ds);
-
-                        //json = System.Text.Json.JsonSerializer.Serialize(
-                        //                value: ds,
-                        //                options: new System.Text.Json.JsonSerializerOptions
-                        //                {
-                        //                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                        //                });
-                    }
+                    objResutl = ds;
                     break;
+            }
+
+            if (response.SerializeType == "Xml")
+            {
+                json = xmlHelp.SerializeXML(objResutl);
+            }
+            else
+            { 
+                json = JsonConvert.SerializeObject(objResutl);
             }
             return json;
         }
@@ -340,10 +315,12 @@ namespace ApiDoc.Middleware
             DataResult returnValue = new DataResult();
             returnValue.DataType = 1;
             returnValue.Exception = exception;
-            string json = JsonHelper.SerializeJSON<DataResult>(returnValue);
+            string json = JsonConvert.SerializeObject(returnValue);   
             await this.context.Response.WriteAsync(json, UTF8Encoding.UTF8);
         }
  
       
     }
+
+     
 }

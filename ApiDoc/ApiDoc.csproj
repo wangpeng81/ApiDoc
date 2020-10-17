@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>b6f6948d-3a43-46b4-9299-a0d23b630f43</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,14 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="PackAges\Newtonsoft.Json.dll" />
     <None Remove="PackAges\System.Data.SqlClient.dll" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="PackAges\Newtonsoft.Json.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="PackAges\System.Data.SqlClient.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

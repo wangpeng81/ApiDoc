@@ -1,28 +1,29 @@
-﻿using ApiDoc.IDAL;
+﻿
+
+using ApiDoc.IDAL;
 using ApiDoc.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections;
+using Microsoft.SqlServer.Management.Common;
+using Microsoft.SqlServer.Management.Smo;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data;
-using System.Data.SqlClient;
-using System.Text;
+using System.Data; 
 
 namespace ApiDoc.DAL
 {
     [Table("api_flow_step_his")]
     public class FlowStepHisDAL : BaseDAL, IFlowStepHisDAL
-    {
-       
-        public FlowStepHisDAL(ILogger<BaseDAL> logger, IDbHelper db) : base(logger, db)
+    { 
+        public FlowStepHisDAL(ILogger<BaseDAL> logger, 
+            IDbHelper db) : base(logger, db)
         {
-             
+            
         }
 
         public List<FlowStepHisModel> Query(int FKSN)
         {
-            string cmdText = "select SN,FKSN,FileName,IsEnable from " + base.tableName + " where fksn=" + FKSN + " order by IsEnable desc,DTime desc";
+            string cmdText = "select * from " + base.tableName + " where fksn=" + FKSN + " order by IsEnable desc,DTime desc";
             DataTable dt = this.db.FillTable(cmdText);
             List<FlowStepHisModel> list = new List<FlowStepHisModel>();
             foreach (DataRow dataRow in dt.Rows)
@@ -32,10 +33,25 @@ namespace ApiDoc.DAL
             }
             return list;
         }
- 
-        public int RunProcSql(List<int> ids)
+
+        public int SmoExecute(string database, string text)
         {
-            return 0;
+            //https://www.cnblogs.com/long-gengyun/archive/2012/05/25/2517954.html
+            //http://www.smochen.com/detail?aid=1280 
+
+            string connectonstring =  this.db.Configuration.GetConnectionString("ApiDocConnStr");
+            Microsoft.Data.SqlClient.SqlConnection sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(connectonstring);
+            sqlConnection.Open();
+            sqlConnection.ChangeDatabase(database);
+             
+            ServerConnection server1 = new ServerConnection(sqlConnection);
+         
+            Microsoft.SqlServer.Management.Smo.Server server = new Microsoft.SqlServer.Management.Smo.Server(server1);
+            Microsoft.SqlServer.Management.Smo.Database db = server.Databases[database];
+  
+            int i = server.ConnectionContext.ExecuteNonQuery(text);
+            sqlConnection.Close();
+            return 1;
         }
     }
 }

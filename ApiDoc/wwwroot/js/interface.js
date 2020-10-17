@@ -143,7 +143,17 @@ function btnSendCS() {
     }
 }
 
+
+function checkAll(sender, checkName) {
+
+    var objList = document.getElementsByName(checkName)
+    for (var i = 0; i < objList.length; i++) {
+        objList[i].checked = sender.checked;
+    }
+}
+
 $(function () {
+ 
     var option = { animation: true, delay: 1500 };
     $('.toast').toast(option); 
     $('[data-toggle="tooltip"]').tooltip()

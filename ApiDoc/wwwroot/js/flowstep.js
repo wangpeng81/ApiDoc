@@ -2,8 +2,7 @@
 var selectFlowStep = null;
 
 $(function () {
-
-    
+     
     var fksn = $('#txtSN').val();
     var data = {  
         FKSN: fksn 

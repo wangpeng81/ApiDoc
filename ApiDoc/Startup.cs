@@ -33,10 +33,12 @@ namespace ApiDoc
         {
             services.AddControllersWithViews();
             services.AddSession();
-            services.AddMvc(options=> {
-                options.Filters.Add<CustomExceptionFilterAttribute>();
+ 
 
-            });
+            //services.AddMvc(options=> {
+            //    options.Filters.Add<CustomExceptionFilterAttribute>();
+
+            //});
 
             // If using Kestrel:
             services.Configure<KestrelServerOptions>(options =>
@@ -72,7 +74,7 @@ namespace ApiDoc
             app.UseMiddleware<DBMiddleware>();
             app.UseMiddleware<CorsMiddleware>();
             app.UseSession();
-
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -103,6 +105,7 @@ namespace ApiDoc
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+ 
         }
     }
 }

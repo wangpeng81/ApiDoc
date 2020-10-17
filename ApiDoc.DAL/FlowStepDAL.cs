@@ -32,7 +32,7 @@ namespace ApiDoc.DAL
 
                 foreach (DataRow dataRow in dt.Rows)
                 {
-                    FlowStepModel info = this.CreateObj(dataRow);
+                    FlowStepModel info = this.CreateModel<FlowStepModel>(dataRow);
                     list.Add(info);
                 } 
             }
@@ -69,11 +69,6 @@ namespace ApiDoc.DAL
             }
 
         }
-
-        private FlowStepModel CreateObj(DataRow dataRow)
-        {
-            FlowStepModel info = base.CreateModel<FlowStepModel>(dataRow); 
-            return info;
-        }
+ 
     }
 }

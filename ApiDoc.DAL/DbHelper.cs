@@ -1,75 +1,92 @@
-﻿ using System.Collections.Generic;
-  using Microsoft.Extensions.Logging;
- 
+﻿ using System.Collections.Generic; 
   using System.Data;
-  using System;
-  using System.Collections;
-  using System.Reflection;
+  using System; 
 using System.Data.SqlClient;
 using ApiDoc.IDAL;
-using Microsoft.Extensions.Configuration;
-using ApiDoc.Utility.Filter;
+using Microsoft.Extensions.Configuration; 
+using Autofac;
 
 namespace ApiDoc.DAL
 {
     public class DbHelper : IDbHelper
     {
-        private SqlConnection connection;
-        private SqlCommand cmd;
-        private SqlDataAdapter sqlDA = new SqlDataAdapter();
+        private readonly IConfiguration config;
+        private readonly IComponentContext componentContext;
+        private readonly IDbConnection dbConnection;
+         
+        public IConfiguration Configuration => config;
 
-        private string dsn;
-
-        public DbHelper(IConfiguration config)
+        public DbHelper(IConfiguration config, IComponentContext componentContext)
         { 
             string SqlConnStr = config.GetConnectionString("ApiDocConnStr");
-            this.dsn = SqlConnStr;
-            this.connection = new SqlConnection(SqlConnStr);
-            this.cmd = new SqlCommand();
-            this.cmd.CommandTimeout = 0;
-            this.cmd.Connection = this.connection;
-            this.sqlDA = new SqlDataAdapter();
-            this.sqlDA.SelectCommand = this.cmd;
+            this.config = config;
+            this.componentContext = componentContext; 
+            this.dbConnection = componentContext.Resolve<IDbConnection>();
+            this.dbConnection.ConnectionString = SqlConnStr;
+           
         }
           
         //IDbHelper
         public int ExecuteSql(string cmdText)
         {
-            SqlCommand comd = CreateSqlComd(cmdText);
-            return ToExecute(comd);
+            IDbCommand comd = CreateSqlComd(cmdText);
+            int iOk = comd.ExecuteNonQuery();
+            ((IDisposable)comd).Dispose();
+            return iOk;
         }
         public int ExecuteSql(string cmdText, DbParameters p)
         {
-            SqlCommand comd = CreateSqlComd(cmdText, p);
-            return ToExecute(comd);
+            IDbCommand comd = CreateSqlComd(cmdText, p);
+            int iOk = comd.ExecuteNonQuery();
+            ((IDisposable)comd).Dispose();
+            return iOk;
         }
 
         public object ExecuteScalar(string cmdText)
         {
-            SqlCommand comd = CreateSqlComd(cmdText);
-            return GetScalar(comd);
+            IDbCommand comd = CreateSqlComd(cmdText);
+            object o = comd.ExecuteScalar();
+            ((IDisposable)comd).Dispose();
+            return o;
         }
         public object ExecuteScalar(string cmdText, DbParameters p)
         {
-            SqlCommand comd = CreateSqlComd(cmdText, p);
-            return GetScalar(comd);
+            IDbCommand comd = CreateSqlComd(cmdText, p);
+            object o = comd.ExecuteScalar();
+            ((IDisposable)comd).Dispose();
+            return o;
         }
 
         public DataSet Fill(string cmdText)
         {
-            SqlDataAdapter adapter = CreateSqlAdapter(cmdText);
-            return GetDataTable(adapter);
+            IDbDataAdapter adapter = CreateSqlAdapter(cmdText);
+            DataSet ds = new DataSet();
+            adapter.Fill(ds);
+            ((IDisposable)adapter).Dispose();
+            return ds;
         } 
         public DataTable FillTable(string cmdText)
         {
-            SqlDataAdapter adapter = CreateSqlAdapter(cmdText);
-            DataSet ds = GetDataTable(adapter);
+            IDbDataAdapter adapter = CreateSqlAdapter(cmdText);
+            DataSet ds = new DataSet();
+            adapter.Fill(ds);
+
+            ((IDisposable)adapter).Dispose();
             return ds.Tables[0];
         } 
+
         public DataSet Fill(string cmdText, DbParameters p)
         {
-            SqlDataAdapter adapter = CreateSqlAdapter(cmdText, p);
-            return GetDataTable(adapter);
+            IDbDataAdapter adapter = CreateSqlAdapter(cmdText, p);
+            DataSet ds = new DataSet();
+            adapter.Fill(ds);
+            return ds;
+        }
+
+        public IDbTransaction BeginTransaction()
+        {
+            IDbTransaction tran = this.dbConnection.BeginTransaction(); 
+            return tran;
         }
 
         //private
@@ -84,14 +101,13 @@ namespace ApiDoc.DAL
                 comd.Connection.Close();
         }
 
-        private SqlCommand CreateSqlComd(string cmdText)
+        private IDbCommand CreateSqlComd(string cmdText)
         {
             try
-            {
-                SqlConnection conn = new SqlConnection(dsn);
-                SqlCommand comd = conn.CreateCommand();
+            { 
+                IDbCommand comd = this.dbConnection.CreateCommand();
                 comd.CommandText = cmdText;
-                comd.CommandType = CommandType.Text; 
+                comd.CommandType = CommandType.Text;  
                 return comd;
             }
             catch (System.Exception ex)
@@ -99,11 +115,11 @@ namespace ApiDoc.DAL
                 throw new Exception(ex.Message);
             }
         }
-        private SqlCommand CreateSqlComd(string cmdText, DbParameters p)
+        private IDbCommand CreateSqlComd(string cmdText, DbParameters p)
         {
             try
             {
-                SqlCommand comd = CreateSqlComd(cmdText);
+                IDbCommand comd = CreateSqlComd(cmdText);
 
                 int len = p.Length;
                 if (len > 0)
@@ -116,62 +132,33 @@ namespace ApiDoc.DAL
                 return comd;
             }
             catch (System.Exception ex)
-            {
-                //Log.LogError("DbCommand->CreateSqlcomd(s,p) 出错\r\n" + ex.Message);
+            { 
                 throw new Exception(ex.Message);
             }
         }
-      
-        private int ToExecute(SqlCommand comd)
+       
+        
+        private IDbDataAdapter CreateSqlAdapter(string cmdText)
         {
             try
             {
-                ConnOpen(ref comd);
-                int iOk = comd.ExecuteNonQuery();
-                ConnClose(ref comd);
-                return iOk;
-            }
-            catch (System.Exception ex)
-            {
-                ConnClose(ref comd); 
-                throw new Exception(ex.Message);
-            }
-        }
-        private object GetScalar(SqlCommand comd)
-        {
-            try
-            {
-                ConnOpen(ref comd);
-                object o = comd.ExecuteScalar();
-                ConnClose(ref comd);
-
-                return o;
-            }
-            catch (System.Exception ex)
-            {
-                ConnClose(ref comd); 
-                throw new Exception(ex.Message);
-            }
-        }
-
-        private SqlDataAdapter CreateSqlAdapter(string cmdText)
-        {
-            try
-            {
-                SqlConnection conn = new SqlConnection(dsn);
-                SqlDataAdapter apter = new SqlDataAdapter(cmdText, conn); 
-                return apter;
+                IDbDataAdapter dataAdapter = componentContext.Resolve<IDbDataAdapter>();
+                IDbCommand dbCommand = this.dbConnection.CreateCommand();
+                dbCommand.CommandText = cmdText;
+                dbCommand.Connection = this.dbConnection;
+                dataAdapter.SelectCommand = dbCommand; 
+                return dataAdapter;
             }
             catch (System.Exception ex)
             { 
                 throw new Exception(ex.Message);
             }
         }
-        private SqlDataAdapter CreateSqlAdapter(string cmdText, DbParameters p)
+        private IDbDataAdapter CreateSqlAdapter(string cmdText, DbParameters p)
         {
             try
             {
-                SqlDataAdapter apter = CreateSqlAdapter(cmdText);
+                IDbDataAdapter apter = CreateSqlAdapter(cmdText);
 
                 int len = p.Length;
                 if (len > 0)
@@ -192,8 +179,7 @@ namespace ApiDoc.DAL
 
         private DataSet GetDataTable(SqlDataAdapter adapter)
         {
-            //try
-            //{ 
+            
             DataSet dt = new DataSet();
             adapter.Fill(dt);
             if (adapter.SelectCommand.Connection.State == ConnectionState.Open)
@@ -201,25 +187,18 @@ namespace ApiDoc.DAL
                 adapter.SelectCommand.Connection.Close();
             }
             adapter.Dispose();
-            return dt;
-            //}
-            //catch (System.Exception ex)
-            //{
-            //    throw new Exception(ex.Message);
-            //}
-            //finally
-            //{
-
-            //}
+            return dt; 
         }
 
-
-        public SqlTransaction BeginTransaction()
+        public void Open()
         {
-            SqlTransaction tran = this.connection.BeginTransaction();
-            return tran;
+            this.dbConnection.Open();
         }
- 
+
+        public void Close()
+        {
+            this.dbConnection.Close(); 
+        }
     }
 }
                                                               

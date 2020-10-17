@@ -7,8 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
-using System.Linq;
+using System.IO; 
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -30,10 +29,11 @@ namespace ApiDoc
             } 
 
             //注册路由集合
-            builder.RegisterType<DBRouteValueDictionary>().AsSelf().SingleInstance();
-
+            builder.RegisterType<DBRouteValueDictionary>().SingleInstance();
+ 
             //注册数据库
-
+            builder.RegisterType<SqlConnection>().As<IDbConnection>();
+            builder.RegisterType<SqlDataAdapter>().As<IDbDataAdapter>();
         }
     }
 }

@@ -3,6 +3,7 @@ using ApiDoc.Models;
 using ApiDoc.Models.Attributes;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Reflection;
@@ -16,9 +17,9 @@ namespace ApiDoc.DAL
         protected string tableName = "";
         protected readonly ILogger<BaseDAL> _logger;
         protected readonly IDbHelper db;
- 
+        
         public BaseDAL(ILogger<BaseDAL> logger, IDbHelper db)
-        {
+        { 
             _logger = logger;
             this.db = db;
             this.GetTableName();
@@ -26,9 +27,11 @@ namespace ApiDoc.DAL
 
         public int Delete(BaseModel model)
         { 
-            string cmdText = "delete from " + tableName + " where SN =" + model.SN.ToString(); 
+            this.db.Open();
+            string cmdText = "delete from " + tableName + " where SN =" + model.SN.ToString();
             int iResult = db.ExecuteSql(cmdText);
-            return iResult;
+            this.db.Close(); 
+            return iResult; 
         }
 
         public T Get<T>(int SN) where T: class, new ()
@@ -121,8 +124,11 @@ namespace ApiDoc.DAL
                     }
                     paras.Add(pro.Name, value);
                 } 
-            } 
+            }
+
+            this.db.Open();
             object result = db.ExecuteScalar(sql.ToString(), paras);
+            this.db.Close();
 
             int SN = int.Parse(result.ToString());
             return SN; 
@@ -169,8 +175,10 @@ namespace ApiDoc.DAL
             { 
                 object value = pro.GetValue(model);
                 paras.Add(pro.Name, value); 
-            } 
+            }
+            this.db.Open();
             int iResult = db.ExecuteSql(sql.ToString(), paras);
+            this.db.Close();
             return iResult;
         }
 

@@ -1,4 +1,4 @@
-﻿
+﻿ 
 //弹出上传sql窗口
 function showStepHis(fksn) {
 
@@ -42,7 +42,8 @@ function btnAddHis_Click() {
                 SN: 0,
                 FKSN: vFKSN,
                 FileName: files[0].name,
-                text: fileString
+                text: fileString,
+                IsEnable: false
             }
 
             $.post(urlFlowStepHisAdd, data, function (result) {
@@ -107,11 +108,30 @@ function btnDeleteStepHis_Click() {
     }
 }
 
-function checkAll(sender,checkName) {
+function btnSmoExecute(fksn) {
+ 
+    var arrayList = [];
+    var list = document.getElementsByName('chkHis_' + fksn);
+    for (var i = 0; i < list.length; i++) {
+        var checked = list[i].checked;
+        var value = list[i].value;
+        if (checked) {
+            arrayList.push(value);
+        }
+    };
 
-    var objList = document.getElementsByName(checkName)
-    for (var i = 0; i < objList.length; i++)
-    {
-        objList[i].checked = sender.checked;
+    if (arrayList.length == 0) {
+        return;
     }
+
+    var data = { FKSN: fksn, ids: arrayList }; 
+    if (arrayList.length > 0) {
+        $.post(urlFlowStepHisSmoExecute, data, function (result) {
+
+            var html = $("#myHis_" + fksn);
+            html.html(result); 
+
+        });
+    }
+    
 }

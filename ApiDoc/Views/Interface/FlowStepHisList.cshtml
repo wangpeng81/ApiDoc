@@ -15,17 +15,28 @@
     <tbody>
         @foreach (var flowStepHis in Model)
         {
-            <tr class="row no-gutters fs-14">
-                <td class="col-2 text-center">
-                    <div class="custom-control custom-checkbox ml-1">
-                        <input type="checkbox" class="custom-control-input" id="custCheckHis_@flowStepHis.SN" name="chkHis_@ViewData["FKSN"]" value="@flowStepHis.SN">
-                        <label class="custom-control-label" for="custCheckHis_@flowStepHis.SN"></label>
-                    </div>
+        <tr class="row no-gutters fs-14">
+            <td class="col-2 text-center">
+                <div class="custom-control custom-checkbox ml-1">
+                    <input type="checkbox" class="custom-control-input" id="custCheckHis_@flowStepHis.SN" name="chkHis_@ViewData["FKSN"]" value="@flowStepHis.SN">
+                    <label class="custom-control-label" for="custCheckHis_@flowStepHis.SN"></label>
+                </div>
+            </td>
+            @if (flowStepHis.IsEnable)
+            {
+                <td class="col-10 text-success">
+                    @flowStepHis.FileName
                 </td>
+
+            }
+            else
+            {
                 <td class="col-10">
                     @flowStepHis.FileName
                 </td>
-            </tr> 
+
+            }
+        </tr> 
         }
     </tbody>
 </table>

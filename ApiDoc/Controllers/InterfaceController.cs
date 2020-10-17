@@ -196,8 +196,7 @@ namespace ApiDoc.Controllers
             model.DTime = System.DateTime.Now;
             this.flowStepHisDAL.Insert(model);
 
-            List<FlowStepHisModel> list = this.flowStepHisDAL.Query(model.FKSN);
-            return PartialView("/Views/Interface/FlowStepHisList.cshtml", list);
+            return this.StepHisList(model.FKSN); 
         }
 
         [HttpPost]
@@ -209,16 +208,37 @@ namespace ApiDoc.Controllers
                 model.SN = SN;
                 int i = this.flowStepHisDAL.Delete(model); 
             }
-          
-            List<FlowStepHisModel> list = this.flowStepHisDAL.Query(FKSN);
-            return PartialView("/Views/Interface/FlowStepHisList.cshtml", list);
+
+            return this.StepHisList(FKSN);
         }
 
         [HttpPost]
-        public int RunProcSql(List<int> ids)
+        public IActionResult SmoExecute(int FKSN, List<int> ids)
         {
+            foreach (int id in ids)
+            {
+                FlowStepModel flowModel = this.flowStepDAL.Get<FlowStepModel>(FKSN);
+                 
+                foreach (FlowStepHisModel hisModel in this.flowStepHisDAL.Query(FKSN))
+                {
+                    if (hisModel.SN == id)
+                    {
+                        hisModel.IsEnable = true;
+                        string script = hisModel.Text;
+                        if( script != "" )
+                        { 
+                            this.flowStepHisDAL.SmoExecute(flowModel.DataBase, script);
+                        }
+                    }
+                    else
+                    {
+                        hisModel.IsEnable = false;
+                    }
+                    this.flowStepHisDAL.Update(hisModel);
+                }
 
-            return 0;
+            }
+            return this.StepHisList(FKSN);
         }
 
 

@@ -4,11 +4,14 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace ApiDoc.IDAL
 {
     public interface IDbHelper
     {
+        IConfiguration Configuration { get; }
+         
         object ExecuteScalar(string cmdText);
         object ExecuteScalar(string cmdText, DbParameters p);
 
@@ -20,6 +23,9 @@ namespace ApiDoc.IDAL
 
         DataTable FillTable(string cmdText);
 
-        SqlTransaction BeginTransaction(); 
+        void Open();
+        void Close();
+
+        IDbTransaction BeginTransaction(); 
     }
 }

@@ -6,17 +6,25 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ApiDoc.Models;
+using System.Data;
+using Autofac;
+using System.Data.SqlClient;
 
 namespace ApiDoc.Controllers
 {
     public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IComponentContext componentContext;
 
-        public HomeController(ILogger<HomeController> logger)
+        // private readonly IContainer container;
+
+        public HomeController(ILogger<HomeController> logger, IComponentContext  componentContext )
         {
             _logger = logger;
-          
+             
+            this.componentContext = componentContext;
+            IDbConnection dbConnection = componentContext.Resolve<IDbConnection>();
         }
 
         public IActionResult Index()

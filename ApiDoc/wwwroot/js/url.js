@@ -17,6 +17,7 @@ var urlFlowStepSaveCmdText = urlRoot + "/Interface/SaveCmdText";
 var urlFlowStepHisList = urlRoot + "/Interface/StepHisList";
 var urlFlowStepHisAdd = urlRoot + "/Interface/StepHisAdd";
 var urlFlowStepHisDelete = urlRoot + "/Interface/StepHisDelete";
+var urlFlowStepHisSmoExecute = urlRoot + "/Interface/SmoExecute";
 
 //参数 
 var urlParamList = urlRoot + "/Interface/ParamList";

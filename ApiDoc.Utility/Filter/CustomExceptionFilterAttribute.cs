@@ -16,7 +16,7 @@ namespace ApiDoc.Utility.Filter
                 context.Result = new JsonResult(new
                 {
                     Result = false,
-                    Msg = "发生异常,请联系管理员"
+                    Msg =  context.Exception.Message
                 });
                 context.ExceptionHandled = true;
             }

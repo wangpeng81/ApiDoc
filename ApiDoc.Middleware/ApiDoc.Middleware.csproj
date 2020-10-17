@@ -6,14 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ApiDoc.IDAL\ApiDoc.IDAL.csproj" />
     <ProjectReference Include="..\ApiDoc.Models\ApiDoc.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\ApiDoc\PackAges\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System.Data.SqlClient">
       <HintPath>..\ApiDoc\PackAges\System.Data.SqlClient.dll</HintPath>
     </Reference>
