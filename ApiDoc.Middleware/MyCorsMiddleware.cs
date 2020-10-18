@@ -10,11 +10,11 @@ namespace ApiDoc.Middleware
     /// <summary>
     /// 跨域中间件
     /// </summary>
-    public class CorsMiddleware
+    public class MyCorsMiddleware
     {
         private readonly RequestDelegate next;
 
-        public CorsMiddleware(RequestDelegate next)
+        public MyCorsMiddleware(RequestDelegate next)
         {
             this.next = next;
         }

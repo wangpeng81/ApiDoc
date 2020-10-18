@@ -50,6 +50,8 @@ namespace ApiDoc.Controllers
             ViewData.Add("FKSN", fksn);
             ViewData.Add("keyTitle", title);
             ViewData.Add("keyUrl", url);
+            ViewData.Add("host", Url.Content("~") );
+            ;
 
             List<InterfaceModel> list = this.infterfaceDAL.All(title,url, fksn);
             return View(list);

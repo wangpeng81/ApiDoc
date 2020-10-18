@@ -31,10 +31,18 @@ namespace ApiDoc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //配置跨域处理
+            services.AddCors(options => options.AddPolicy("CorsPolicy",
+               builder =>
+               {
+                   builder.AllowAnyMethod()
+                       .AllowAnyHeader()
+                       .AllowAnyOrigin(); //允许任何来源的主机访问 ;
+               }));
+
             services.AddControllersWithViews();
             services.AddSession();
  
-
             //services.AddMvc(options=> {
             //    options.Filters.Add<CustomExceptionFilterAttribute>();
 
@@ -60,21 +68,15 @@ namespace ApiDoc
         {
             //添加依赖注入实例，AutofacModuleRegister就继承自Autofac.Module的类
             builder.RegisterModule(new AutofacModuleRegister());
-
-            //没有接口
-            //var assemblysServicesNoInterfaces = Assembly.Load("ApiDoc.DAL");
-            //builder.RegisterAssemblyTypes(assemblysServicesNoInterfaces);  
-
-          
+ 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseMiddleware<DBMiddleware>();
-            app.UseMiddleware<CorsMiddleware>();
-            app.UseSession();
             
+            
+            app.UseSession(); 
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -91,12 +93,21 @@ namespace ApiDoc
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot"))
             });
 
-            app.UseRouting();
-            //app.Use((context,next)=> {
-            //    var endpoint = context.GetEndpoint();
-            //    var route = context.Request.RouteValues;
-            //    return next(); 
+            app.UseMiddleware<MyCorsMiddleware>();
+            app.UseMiddleware<DBMiddleware>();
+            //app.Use((context, next) => {
+            //    if (context.Request.Path.ToString().Contains("cs2"))
+            //    {
+            //        return context.Response.WriteAsync("400");
+            //    }
+            //    else
+            //    {
+            //        return next();
+            //    }
             //});
+
+            app.UseRouting();
+            app.UseCors("CorsPolicy");
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

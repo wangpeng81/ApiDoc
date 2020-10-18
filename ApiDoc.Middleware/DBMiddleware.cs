@@ -34,9 +34,9 @@ namespace ApiDoc.Middleware
 
         private string ServerIP = "";
         private string pwd = "";
-       
-        public DBMiddleware(RequestDelegate _next, 
-                            IInterfaceDAL interfaceDAL, 
+
+        public DBMiddleware(RequestDelegate _next,
+                            IInterfaceDAL interfaceDAL,
                             IFlowStepDAL flowStpeDAL,
                             IDbHelper dbHelp,
                             DBRouteValueDictionary _routeDict,
@@ -50,9 +50,9 @@ namespace ApiDoc.Middleware
             SqlConnStr = config.GetConnectionString("ApiDocConnStr");
             this.ServerIP = config.GetConnectionString("ServerIP");
             this.pwd = config.GetConnectionString("pwd");
- 
+
             //加载路由集合
-            List< InterfaceModel > dtInterface = interfaceDAL.All();
+            List<InterfaceModel> dtInterface = interfaceDAL.All();
             foreach (InterfaceModel model in dtInterface)
             {
                 //加载步骤
@@ -61,45 +61,45 @@ namespace ApiDoc.Middleware
                 DBInterfaceModel dbInter = new DBInterfaceModel();
                 dbInter.SerializeType = model.SerializeType;
                 dbInter.Method = model.Method;
-                dbInter.Steps =  flowStpeDAL.Query(SN);
+                dbInter.Steps = flowStpeDAL.Query(SN);
                 dbInter.IsTransaction = model.IsTransaction;
                 dbInter.ExecuteType = model.ExecuteType;
-
-                routeDict.Add(Url, dbInter);
-            } 
-
+                if (!routeDict.ContainsKey(Url))
+                {
+                    routeDict.Add(Url, dbInter);
+                }
+            }
         }
 
         public async Task Invoke(HttpContext context)
         {
-            
+
             string path = context.Request.Path.ToString();
             this.logger.LogInformation(path);
             switch (path)
             {
                 case "/CS":
-                    await context.Response.WriteAsync("欢迎浏览ApiDoc", Encoding.GetEncoding("GB2312"));
+                    await this.WriteAsync("欢迎浏览ApiDoc");
                     return;
                 case "/CSDB":
-
                     return;
             }
 
             if (this.routeDict.ContainsKey(path))
             {
                 await InvokeDB(context);
-            } 
+            }
             else
             {
-                await next(context); 
+                await next(context);
             } 
-        } 
+        }
         private async Task InvokeDB(HttpContext context)
         {
-            this.context = context; 
+            this.context = context;
 
             string path = context.Request.Path.ToString();
-            DBInterfaceModel response = this.routeDict[path]; 
+            DBInterfaceModel response = this.routeDict[path];
 
             string exceMsg = ""; //存储异常的存储过程名  
             if (response.Steps.Count > 0)
@@ -114,7 +114,7 @@ namespace ApiDoc.Middleware
                     {
                         tran = connection.BeginTransaction();
                     }
-                     
+
                     //执行第一步 
                     string text = this.InvokeFistStep(response, connection, tran, out exceMsg);
 
@@ -129,26 +129,25 @@ namespace ApiDoc.Middleware
                     {
                         tran.Commit();
                     }
- 
-                    await context.Response.WriteAsync(text, Encoding.GetEncoding("GB2312"));
+
+                    await this.WriteAsync(text);
                 }
                 catch (System.Exception ex)
                 {
                     if (response.IsTransaction)
                     {
                         tran.Rollback();
-                    }
-
+                    } 
                     await this.InvokeException(ex.Message);
                 }
                 finally
                 {
                     connection.Close();
-                } 
+                }
             }
             else
-            {
-                await context.Response.WriteAsync(path + "没有任何步骤，请维护", UTF8Encoding.UTF8);
+            { 
+                await this.WriteAsync(path + "没有任何步骤，请维护");
             }
         }
 
@@ -163,14 +162,14 @@ namespace ApiDoc.Middleware
                 return "";
             }
 
-            connection.ChangeDatabase(flow.DataBase); 
+            connection.ChangeDatabase(flow.DataBase);
             SqlCommand cmd = new SqlCommand();
             cmd.CommandTimeout = 0;
             cmd.Connection = connection;
             SqlDataAdapter sqlDA = new SqlDataAdapter();
             sqlDA.SelectCommand = cmd;
             cmd.Transaction = tran;
-             
+
             //初始化参数
             switch (flow.CommandType)
             {
@@ -194,11 +193,11 @@ namespace ApiDoc.Middleware
                 }
             }
             else if (response.Method.ToLower() == "post")
-            { 
+            {
                 var reader = new StreamReader(context.Request.Body);
                 var contentFromBody = reader.ReadToEnd();
                 if (contentFromBody != "")
-                { 
+                {
                     Dictionary<string, object> dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(contentFromBody);
                     foreach (KeyValuePair<string, object> kv in dict)
                     {
@@ -208,12 +207,12 @@ namespace ApiDoc.Middleware
             }
 
             //执行Sql
-            string result = this.ExecSql(response, connection, sqlDA, cmd); 
+            string result = this.ExecSql(response, connection, sqlDA, cmd);
             this.InvokeOtherStep(response, connection, tran);
 
             return result;
         }
- 
+
         private string InvokeOtherStep(DBInterfaceModel response, SqlConnection connection, SqlTransaction tran)
         {
             SqlCommand cmd = new SqlCommand();
@@ -226,7 +225,7 @@ namespace ApiDoc.Middleware
             string exceMsg = "";
             for (int i = 1; i < response.Steps.Count; i++)
             {
-                FlowStepModel flow = response.Steps[i]; 
+                FlowStepModel flow = response.Steps[i];
                 if (flow.CommandText == "")
                 {
                     exceMsg = flow.StepName + " 没有数据库语句，请维护";
@@ -283,17 +282,17 @@ namespace ApiDoc.Middleware
 
         private string ExecSql(DBInterfaceModel response, SqlConnection connection, SqlDataAdapter sqlDA, SqlCommand cmd)
         {
-            string json = ""; 
+            string json = "";
             XmlHelper xmlHelp = new XmlHelper();
 
             object objResutl = new object();
             switch (response.ExecuteType)
             {
                 case "Scalar":
-                    objResutl = cmd.ExecuteScalar(); 
+                    objResutl = cmd.ExecuteScalar();
                     break;
                 case "Int":
-                    objResutl = cmd.ExecuteNonQuery();  
+                    objResutl = cmd.ExecuteNonQuery();
                     break;
                 case "DataSet":
 
@@ -308,25 +307,28 @@ namespace ApiDoc.Middleware
                 json = xmlHelp.SerializeXML(objResutl);
             }
             else
-            { 
+            {
                 json = JsonConvert.SerializeObject(objResutl);
             }
             return json;
         }
 
-        private async Task InvokeException(string exception) {
+        private async Task InvokeException(string exception)
+        {
 
             DataResult returnValue = new DataResult();
             returnValue.DataType = 1;
             returnValue.Exception = exception;
             this.logger.LogError(exception);
-
-            string json = JsonConvert.SerializeObject(returnValue);   
-            await this.context.Response.WriteAsync(json, Encoding.GetEncoding("GB2312"));
+            string json = JsonConvert.SerializeObject(returnValue);
+            await this.WriteAsync(json);
         }
- 
-      
-    }
 
-     
+        private async Task WriteAsync(string text)
+        { 
+            //await this.context.Response.WriteAsync(text, Encoding.GetEncoding("GB2312"));
+            await this.context.Response.WriteAsync(text, Encoding.UTF8);
+        }
+
+    }
 }

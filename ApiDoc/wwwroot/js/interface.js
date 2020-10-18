@@ -1,4 +1,4 @@
-﻿
+﻿ 
 //保存接口
 function btnSaveIntterface_Click() {
 
@@ -67,8 +67,8 @@ function btnDownLoad_Click() {
 //弹出测试窗口
 function btnShow_CS_Click() {
 
-    var url = window.location.protocol + "//" + window.location.host + urlRoot + $("#txtUrl").val();
-    $("#lblUrl").html(url);
+    var url = window.location.protocol + "//" + window.location.host + urlRoot + $("#txtUrl").val(); 
+    $("#lblUrl").html(url); 
 
     var method = $("#cbxMethod").val();
 
@@ -83,20 +83,20 @@ function btnShow_CS_Click() {
                 csJson += "&";
             }
             if (json.DataType == "varchar") {
-                csJson += json.ParamName + "= '" + json.DefaultValue + "'";
+                csJson += json.ParamName + "='" + json.DefaultValue + "'";
             }
             else if (json.DataType == "int") {
-                csJson += json.ParamName + "= " + json.DefaultValue;
+                csJson += json.ParamName + "=" + json.DefaultValue;
             }
             else {
-                csJson += json.ParamName + "= '" + json.DefaultValue + "'";
+                csJson += json.ParamName + "='" + json.DefaultValue + "'";
             }
         }
         else if (method == "Post") {
             if (csJson != "") {
                 csJson += ",";
             }
-            csJson += json.ParamName + ": '" + json.DefaultValue + "'"
+            csJson += json.ParamName + ":'" + json.DefaultValue + "'"
         }
     }
 
@@ -114,16 +114,15 @@ function btnShow_CS_Click() {
 
 //--------------------------------------------------测试
 function btnSendCS() {
- 
+
     var url = window.location.protocol + "//" + window.location.host + urlRoot + $("#txtUrl").val();
     var txtInput = $("#txtInput").val();
     var txtResult = $("#txtResult");
     var method = $("#cbxMethod").val();
 
-    url = "http://124.71.173.177/apidoc/a/b/c";
-    
-    if (method == "Post") { 
-        var vdata = txtInput; 
+    if (method == "Post") {
+
+        var vdata = txtInput;
         $.ajax({
             url: url,
             type: "POST",
@@ -139,15 +138,16 @@ function btnSendCS() {
     else if (method == "Get") {
 
         if (txtInput != "") {
-            url = url + "?" + txtInput; 
-        } 
-        $.get(url, function (result) {
-            txtResult.val(result);
-        });
+            url = url + "?" + txtInput;
 
+            $.get(url, function (result) {
+                txtResult.val(result);
+            });
+
+        }
     }
-}
 
+}
 
 function checkAll(sender, checkName) {
 
@@ -158,10 +158,7 @@ function checkAll(sender, checkName) {
 }
 
 $(function () {
- 
     var option = { animation: true, delay: 1500 };
-    $('.toast').toast(option); 
-    $('[data-toggle="tooltip"]').tooltip()
+    $('.toast').toast(option);
+    $('[data-toggle="tooltip"]').tooltip();
 });
-
-
