@@ -8,6 +8,6 @@ namespace ApiDoc.IDAL
     public interface IFlowStepHisDAL : IBaseDAL
     {
         List<FlowStepHisModel> Query(int FKSN); 
-        int SmoExecute(string database, string text);
+        int SmoExecute(string database, string procName, string text);
     }
 }

@@ -34,7 +34,7 @@ namespace ApiDoc.DAL
             return list;
         }
 
-        public int SmoExecute(string database, string text)
+        public int SmoExecute(string database, string procName, string text)
         {
             //https://www.cnblogs.com/long-gengyun/archive/2012/05/25/2517954.html
             //http://www.smochen.com/detail?aid=1280 
@@ -48,7 +48,16 @@ namespace ApiDoc.DAL
          
             Microsoft.SqlServer.Management.Smo.Server server = new Microsoft.SqlServer.Management.Smo.Server(server1);
             Microsoft.SqlServer.Management.Smo.Database db = server.Databases[database];
-  
+
+            if (db.StoredProcedures.Contains(procName))
+            {
+                text = text.Replace("CREATE PROCEDURE", "ALTER PROCEDURE", System.StringComparison.OrdinalIgnoreCase);
+            }
+            else
+            {
+                text = text.Replace("ALTER PROCEDURE", "CREATE PROCEDURE", System.StringComparison.OrdinalIgnoreCase);
+            }
+
             int i = server.ConnectionContext.ExecuteNonQuery(text);
             sqlConnection.Close();
             return 1;

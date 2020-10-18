@@ -226,8 +226,9 @@ namespace ApiDoc.Controllers
                         hisModel.IsEnable = true;
                         string script = hisModel.Text;
                         if( script != "" )
-                        { 
-                            this.flowStepHisDAL.SmoExecute(flowModel.DataBase, script);
+                        {
+                            string procName = hisModel.FileName.Split(".")[0].Split("-")[0]; 
+                            this.flowStepHisDAL.SmoExecute(flowModel.DataBase, procName, script);
                         }
                     }
                     else

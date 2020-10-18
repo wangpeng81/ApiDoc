@@ -25,7 +25,9 @@ function onStepSelect_Click(json) {
 //选择步骤项，加载历史sql数据
 function OnCollapse_Click(id, sn) {
 
-    $('#' + id).on('show.bs.collapse', function (event, data) {
+    var accordion = $('#' + id);
+
+    accordion.on('show.bs.collapse', function (event, data) {
 
         var id = "myHis_" + sn;
         var data = { FKSN: sn};
@@ -38,7 +40,7 @@ function OnCollapse_Click(id, sn) {
         
     });
 
-    $('#' + id).collapse('show', {data:1});
+    accordion.collapse('show');
 
 }
 
