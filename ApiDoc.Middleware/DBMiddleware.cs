@@ -6,8 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using System.Collections.Generic; 
-using System.Data;
-using System.Data.SqlClient;
+using System.Data; 
 using System.IO;
 using System.IO.Pipelines;
 using System.Net.Http;
@@ -17,6 +16,8 @@ using System.Threading.Tasks;
 
 using System;
 using Newtonsoft.Json;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 
 namespace ApiDoc.Middleware
 {
@@ -28,6 +29,7 @@ namespace ApiDoc.Middleware
         private readonly RequestDelegate next;
         private readonly IDbHelper dbHelp;
         private readonly DBRouteValueDictionary routeDict;
+        private readonly ILogger<DBMiddleware> logger;
         private HttpContext context;
 
         private string ServerIP = "";
@@ -38,12 +40,13 @@ namespace ApiDoc.Middleware
                             IFlowStepDAL flowStpeDAL,
                             IDbHelper dbHelp,
                             DBRouteValueDictionary _routeDict,
-                            IConfiguration config)
+                            IConfiguration config,
+                            ILogger<DBMiddleware> logger)
         {
             this.next = _next;
             this.dbHelp = dbHelp;
             this.routeDict = _routeDict;
-
+            this.logger = logger;
             SqlConnStr = config.GetConnectionString("ApiDocConnStr");
             this.ServerIP = config.GetConnectionString("ServerIP");
             this.pwd = config.GetConnectionString("pwd");
@@ -63,14 +66,15 @@ namespace ApiDoc.Middleware
                 dbInter.ExecuteType = model.ExecuteType;
 
                 routeDict.Add(Url, dbInter);
-            }
-
+            } 
 
         }
 
         public async Task Invoke(HttpContext context)
         {
+            
             string path = context.Request.Path.ToString();
+            this.logger.LogInformation(path);
             switch (path)
             {
                 case "/CS":
@@ -126,7 +130,7 @@ namespace ApiDoc.Middleware
                         tran.Commit();
                     }
  
-                    await context.Response.WriteAsync(text);
+                    await context.Response.WriteAsync(text, Encoding.GetEncoding("GB2312"));
                 }
                 catch (System.Exception ex)
                 {
@@ -315,8 +319,10 @@ namespace ApiDoc.Middleware
             DataResult returnValue = new DataResult();
             returnValue.DataType = 1;
             returnValue.Exception = exception;
+            this.logger.LogError(exception);
+
             string json = JsonConvert.SerializeObject(returnValue);   
-            await this.context.Response.WriteAsync(json, UTF8Encoding.UTF8);
+            await this.context.Response.WriteAsync(json, Encoding.GetEncoding("GB2312"));
         }
  
       

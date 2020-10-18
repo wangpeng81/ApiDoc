@@ -67,6 +67,9 @@ function btnDownLoad_Click() {
 //弹出测试窗口
 function btnShow_CS_Click() {
 
+    var url = window.location.protocol + "//" + window.location.host + urlRoot + $("#txtUrl").val();
+    $("#lblUrl").html(url);
+
     var method = $("#cbxMethod").val();
 
     var paraList = document.getElementsByName("chkParam_");
@@ -116,7 +119,9 @@ function btnSendCS() {
     var txtInput = $("#txtInput").val();
     var txtResult = $("#txtResult");
     var method = $("#cbxMethod").val();
-  
+
+    url = "http://124.71.173.177/apidoc/a/b/c";
+    
     if (method == "Post") { 
         var vdata = txtInput; 
         $.ajax({

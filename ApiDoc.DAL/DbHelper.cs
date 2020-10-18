@@ -1,10 +1,10 @@
 ﻿ using System.Collections.Generic; 
   using System.Data;
-  using System; 
-using System.Data.SqlClient;
+  using System;  
 using ApiDoc.IDAL;
 using Microsoft.Extensions.Configuration; 
 using Autofac;
+using Microsoft.Data.SqlClient;
 
 namespace ApiDoc.DAL
 {

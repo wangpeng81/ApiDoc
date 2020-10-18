@@ -14,10 +14,4 @@
     <ProjectReference Include="..\ApiDoc.Models\ApiDoc.Models.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="System.Data.SqlClient">
-      <HintPath>..\ApiDoc\PackAges\System.Data.SqlClient.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>

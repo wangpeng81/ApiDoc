@@ -13,16 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="PackAges\System.Data.SqlClient.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="PackAges\System.Data.SqlClient.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="wwwroot\js\bootstrap.bundle.js.map" />
     <None Include="wwwroot\js\bootstrap.bundle.min.js.map" />
     <None Include="wwwroot\js\bootstrap.js.map" />
@@ -41,9 +31,9 @@
     <PackageReference Include="Autofac" Version="6.0.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.0.1" />
     <PackageReference Include="log4net.AspNetCore" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="3.0.3" />
     <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
   </ItemGroup>
 
   <ItemGroup>

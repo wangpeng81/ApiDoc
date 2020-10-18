@@ -9,26 +9,30 @@
                     <label class="custom-control-label" for="ParamCheckAll"></label>
                 </div>
             </th>
-            <th class="col-10">参数名称</th>
+            <th class="col-5">参数名称</th>
+            <th class="col-5">说明</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var param in Model)
         {
-            <tr class="row no-gutters fs-14">
-                <td class="col-2 text-center">
-                    <div class="custom-control custom-checkbox ml-1">
-                        <input type="checkbox" class="custom-control-input" 
-                               id="custCheckParam_@param.SN" 
-                               name="chkParam_" 
-                               value="{SN: @param.SN, FKSN: @param.FKSN, ParamName: '@param.ParamName', DataType: '@param.DataType', DefaultValue: '@param.DefaultValue', Remark: '@param.Remark'}">
-                        <label class="custom-control-label" for="custCheckParam_@param.SN"></label>
-                    </div>
-                </td>
-                <td class="col-10">
-                    @param.ParamName
-                </td>
-            </tr> 
+        <tr class="row no-gutters fs-14">
+            <td class="col-2 text-center">
+                <div class="custom-control custom-checkbox ml-1">
+                    <input type="checkbox" class="custom-control-input"
+                           id="custCheckParam_@param.SN"
+                           name="chkParam_"
+                           value="{SN: @param.SN, FKSN: @param.FKSN, ParamName: '@param.ParamName', DataType: '@param.DataType', DefaultValue: '@param.DefaultValue', Remark: '@param.Remark'}">
+                    <label class="custom-control-label" for="custCheckParam_@param.SN"></label>
+                </div>
+            </td>
+            <td class="col-5">
+                @param.ParamName
+            </td>
+            <td class="col-5">
+                @param.Remark
+            </td>
+        </tr> 
         }
     </tbody>
 </table>
