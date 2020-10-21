@@ -33,12 +33,12 @@
 
 		levels: 2,
 
-		expandIcon: 'zi zi_pathRight tree-icon-size',
-		collapseIcon: 'zi zi_pathDown tree-icon-size',
-		emptyIcon: 'zi',
-		nodeIcon: 'zi zi_floderLine',
-		selectedIcon: 'zi zi_floderOpen',
-		checkedIcon: 'zi zi_check',
+		expandIcon: 'fa fa-angle-right ',
+		collapseIcon: 'fa fa-angle-down',
+		emptyIcon: 'fa',
+		nodeIcon: '',
+		selectedIcon: 'fa fa-check',
+		checkedIcon: 'fa fa-check',
 		uncheckedIcon: '',
 
 		color: undefined, // '#000000',

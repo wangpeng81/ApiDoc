@@ -109,18 +109,7 @@ namespace ApiDoc.DAL
                     object value = pro.GetValue(model);
                     if (value == null)
                     {
-                        if (pro.PropertyType.Name == nameof(System.String))
-                        {
-                            value = "";
-                        }
-                        else if (pro.PropertyType.Name == nameof(Int32))
-                        {
-                            value = 0;
-                        }
-                        else if (pro.PropertyType.Name == nameof(DateTime))
-                        {
-                            value = DateTime.Now; 
-                        }
+                        value = getDefault(pro);
                     }
                     paras.Add(pro.Name, value);
                 } 
@@ -133,7 +122,7 @@ namespace ApiDoc.DAL
             int SN = int.Parse(result.ToString());
             return SN; 
         }
-
+         
         public int Update(BaseModel model)
         {
             Type T = model.GetType(); 
@@ -174,6 +163,10 @@ namespace ApiDoc.DAL
             foreach (PropertyInfo pro in propertys)
             { 
                 object value = pro.GetValue(model);
+                if (value == null)
+                {
+                    value = getDefault(pro);
+                }
                 paras.Add(pro.Name, value); 
             }
             this.db.Open();
@@ -203,6 +196,24 @@ namespace ApiDoc.DAL
             Type t = this.GetType(); 
             TableAttribute tableAttribute = Attribute.GetCustomAttribute(t, typeof(TableAttribute)) as TableAttribute;
             this.tableName = tableAttribute.Name;
+        }
+
+        private object getDefault(PropertyInfo pro)
+        {
+            object value = "";
+            if (pro.PropertyType.Name == nameof(System.String))
+            {
+                value = "";
+            }
+            else if (pro.PropertyType.Name == nameof(Int32))
+            {
+                value = 0;
+            }
+            else if (pro.PropertyType.Name == nameof(DateTime))
+            {
+                value = DateTime.Now;
+            }
+            return value;
         }
     }
 }

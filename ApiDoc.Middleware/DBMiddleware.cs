@@ -52,7 +52,7 @@ namespace ApiDoc.Middleware
             this.pwd = config.GetConnectionString("pwd");
 
             //加载路由集合
-            List<InterfaceModel> dtInterface = interfaceDAL.All();
+            List<InterfaceModel> dtInterface = interfaceDAL.Query(false);
             foreach (InterfaceModel model in dtInterface)
             {
                 //加载步骤
@@ -69,11 +69,14 @@ namespace ApiDoc.Middleware
                     routeDict.Add(Url, dbInter);
                 }
             }
+
+            logger.LogInformation("加载接口完成,共" + dtInterface.Count.ToString());
+
         }
 
         public async Task Invoke(HttpContext context)
         {
-
+            this.context = context;
             string path = context.Request.Path.ToString();
             this.logger.LogInformation(path);
             switch (path)
@@ -306,9 +309,13 @@ namespace ApiDoc.Middleware
             {
                 json = xmlHelp.SerializeXML(objResutl);
             }
-            else
+            else if (response.SerializeType == "Json")
             {
                 json = JsonConvert.SerializeObject(objResutl);
+            }
+            else
+            {
+                json = objResutl.ToString();
             }
             return json;
         }
@@ -325,9 +332,10 @@ namespace ApiDoc.Middleware
         }
 
         private async Task WriteAsync(string text)
-        { 
-            //await this.context.Response.WriteAsync(text, Encoding.GetEncoding("GB2312"));
-            await this.context.Response.WriteAsync(text, Encoding.UTF8);
+        {
+            // await this.context.Response.WriteAsync(text, Encoding.UTF8);  , Encoding.GetEncoding("GB2312")
+            this.context.Response.ContentType = "text/plain;charset=utf-8";
+            await this.context.Response.WriteAsync(text);
         }
 
     }

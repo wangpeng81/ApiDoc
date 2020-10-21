@@ -1,8 +1,10 @@
 ﻿var urlRoot = document.getElementById("txtHost").value; 
 var urlFolderAll = urlRoot + "/Folder/All";  
 
+//接口基础信息
 var urlInterfaceSave = urlRoot + "/Interface/Save";
 var urlInterfaceDelete = urlRoot + "/Interface/Delete";
+var urlInterfaceStop = urlRoot + "/Interface/UpdateStop";
  
 var urlFolderDel = urlRoot + "/Folder/DeleteFolder";
 var urlFolderSave = urlRoot + "/Folder/SaveFolder";

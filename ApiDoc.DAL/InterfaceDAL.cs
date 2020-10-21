@@ -23,7 +23,7 @@ namespace ApiDoc.DAL
         {
             List<InterfaceModel> list = new List<InterfaceModel>();
  
-            string strSql = "select * from api_interface";
+            string strSql = "select * from " + base.tableName;
             DataTable dt = db.FillTable(strSql);
             foreach (DataRow dataRow in dt.Rows)
             {
@@ -103,6 +103,20 @@ namespace ApiDoc.DAL
                 throw ex;
             }
         }
- 
+
+        public List<InterfaceModel> Query(bool isStop)
+        {
+            List<InterfaceModel> list = new List<InterfaceModel>();
+            string vStop = isStop ? "1" : "0";
+            string strSql = "select * from " + base.tableName + " where isStop = " + vStop;
+            DataTable dt = db.FillTable(strSql);
+            foreach (DataRow dataRow in dt.Rows)
+            {
+                InterfaceModel info = base.CreateModel<InterfaceModel>(dataRow);
+                list.Add(info);
+            }
+
+            return list;
+        }
     }
 }

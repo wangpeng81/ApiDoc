@@ -1,4 +1,6 @@
-﻿ 
+﻿var _SN = 0;
+ 
+
 //保存接口
 function btnSaveIntterface_Click() {
 
@@ -11,6 +13,7 @@ function btnSaveIntterface_Click() {
     var vFKSN = $("#txtFKSN").val();
     var vExecuteType = $("#cbxExecuteType").val();
     var vIsTransaction = document.getElementById("txtStepIsTransaction").checked;
+    var vIsStop = $("#txtIsStop").val();  
 
     $.post(urlInterfaceSave, {
         SN: vSN,
@@ -20,12 +23,41 @@ function btnSaveIntterface_Click() {
         FKSN: vFKSN,
         SerializeType: vSerializeType,
         IsTransaction: vIsTransaction,
-        ExecuteType: vExecuteType
+        ExecuteType: vExecuteType,
+        IsStop: vIsStop
     }, function (data) {
 
             $('#myToastSuccess').toast('show');
+            _SN = data.sn;
             $("#txtSN").val(data.sn);
     })
+}
+
+//停用接口
+function btnStopIntterface_Click() {
+
+    var isStop = $("#iPlay").hasClass("text-success");
+
+    var url = urlInterfaceStop + "?SN=" + _SN + "&bStop=" + isStop;
+    var data = { SN: _SN, bStop: isStop };
+    $.get(url, function (result) {
+
+        if (result > 0) {
+            if (isStop) {
+                $("#iPlay").removeClass("text-success");
+                $("#txtIsStop").val(1);
+            }
+            else { 
+                $("#iPlay").addClass("text-success");
+                $("#txtIsStop").val(0);
+            }
+        }
+        else { 
+
+            showWarning("停用失败!");
+
+        }
+    });
 }
 
 //上传接口到路由
@@ -54,6 +86,7 @@ function btnDownLoad_Click() {
     $.get(url, function (myResponse) {
 
         if (myResponse.dataType == 0) {
+
             //成功
             alert("删除成功");
         }
@@ -157,8 +190,17 @@ function checkAll(sender, checkName) {
     }
 }
 
+function showWarning(msg) {
+
+    var messageBox = $("#myToast");
+    $("#myMsg").html(msg); 
+    messageBox.toast("show");
+}
+
 $(function () {
     var option = { animation: true, delay: 1500 };
     $('.toast').toast(option);
     $('[data-toggle="tooltip"]').tooltip();
+
+    _SN = $("#txtSN").val();
 });

@@ -17,11 +17,17 @@
 }
 
 <!--message -->
+<div id="myToast" class="toast position-fixed " role="alert" aria-live="assertive" aria-atomic="true" style="top:50%; left:50%; z-index:5;">
+    <div id="myMsg" class="toast-body bg-warning text-white">
+        上传接口成功
+    </div>
+</div>
+
 <div id="myToastUpdate" class="toast position-fixed " role="alert" aria-live="assertive" aria-atomic="true" style="top:50%; left:50%; z-index:5;">
     <div class="toast-body bg-warning text-white">
         请选择要修改的数据
     </div>
-</div> 
+</div>
 <div id="myToastSuccess" class="toast position-fixed " role="alert" aria-live="assertive" aria-atomic="true" style="top:50%; left:50%; z-index:5;">
     <div class="toast-body bg-success text-white">
         保存成功
@@ -40,156 +46,193 @@
 
 <div id="myToastSmo" class="toast position-fixed " role="alert" aria-live="assertive" aria-atomic="true" style="top:50%; left:50%; z-index:5;">
     <div class="toast-body bg-warning text-white">
-       更新存储过程成功
+        更新存储过程成功
     </div>
 </div>
 
+<ul class="nav nav-pills justify-content-center border-bottom" id="pills-tab" role="tablist">
+    <li class="nav-item py-1">
+        <a class="nav-link active py-1" id="pills-home-tab" data-toggle="pill" href="#tab-in" role="tab" aria-controls="pills-home" aria-selected="true">
+            <i class="fa fa-info mr-1"></i>接口
+        </a>
+    </li>
+    <li class="nav-item py-1 ">
+        <a class="nav-link py-1" id="pills-profile-tab" data-toggle="pill" href="#tab-step" role="tab" aria-controls="pills-profile" aria-selected="false">
+            <i class="fa fa-code mr-1"></i>步骤
+        </a>
+    </li>
+</ul>
 
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="tab-in" role="tabpanel" aria-labelledby="home-tab">
+        <div class="container-fluid py-3 ">
 
-<div class="container-fluid py-3 pr-0">
+            <input type="hidden" id="txtSN" value="@Model.SN" />
+            <input type="hidden" id="txtFKSN" value="@Model.FKSN" />
+ 
+                <!-- base info -->
+                <input type="hidden" id="txtIsStop" value="@Model.IsStop" />
+                <div class="align-bottom" >
+                    <div class="btn-toolbar mt-0 mb-2 " role="toolbar" aria-label="Toolbar with button groups">
+                        <div class="btn-group btn-group-sm border-bottom" role="group" aria-label="First group">
+                            <button type="button" class="btn btn-info">接口信息</button>
+                            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="保存接口" onclick="btnSaveIntterface_Click()"><i class="fa fa-save"></i></button>
 
-    <input type="hidden" id="txtSN" value="@Model.SN" />
-    <input type="hidden" id="txtFKSN" value="@Model.FKSN" />
+                            @if (Model.IsStop)
+                            {
+                                <button type="button"
+                                        class="btn btn-default"
+                                        data-toggle="tooltip"
+                                        data-placement="bottom"
+                                        title="启用/停用接口"
+                                        onclick="btnStopIntterface_Click()">
+                                    <i id="iPlay" class="fa fa-play-circle"></i>
+                                </button>
+                            }
+                            else
+                            {
+                                <button id="btnStop" type="button"
+                                        class="btn btn-default"
+                                        data-toggle="tooltip"
+                                        data-placement="bottom"
+                                        title="启用/停接口"
+                                        onclick="btnStopIntterface_Click()">
+                                    <i id="iPlay" class="fa fa-play-circle text-success"></i>
+                                </button>
+                            }
+                            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="发布接口" onclick="btnUpLoad_Click()"><i class="fa fa-upload"></i></button>
+                            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="测试接口" onclick="btnShow_CS_Click()"><i class="fa fa-link"></i></button>
 
-    <div class="row pr-0 mr-0 border-bottom">
+                        </div>
+                    </div> 
+                    <div class="input-group input-group-sm mb-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text w-lab">标题</div>
+                        </div>
+                        <input type="text" class="form-control" id="txtTitle" value="@Model.Title">
+                    </div>
 
-        <!-- base info -->
-        <div class="col-9 pl-3">
-            <div class="btn-toolbar mt-0 mb-2 " role="toolbar" aria-label="Toolbar with button groups">
-                <div class="btn-group btn-group-sm border-bottom" role="group" aria-label="First group">
-                    <button type="button" class="btn btn-info">基础操作</button>
-                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="保存接口" onclick="btnSaveIntterface_Click()"><i class="fa fa-save"></i></button>
-                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="发布接口" onclick="btnUpLoad_Click()"><i class="fa fa-upload"></i></button>
-                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="删除接口" onclick="btnDownLoad_Click()"><i class="fa fa-trash-o"></i></button>
-                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="测试接口" onclick="btnShow_CS_Click()"><i class="fa fa-link"></i></button>
-
-                </div> 
-            </div>
-            <div class="input-group input-group-sm mb-3">
-                <div class="input-group-prepend">
-                    <div class="input-group-text w-lab">标题</div>
-                </div>
-                <input type="text" class="form-control" id="txtTitle" value="@Model.Title">
-            </div>
-
-            <!-- Url -->
-            <div class="input-group input-group-sm mb-3">
-                <div class="input-group-prepend">
-                    <div class="input-group-text w-lab">Url</div>
-                </div>
-                @if (Model.SN == 0)
-                {
-                    <input type="text" class="form-control" id="txtUrl" value="@ViewData["FullPath"]" />
-                }
-                else
-                {
-                    <input type="text" class="form-control" id="txtUrl" value="@Model.Url" disabled="disabled" />
-                }
-            </div>
-
-            <!-- 数据格式 -->
-            <div class="input-group input-group-sm mb-3">
-                <div class="input-group-prepend">
-                    <div class="input-group-text w-lab">数据格式</div>
-                </div>
-                <select class="custom-select mr-sm" id="cbxSerializeType">
-                    @if (Model.SerializeType == "Json")
-                    {
-                        <option value="Json" selected>Json</option>
-                        <option value="Xml">Xml</option>
-                    }
-                    else
-                    {
-                        <option value="Json">Json</option>
-                        <option value="Xml" selected>Xml</option>
-                    }
-                </select>
-            </div>
-
-            <!-- 结果集类型 -->
-            <div class="input-group input-group-sm mb-3">
-                <div class="input-group-prepend">
-                    <div class="input-group-text w-lab">结果集类型</div>
-                </div>
-                <select class="custom-select mr-sm" id="cbxExecuteType">
-                    @foreach (string value in (List<string>)ViewData["ExecuteType"])
-                    {
-                        if (Model.ExecuteType == value)
+                    <!-- Url -->
+                    <div class="input-group input-group-sm mb-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text w-lab">Url</div>
+                        </div>
+                        @if (Model.SN == 0)
                         {
-                            <option value="@value" selected>@value</option>
+                            <input type="text" class="form-control" id="txtUrl" value="@ViewData["FullPath"]" />
                         }
                         else
                         {
-                            <option value="@value">@value</option>
+                            <input type="text" class="form-control" id="txtUrl" value="@Model.Url" disabled="disabled" />
                         }
-                    }
-                </select>
-            </div>
+                    </div>
 
-            <!-- 发送方法 -->
-            <div class="input-group input-group-sm mb-3">
-                <div class="input-group-prepend">
-                    <div class="input-group-text w-lab">发送方法</div>
-                </div>
-                <select class="custom-select" id="cbxMethod">
-                    @if (Model.Method == "Post")
-                    {
-                        <option value="Post" selected>Post</option>
-                        <option value="Get">Get</option>
-                    }
-                    else
-                    {
-                        <option value="Post">Post</option>
-                        <option value="Get" selected>Get</option>
-                    }
+                    <div class="row">
 
-                </select>
-            </div>
+                        <!-- 数据格式 -->
+                        <div class="col input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text w-lab">数据格式</div>
+                            </div>
+                            <select class="custom-select mr-sm" id="cbxSerializeType">
+                                @foreach (string st in (List<string>)ViewData["SerializeType"])
+                                {
+                                    if (st == Model.SerializeType)
+                                    {
+                                        <option value="@st" selected>@st</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@st">@st</option>
+                                    }
+                                }
 
-            <!-- 事物 -->
-            <div class="input-group input-group-sm mb-3">
-                <div class="input-group-prepend">
-                    <div class="input-group-text w-lab"></div>
-                </div>
-                <div class="custom-control custom-checkbox ml-1 col-auto">
-                    <input id="txtStepIsTransaction" type="checkbox" class="custom-control-input" checked="@Model.IsTransaction">
-                    <label class="custom-control-label" for="txtStepIsTransaction">事物</label>
-                </div>
-            </div>
-        </div>
+                            </select>
+                        </div>
 
-        <!-- param -->
-        <div id="myParam" class="col-3 p-0 pr-3">
-            <div class="btn-toolbar w-100" role="toolbar" aria-label="Toolbar with button groups">
-                <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Second group">
-                    <button type="button" class="btn btn-info">参数</button>
-                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="添加参数" onclick="showParamWin(0)"><i class="fa fa-plus"></i></button>
-                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="修改参数" onclick="showParamWin(1)"><i class="fa fa-edit"></i></button>
-                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="删除参数" onclick="showDeleteModal()"><i class="fa fa-trash-o"></i></button>
-                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="刷新参数" onclick="btnSeachParam_Click()"><i class="fa fa-refresh"></i></button>
+                        <!-- 结果集类型 -->
+                        <div class="col input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text w-lab">结果集类型</div>
+                            </div>
+                            <select class="custom-select mr-sm" id="cbxExecuteType">
+                                @foreach (string value in (List<string>)ViewData["ExecuteType"])
+                                {
+                                    if (Model.ExecuteType == value)
+                                    {
+                                        <option value="@value" selected>@value</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@value">@value</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <!-- 发送方法 -->
+                        <div class="col input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text w-lab">发送方法</div>
+                            </div>
+                            <select class="custom-select" id="cbxMethod">
+                                @if (Model.Method == "Post")
+                                {
+                                    <option value="Post" selected>Post</option>
+                                    <option value="Get">Get</option>
+                                }
+                                else
+                                {
+                                    <option value="Post">Post</option>
+                                    <option value="Get" selected>Get</option>
+                                }
+
+                            </select>
+                        </div>
+
+                        <!-- 事物 -->
+                        <div class="col input-group input-group-sm mb-3"> 
+                            <div class="custom-control custom-checkbox ml-1 col-auto">
+                                <input id="txtStepIsTransaction" type="checkbox" class="custom-control-input" checked="@Model.IsTransaction">
+                                <label class="custom-control-label" for="txtStepIsTransaction">事物</label>
+                            </div>
+                        </div>
+                    </div> 
                 </div>
-            </div>
-            <div id="myParamList" class="bg-light overflow-auto" style="height:270px;"></div>
+
+                <!-- param -->
+                <div id="myParam" class="p-0 pr-3">
+                    <div class="btn-toolbar w-100" role="toolbar" aria-label="Toolbar with button groups">
+                        <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Second group">
+                            <button type="button" class="btn btn-info">接口参数</button>
+                            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="添加参数" onclick="showParamWin(0)"><i class="fa fa-plus"></i></button>
+                            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="修改参数" onclick="showParamWin(1)"><i class="fa fa-edit"></i></button>
+                            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="删除参数" onclick="showDeleteModal()"><i class="fa fa-trash-o"></i></button>
+                            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="刷新参数" onclick="btnSeachParam_Click()"><i class="fa fa-refresh"></i></button>
+                        </div>
+                    </div>
+                    <div id="myParamList" class="" style="height:calc(100% - 10px);"></div>
+                </div>
+           
         </div>
     </div>
-
-    <!--Step -->
-    @if (Model.SN > 0)
-    {
-        <div class="btn-toolbar my-2" role="toolbar" aria-label="Toolbar with button groups">
-            <div class="btn-group btn-group-sm mr-2" role="group" aria-label="Second group">
-                <button type="button" class="btn btn-info">接口步骤</button>
-                <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="添加步骤" onclick="btnShowFlowStep(@Model.SN)"><i class="fa fa-plus"></i></button>
-                <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="修改步骤" onclick="btnShowFlowStep(0)"><i class="fa fa-edit"></i></button>
-                <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="删除步骤" onclick="btnShowFlowStepDelete()"><i class="fa fa-trash-o"></i></button>
+    <div class="tab-pane fade" id="tab-step" role="tabpanel" aria-labelledby="profile-tab">
+        <!--Step -->
+        @if (Model.SN > 0)
+        {
+            <div class="btn-toolbar my-2" role="toolbar" aria-label="Toolbar with button groups">
+                <div class="btn-group btn-group-sm mr-2" role="group" aria-label="Second group">
+                    <button type="button" class="btn btn-info">接口步骤</button>
+                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="添加步骤" onclick="btnShowFlowStep(@Model.SN)"><i class="fa fa-plus"></i></button>
+                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="修改步骤" onclick="btnShowFlowStep(0)"><i class="fa fa-edit"></i></button>
+                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="删除步骤" onclick="btnShowFlowStepDelete()"><i class="fa fa-trash-o"></i></button>
+                </div>
             </div>
-        </div>
-        <div id="myStepList" class="pr-3">
-        </div>
-    }
-
+            <div id="myStepList" class="pr-3">
+            </div>
+        }
+    </div>
 </div>
-
 
 <!-- 步骤窗口 -->
 <div class="modal fade" id="myStep" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -247,7 +290,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-body">
-                <div class="form-group"> 
+                <div class="form-group">
                     <label id="lblUrl" for="txtInput">:</label>
                     <textarea id="txtInput" class="form-control bg-light p-0" style="min-width: 90%" rows="5"></textarea>
                 </div>
@@ -263,7 +306,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- 历史Sql窗口 -->
 <div class="modal fade" id="myStepHisModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -337,10 +379,10 @@
                     <label for="cbxParamDataType" class="col-3 col-form-label">数据类型</label>
                     <div class="col-9">
                         <select class="custom-select mr-sm" id="cbxParamDataType">
-                              @foreach(string dataType in (List<string>)ViewData["DataType"])
-                              {
-                                  <option value="@dataType">@dataType</option>
-                              }
+                            @foreach (string dataType in (List<string>)ViewData["DataType"])
+                            {
+                                <option value="@dataType">@dataType</option>
+                            }
                         </select>
                     </div>
                 </div>

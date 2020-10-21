@@ -33,5 +33,7 @@ namespace ApiDoc.Models
 
         public string ExecuteType { get; set; } //结果集: Int, Scalar, DataSet
         public bool IsTransaction { get; set; }
+
+        public bool IsStop { get; set; } //是否停用
     }
 }
