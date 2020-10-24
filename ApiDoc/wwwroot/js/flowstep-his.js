@@ -1,6 +1,16 @@
-﻿ 
+﻿
+
+function loadHisData(SN) { 
+    $.post(urlFlowStepHisList, { FKSN: SN }, function (html) {
+        $("#myHis_" + SN).html(html);
+    });
+}
+
+
 //弹出上传sql窗口
-function showStepHis(fksn) {
+function showStepHis() {
+
+    var fksn = selectFlowStep.SN;
 
     $("#txtStepHisSN").val(0);
     $("#txtStepHisFKSN").val(fksn);
@@ -14,7 +24,7 @@ function showStepHis(fksn) {
 function btnAddHis_Click() {
 
     if (!(window.File || window.FileReader || window.FileList || window.Blob)) {
-        alert('换Chrome浏览器啦');
+        popToastWarning("请换Chrome浏览器"); 
         return;
     }
      
@@ -23,13 +33,12 @@ function btnAddHis_Click() {
 
     var files = $('input[name="fileTrans"]').prop('files');
     if (files.length == 0) {
-        alert('请选择文件');
+        popToastWarning("请选择文件");  
         return;
     } else {
        
         if (!/.(sql)$/.test(vFile)) {
-
-            alert("必须是sql文件");
+            popToastWarning("必须是sql文件");  
             return false; 
         }
 
@@ -53,63 +62,13 @@ function btnAddHis_Click() {
 
             });
         }
-    }
-
-   
-
+    } 
 }
 
 //弹出删除窗口
-function showStepHisDelete(FKSN) {
+function showStepHisDelete() {
 
-    var arrayList = [];
-    var list = document.getElementsByName('chkHis_' + FKSN);
-    for (var i = 0; i < list.length; i++) {
-        var checked = list[i].checked;
-        var value = list[i].value;
-        if (checked) {
-            arrayList.push(value);
-        }
-    };
-
-    if (arrayList.length == 0) {
-        $('#myDelete').toast('show');
-        return;
-    }
-    document.getElementById("txtStepHisFKSN").value = FKSN;
-    //$("#txtStepHisFKSN").val(FKSN); 
-    $("#myHisModalDelete").modal("show");
-
-}
-
-//删除接口
-function btnDeleteStepHis_Click() {
-
-    var vFKSN = $("#txtStepHisFKSN").val();
-    var arrayList = [];
-
-    var list = document.getElementsByName('chkHis_' + vFKSN);
-    for (var i = 0; i < list.length; i++) {
-        var checked = list[i].checked;
-        var value = list[i].value;
-        if (checked) {
-            arrayList.push(value);
-        }
-    }
-     
-   
-    if (arrayList.length > 0) {
-       
-        var data = { ids: arrayList, FKSN: vFKSN };
-        $.post(urlFlowStepHisDelete, data
-            , function (data) {
-                $("#myHis_" + vFKSN).html(data);
-            })
-    }
-}
-
-function btnSmoExecute(fksn) {
- 
+    var fksn = selectFlowStep.SN; 
     var arrayList = [];
     var list = document.getElementsByName('chkHis_' + fksn);
     for (var i = 0; i < list.length; i++) {
@@ -121,17 +80,106 @@ function btnSmoExecute(fksn) {
     };
 
     if (arrayList.length == 0) {
+        $('#myDelete').toast('show');
+        return;
+    }  
+    $("#myHisModalDelete").modal("show");
+
+}
+
+//删除接口
+function btnDeleteStepHis_Click() {
+
+    var vFKSN = selectFlowStep.SN; 
+    var arrayList = [];
+
+    var list = document.getElementsByName('chkHis_' + vFKSN);
+    for (var i = 0; i < list.length; i++) {
+        var checked = list[i].checked;
+        var value = list[i].value;
+        if (checked) {
+            arrayList.push(value);
+        }
+    }
+   
+    if (arrayList.length > 0) {
+       
+        var data = { ids: arrayList, FKSN: vFKSN };
+        $.post(urlFlowStepHisDelete, data
+            , function (data) {
+                $("#myHis_" + vFKSN).html(data);
+            });
+    }
+}
+
+//执行历史sql
+function btnSmoExecute() {
+
+    var fksn = selectFlowStep.SN;  //步骤SN
+    var cmdText; //历史sql变量 
+    var idList = []; //历史 SN
+    var list = document.getElementsByName('chkHis_' + fksn);
+    for (var i = 0; i < list.length; i++) {
+        var chk = list[i];
+        var checked = chk.checked;
+        if (checked) {
+            cmdText = chk.attributes["data-text"].value;
+            idList.push(chk.value);
+        }
+    };
+
+    if (idList.length != 1) {
+
+        popToastWarning("请选择一条数据");
         return;
     }
 
-    var data = { FKSN: fksn, ids: arrayList }; 
-    if (arrayList.length > 0) {
-        $.post(urlFlowStepHisSmoExecute, data, function (result) {
+    var data = { FKSN: fksn, ids: idList };
 
-            var html = $("#myHis_" + fksn);
-            html.html(result); 
+    $.post(urlFlowStepHisSmoExecute, data, function (result) {
 
-        });
+        var html = $("#myHis_" + fksn);
+        html.html(result);
+
+        //更新commandText内容
+        var commandType = $("#tab_step_" + fksn + " [name = 'commandType']");
+        if (commandType.val() == "Text") {
+
+            var commandText = $("#tab_step_" + fksn + " [name = 'commandText']");
+            commandText.val(cmdText);
+
+        }
+    });
+
+}
+
+//查询执行脚本
+function showText() {
+
+    var text = selectedHisText();
+    var textarea = $("#myHisModalInfo textarea");
+
+    var height = $(document).height();
+    var rows = height / 32;
+
+    textarea[0].attributes["rows"].value = rows;
+    textarea.html(text); 
+    $("#myHisModalInfo").modal("show");
+
+}
+
+function selectedHisText() {
+
+    var vFKSN = selectFlowStep.SN; 
+    var list = document.getElementsByName('chkHis_' + vFKSN); 
+    var cmdText; //历史sql变量 
+    for (var i = 0; i < list.length; i++) {
+        var chk = list[i]; 
+        var checked = chk.checked; 
+        if (checked) {
+            cmdText = chk.attributes["data-text"].value;
+        }
     }
-    
+
+    return cmdText;
 }

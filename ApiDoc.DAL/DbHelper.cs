@@ -30,6 +30,11 @@ namespace ApiDoc.DAL
         public int ExecuteSql(string cmdText)
         {
             IDbCommand comd = CreateSqlComd(cmdText);
+            if (this.dbConnection.State == ConnectionState.Closed)
+            {
+                this.dbConnection.Open();
+            }
+
             int iOk = comd.ExecuteNonQuery();
             ((IDisposable)comd).Dispose();
             return iOk;
@@ -37,6 +42,10 @@ namespace ApiDoc.DAL
         public int ExecuteSql(string cmdText, DbParameters p)
         {
             IDbCommand comd = CreateSqlComd(cmdText, p);
+            if (this.dbConnection.State == ConnectionState.Closed)
+            {
+                this.dbConnection.Open();
+            }
             int iOk = comd.ExecuteNonQuery();
             ((IDisposable)comd).Dispose();
             return iOk;
@@ -88,19 +97,7 @@ namespace ApiDoc.DAL
             IDbTransaction tran = this.dbConnection.BeginTransaction(); 
             return tran;
         }
-
-        //private
-        private void ConnOpen(ref SqlCommand comd)
-        {
-            if (comd.Connection.State == ConnectionState.Closed)
-                comd.Connection.Open();
-        }
-        private void ConnClose(ref SqlCommand comd)
-        {
-            if (comd.Connection.State == ConnectionState.Open)
-                comd.Connection.Close();
-        }
-
+ 
         private IDbCommand CreateSqlComd(string cmdText)
         {
             try

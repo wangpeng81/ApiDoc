@@ -11,38 +11,28 @@ $(function () {
     //加载执行步骤
     $.post(urlFlowStepList, data,
         function (data) {
-            $("#myStepList").html(data);
-             
+
+            $("#myStepList").html(data); 
+            var tabSteps = $("#pills-tab-steps"); 
+            tabSteps.on("shown.bs.tab", function (e) {
+
+                var value = e.target.attributes["data-data"].nodeValue; 
+                selectFlowStep = eval("(" + value + ")");
+
+                var isload = e.target.attributes["data-isload"].value;
+                if (isload == "0") {
+
+                    //如果没有加载过
+                    loadHisData(selectFlowStep.SN);
+                    e.target.attributes["data-isload"].value = "1";
+                }
+            });
+
+            //显示第一步 
+            var tabFirst = $('#pills-tab-steps li:first-child a');
+            tabFirst.tab('show');
         }); 
 })
-
-
-//选择行
-function onStepSelect_Click(json) {
-    selectFlowStep = json;
-}
-
-//选择步骤项，加载历史sql数据
-function OnCollapse_Click(id, sn) {
-
-    var accordion = $('#' + id);
-
-    accordion.on('show.bs.collapse', function (event, data) {
-
-        var id = "myHis_" + sn;
-        var data = { FKSN: sn};
-
-        $.post(urlFlowStepHisList, data, function (result) {
-
-            $('#myHis_' + sn).html(result);
-
-        });
-        
-    });
-
-    accordion.collapse('show');
-
-}
 
 //弹出主信息窗口
 function btnShowFlowStep(FKSN) { 
@@ -57,8 +47,9 @@ function btnShowFlowStep(FKSN) {
             $('#txtStepOrder').val(selectFlowStep.StepOrder); 
             
         }
-        else {
-            $('#myToastUpdate').toast("show"); 
+        else { 
+            popToastWarning("请选择要修改的步骤数据");
+
             return;
         }
     }
@@ -102,7 +93,9 @@ function btnShowFlowStepDelete() {
         $("#myModalDelete").modal('show');
     }
     else {
-        $("#myToastDelete").toast('show'); 
+
+        popToastWarning("请选要删除的步骤");
+         
     }
 }
 
@@ -140,4 +133,3 @@ function btnSaveCmdText(SN) {
 
         });
 }
- 

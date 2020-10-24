@@ -20,27 +20,19 @@ namespace ApiDoc.Controllers
     [CustomExceptionFilterAttribute]
     public class InterfaceController : Controller
     {
-        private readonly IInterfaceDAL infterfaceDAL;
-        private readonly IFlowStepDAL flowStepDAL;
-        private readonly IFlowStepHisDAL flowStepHisDAL;
+        private readonly IInterfaceDAL infterfaceDAL; 
         private readonly DBRouteValueDictionary routeDict;
-        private readonly IParamDAL paramDAL;
+        
         private readonly IInterfaceBLL interfaceBLL;
         private readonly IConfiguration config;
 
-        public InterfaceController(IInterfaceDAL infterfaceDAL, 
-            IFlowStepDAL flowStepDAL,
-            IFlowStepHisDAL flowStepHisDAL,
-            DBRouteValueDictionary _routeDict,
-            IParamDAL paramDAL,
+        public InterfaceController(IInterfaceDAL infterfaceDAL,  
+            DBRouteValueDictionary _routeDict, 
             IInterfaceBLL interfaceBLL,
             IConfiguration config)
         {
-            this.infterfaceDAL = infterfaceDAL;
-            this.flowStepDAL = flowStepDAL;
-            this.flowStepHisDAL = flowStepHisDAL;
-            this.routeDict = _routeDict;
-            this.paramDAL = paramDAL;
+            this.infterfaceDAL = infterfaceDAL; 
+            this.routeDict = _routeDict; 
             this.interfaceBLL = interfaceBLL;
             this.config = config;
         } 
@@ -56,9 +48,7 @@ namespace ApiDoc.Controllers
             List<InterfaceModel> list = this.infterfaceDAL.All(title,url, fksn);
             return View(list);
         }
-
-        #region 接口
-
+ 
         public IActionResult Add(int FKSN, int SN)
         {
             List<string> list = new List<string>();
@@ -187,160 +177,7 @@ namespace ApiDoc.Controllers
 
             return model.SN;
         }
-         
-        #endregion
-          
-        #region Step
-
-        private IActionResult Redist(int FKSN)
-        {
-            string[] dataBase = this.config.GetSection("DataBase").Get<string[]>();
-            ViewData["DataBase"] = dataBase;
-            List<FlowStepModel> list = this.flowStepDAL.Query(FKSN);
-            return PartialView("/Views/Interface/FlowStepList.cshtml", list);
-        }
-        public IActionResult FlowStepList(int FKSN)
-        {  
-            return this.Redist(FKSN); 
-        }
-
-        [HttpPost]
-        public IActionResult StepSave(FlowStepModel model)
-        {
-            if (model.SN > 0)
-            {
-                FlowStepModel modelOld = this.flowStepDAL.Get< FlowStepModel>(model.SN);  
-                model.CommandText = modelOld.CommandText;
-                model.CommandType = modelOld.CommandType;
-                model.DataBase = modelOld.DataBase;
-                this.flowStepDAL.Update(model);
-            }
-            else
-            {
-                int SN = this.flowStepDAL.Insert(model);
-                model.SN = SN;
-            }
-            return Redist(model.FKSN);
-             
-        }
-
-        public IActionResult DeleteFlowStep(FlowStepModel model)
-        {
-            int resutl = this.flowStepDAL.Delete(model); 
-            return this.Redist(model.FKSN);
-        }
-
-        [HttpPost]
-        public int SaveCmdText(int SN, string CommandType, string CommandText, string DataBase)
-        {
-           return this.flowStepDAL.SaveCmdText(SN, CommandType, CommandText, DataBase);
-        }
-
-        #endregion
-
-        #region 历史His
-
-        [HttpPost]
-        public IActionResult StepHisList(int FKSN)
-        {
-            ViewData.Add("FKSN", FKSN);
-
-            List<FlowStepHisModel> list = this.flowStepHisDAL.Query(FKSN);
-            return PartialView("/Views/Interface/FlowStepHisList.cshtml", list);
-        }
-
-        [HttpPost]
-        public IActionResult StepHisAdd(FlowStepHisModel model)
-        {
-            model.DTime = System.DateTime.Now;
-            this.flowStepHisDAL.Insert(model);
-
-            return this.StepHisList(model.FKSN); 
-        }
-
-        [HttpPost]
-        public IActionResult StepHisDelete(List<int> ids, int FKSN)
-        {
-            foreach (int SN in ids)
-            {
-                FlowStepHisModel model = new FlowStepHisModel();
-                model.SN = SN;
-                int i = this.flowStepHisDAL.Delete(model); 
-            }
-
-            return this.StepHisList(FKSN);
-        }
-
-        [HttpPost]
-        public IActionResult SmoExecute(int FKSN, List<int> ids)
-        {
-            foreach (int id in ids)
-            {
-                FlowStepModel flowModel = this.flowStepDAL.Get<FlowStepModel>(FKSN);
-                 
-                foreach (FlowStepHisModel hisModel in this.flowStepHisDAL.Query(FKSN))
-                {
-                    if (hisModel.SN == id)
-                    {
-                        hisModel.IsEnable = true;
-                        string script = hisModel.Text;
-                        if( script != "" )
-                        {
-                            string procName = hisModel.FileName.Split(".")[0].Split("-")[0]; 
-                            this.flowStepHisDAL.SmoExecute(flowModel.DataBase, procName, script);
-                        }
-                    }
-                    else
-                    {
-                        hisModel.IsEnable = false;
-                    }
-                    this.flowStepHisDAL.Update(hisModel);
-                }
-
-            }
-            return this.StepHisList(FKSN);
-        }
-
-
-        #endregion
-
-        #region 参数
-
-        [HttpPost]
-        public IActionResult ParamList(int FKSN)
-        { 
-            List<ParamModel> list = this.paramDAL.Query(FKSN);
-            return PartialView("/Views/Interface/ParamList.cshtml", list);
-        }
-
-        [HttpPost]
-        public IActionResult ParamAdd(ParamModel model)
-        {
-            if (model.SN > 0)
-            {
-                this.paramDAL.Update(model);
-            }
-            else
-            { 
-                this.paramDAL.Insert(model);
-            }
-            return ParamList(model.FKSN);
-        }
-
-        [HttpPost]
-        public IActionResult ParamDelete(List<int> ids, int FKSN)
-        {
-            foreach (int SN in ids)
-            {
-                ParamModel model = new ParamModel();
-                model.SN = SN;
-                int i = this.paramDAL.Delete(model);
-            }
-
-            return ParamList(FKSN);
-        }
-        #endregion
-
+        
     }
 }
 

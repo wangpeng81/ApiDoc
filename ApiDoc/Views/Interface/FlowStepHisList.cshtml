@@ -13,26 +13,43 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var flowStepHis in Model)
+        @foreach (var stepHis in Model)
         {
         <tr class="row no-gutters fs-14">
             <td class="col-2 text-center">
                 <div class="custom-control custom-checkbox ml-1">
-                    <input type="checkbox" class="custom-control-input" id="custCheckHis_@flowStepHis.SN" name="chkHis_@ViewData["FKSN"]" value="@flowStepHis.SN">
-                    <label class="custom-control-label" for="custCheckHis_@flowStepHis.SN"></label>
+                    @if (stepHis.IsEnable)
+                    {
+                        <input type="checkbox"
+                               class="custom-control-input"
+                               id="custCheckHis_@stepHis.SN"
+                               name="chkHis_@ViewData["FKSN"]"
+                               value="@stepHis.SN"
+                               checked="checked"
+                               data-text="@stepHis.Text">
+                    }
+                    else
+                    {
+                        <input type="checkbox"
+                               class="custom-control-input"
+                               id="custCheckHis_@stepHis.SN"
+                               name="chkHis_@ViewData["FKSN"]"
+                               value="@stepHis.SN"
+                               data-text="@stepHis.Text" >
+                    }
+                    <label class="custom-control-label" for="custCheckHis_@stepHis.SN"></label>
                 </div>
             </td>
-            @if (flowStepHis.IsEnable)
+            @if (stepHis.IsEnable)
             {
                 <td class="col-10 text-success">
-                    @flowStepHis.FileName
-                </td>
-
+                    @stepHis.FileName
+                </td> 
             }
             else
             {
                 <td class="col-10">
-                    @flowStepHis.FileName
+                    @stepHis.FileName
                 </td>
 
             }

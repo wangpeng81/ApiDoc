@@ -1,7 +1,7 @@
 ﻿
 $(function () {
-    var option = { animation: true, delay: 1500 };
-    $('.toast').toast(option); 
+    //var option = { animation: true, delay: 1500 };
+    //$('.toast').toast(option); 
 });
 
 function checkAll(sender, checkName) {

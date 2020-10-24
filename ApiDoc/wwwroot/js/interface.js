@@ -27,7 +27,8 @@ function btnSaveIntterface_Click() {
         IsStop: vIsStop
     }, function (data) {
 
-            $('#myToastSuccess').toast('show');
+            popToastSuccess("保存成功!");
+
             _SN = data.sn;
             $("#txtSN").val(data.sn);
     })
@@ -47,15 +48,14 @@ function btnStopIntterface_Click() {
                 $("#iPlay").removeClass("text-success");
                 $("#txtIsStop").val(1);
             }
-            else { 
+            else {
                 $("#iPlay").addClass("text-success");
                 $("#txtIsStop").val(0);
             }
         }
-        else { 
+        else {
 
-            showWarning("停用失败!");
-
+            popToastWarning("停用失败!"); 
         }
     });
 }
@@ -68,9 +68,9 @@ function btnUpLoad_Click() {
     $.get(url, function (myResponse) {
 
         if (myResponse.dataType == 0) {
-            
-            $("#myToastUpLoad").toast("show");
 
+            popToastSuccess("发布接口成功!");
+             
         }
         else {
             alert( myResponse.exception );
@@ -189,18 +189,15 @@ function checkAll(sender, checkName) {
         objList[i].checked = sender.checked;
     }
 }
-
-function showWarning(msg) {
-
-    var messageBox = $("#myToast");
-    $("#myMsg").html(msg); 
-    messageBox.toast("show");
-}
-
+ 
 $(function () {
-    var option = { animation: true, delay: 1500 };
-    $('.toast').toast(option);
+
+    //初始化提示信息
+    var option = { animation: true, delay: 3000 };
+    $('.toast').toast(option); 
     $('[data-toggle="tooltip"]').tooltip();
+
+    //$("#myParamList").height(50);
 
     _SN = $("#txtSN").val();
 });

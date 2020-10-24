@@ -17,7 +17,9 @@ namespace ApiDoc.DAL
         protected string tableName = "";
         protected readonly ILogger<BaseDAL> _logger;
         protected readonly IDbHelper db;
-        
+
+        public Logger<BaseDAL> Logger { get; set; }
+
         public BaseDAL(ILogger<BaseDAL> logger, IDbHelper db)
         { 
             _logger = logger;
@@ -25,6 +27,11 @@ namespace ApiDoc.DAL
             this.GetTableName();
         }
 
+        public void Show()
+        {
+            object o = this.Logger;
+        }
+ 
         public int Delete(BaseModel model)
         { 
             this.db.Open();

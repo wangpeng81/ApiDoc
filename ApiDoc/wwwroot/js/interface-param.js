@@ -33,7 +33,7 @@ function showParamWin(sn) {
         }
 
         if (json == null) {
-            $('#myToastUpdate').toast("show");
+            popToastWarning("请选择要修改的数据");
             return;
         }
         json = eval("(" + json + ")");
@@ -98,7 +98,7 @@ function showDeleteModal() {
     }
 
     if (ids.length == 0) {
-        $("#myToastDelete").toast('show');
+        popToastWarning("请选择要删除的参数"); 
         return;
     }
 
@@ -120,7 +120,7 @@ function btnDeleteParam_Click() {
     }
 
     if (idsList.length == 0) {
-        $("#myToastDelete").toast('show');
+        popToastWarning("请选择要删除的参数"); 
         return;
     }
 

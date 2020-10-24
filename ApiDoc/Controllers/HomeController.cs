@@ -9,26 +9,28 @@ using ApiDoc.Models;
 using System.Data;
 using Autofac;
 using System.Data.SqlClient;
+using ApiDoc.DAL;
 
 namespace ApiDoc.Controllers
 {
     public class HomeController : BaseController
-    {
-        private readonly ILogger<HomeController> _logger;
+    { 
         private readonly IComponentContext componentContext;
-
-        // private readonly IContainer container;
-
-        public HomeController(ILogger<HomeController> logger, IComponentContext  componentContext )
-        {
-            _logger = logger;
-             
+　
+        public HomeController(IComponentContext componentContext )
+        { 
             this.componentContext = componentContext;
             IDbConnection dbConnection = componentContext.Resolve<IDbConnection>();
+
+            //var c = componentContext.Resolve<ClassC>();
+            //c.Show();
+            //c.D.LogWarning("");
+ 
         }
 
         public IActionResult Index()
-        { 
+        {
+         　
             ViewData["Nav"] = base.LoadNav("Home");
 
             return View();

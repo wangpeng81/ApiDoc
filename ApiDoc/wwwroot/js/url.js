@@ -10,21 +10,21 @@ var urlFolderDel = urlRoot + "/Folder/DeleteFolder";
 var urlFolderSave = urlRoot + "/Folder/SaveFolder";
 
 //执行步骤
-var urlFlowStepSave = urlRoot + "/Interface/StepSave";
-var urlFlowStepList = urlRoot + "/Interface/FlowStepList";
-var urlFlowStepDelete = urlRoot + "/Interface/DeleteFlowStep";
-var urlFlowStepSaveCmdText = urlRoot + "/Interface/SaveCmdText";
+var urlFlowStepSave = urlRoot + "/Step/StepSave";
+var urlFlowStepList = urlRoot + "/Step/FlowStepList";
+var urlFlowStepDelete = urlRoot + "/Step/DeleteFlowStep";
+var urlFlowStepSaveCmdText = urlRoot + "/Step/SaveCmdText";
 
 //历史Sql
-var urlFlowStepHisList = urlRoot + "/Interface/StepHisList";
-var urlFlowStepHisAdd = urlRoot + "/Interface/StepHisAdd";
-var urlFlowStepHisDelete = urlRoot + "/Interface/StepHisDelete";
-var urlFlowStepHisSmoExecute = urlRoot + "/Interface/SmoExecute";
+var urlFlowStepHisList = urlRoot + "/His/StepHisList";
+var urlFlowStepHisAdd = urlRoot + "/His/StepHisAdd";
+var urlFlowStepHisDelete = urlRoot + "/His/StepHisDelete";
+var urlFlowStepHisSmoExecute = urlRoot + "/His/SmoExecute";
 
 //参数 
-var urlParamList = urlRoot + "/Interface/ParamList";
-var urlParamAdd = urlRoot + "/Interface/ParamAdd";
-var urlParamDelete = urlRoot + "/Interface/ParamDelete";
+var urlParamList = urlRoot + "/Param/ParamList";
+var urlParamAdd = urlRoot + "/Param/ParamAdd";
+var urlParamDelete = urlRoot + "/Param/ParamDelete";
 
 var urlRouteUpLoad = urlRoot + "/RouteValue/UpLoad";
 var urlRouteDelete = urlRoot + "/RouteValue/Delete";
