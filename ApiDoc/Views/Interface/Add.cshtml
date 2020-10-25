@@ -111,7 +111,7 @@
                     }
                     else
                     {
-                        <input type="text" class="form-control" id="txtUrl" value="@Model.Url" readonly="readonly" />
+                        <input type="text" class="form-control bg-white" id="txtUrl" value="@Model.Url" readonly="readonly" />
                     }
                 </div>
 
@@ -203,8 +203,8 @@
                 <div class="btn-toolbar my-2" role="toolbar" aria-label="Toolbar with button groups">
                     <div class="btn-group btn-group-sm" role="group" aria-label="Second group">
                         <button type="button" class="btn btn-info">接口步骤</button>
-                        <button type="button" class="btn btn-default" data-toggle="tooltip" onclick="btnShowFlowStep(@Model.SN)"><i class="fa fa-plus"></i></button>
-                        <button type="button" class="btn btn-default" data-toggle="tooltip" onclick="btnShowFlowStep(0)"><i class="fa fa-edit"></i></button>
+                        <button type="button" class="btn btn-default" data-toggle="tooltip" onclick="showFlowStep(@Model.SN)"><i class="fa fa-plus"></i></button>
+                        <button type="button" class="btn btn-default" data-toggle="tooltip" onclick="showFlowStep(0)"><i class="fa fa-edit"></i></button>
                         <button type="button" class="btn btn-default" data-toggle="tooltip" onclick="btnShowFlowStepDelete()"><i class="fa fa-trash-o"></i></button>
                     </div>
                 </div>
@@ -227,5 +227,6 @@
     <script src="~/js/flowstep-his.js"></script>
     <script src="~/js/flowstep-param.js"></script>
     <script src="~/js/interface-param.js"></script>
+    <script src="~/js/xnTable.js"></script>
 }
 

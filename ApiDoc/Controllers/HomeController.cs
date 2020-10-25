@@ -22,10 +22,17 @@ namespace ApiDoc.Controllers
             this.componentContext = componentContext;
             IDbConnection dbConnection = componentContext.Resolve<IDbConnection>();
 
+            //Dictionary<string, object> dict = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            //dict.Add("abc", 123);
+            
+            //if (dict.ContainsKey("AbC"))
+            //{
+            //    object value = dict["abc"]; 
+            //}
             //var c = componentContext.Resolve<ClassC>();
             //c.Show();
             //c.D.LogWarning("");
- 
+
         }
 
         public IActionResult Index()

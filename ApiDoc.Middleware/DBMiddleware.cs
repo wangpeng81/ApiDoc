@@ -18,6 +18,7 @@ using System;
 using Newtonsoft.Json;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using ApiDoc.IBLL;
 
 namespace ApiDoc.Middleware
 {
@@ -27,6 +28,7 @@ namespace ApiDoc.Middleware
         private string SqlConnStr;
 
         private readonly RequestDelegate next;
+        private readonly IParamDAL paramDAL;
         private readonly IDbHelper dbHelp;
         private readonly DBRouteValueDictionary routeDict;
         private readonly ILogger<DBMiddleware> logger;
@@ -37,13 +39,15 @@ namespace ApiDoc.Middleware
 
         public DBMiddleware(RequestDelegate _next,
                             IInterfaceDAL interfaceDAL,
-                            IFlowStepDAL flowStpeDAL,
+                            IFlowStepDAL flowStepDAL,
+                            IParamDAL paramDAL,
                             IDbHelper dbHelp,
                             DBRouteValueDictionary _routeDict,
                             IConfiguration config,
                             ILogger<DBMiddleware> logger)
         {
             this.next = _next;
+            this.paramDAL = paramDAL;
             this.dbHelp = dbHelp;
             this.routeDict = _routeDict;
             this.logger = logger;
@@ -52,6 +56,7 @@ namespace ApiDoc.Middleware
             this.pwd = config.GetConnectionString("pwd");
 
             //加载路由集合
+
             List<InterfaceModel> dtInterface = interfaceDAL.Query(false);
             foreach (InterfaceModel model in dtInterface)
             {
@@ -61,9 +66,23 @@ namespace ApiDoc.Middleware
                 DBInterfaceModel dbInter = new DBInterfaceModel();
                 dbInter.SerializeType = model.SerializeType;
                 dbInter.Method = model.Method;
-                dbInter.Steps = flowStpeDAL.Query(SN);
+                dbInter.Steps = flowStepDAL.QueryOfParam(SN);
                 dbInter.IsTransaction = model.IsTransaction;
                 dbInter.ExecuteType = model.ExecuteType;
+
+                //接口参数
+                string auth = ""; 
+                foreach (ParamModel param in this.paramDAL.Query(SN))
+                {
+                    if (auth != "")
+                    {
+                        auth += "_";
+                    }
+                    auth += param.ParamName;
+                }
+                auth = auth.ToLower();
+                dbInter.Auth = auth;
+
                 if (!routeDict.ContainsKey(Url))
                 {
                     routeDict.Add(Url, dbInter);
@@ -97,6 +116,7 @@ namespace ApiDoc.Middleware
                 await next(context);
             } 
         }
+
         private async Task InvokeDB(HttpContext context)
         {
             this.context = context;
@@ -107,6 +127,58 @@ namespace ApiDoc.Middleware
             string exceMsg = ""; //存储异常的存储过程名  
             if (response.Steps.Count > 0)
             {
+                //参数验证
+                //从Request中获取参数集合
+                Dictionary<string, object> dict = null;
+                string method = response.Method.ToLower();
+                string auth = "";
+                if (method == "post")
+                {
+                    var reader = new StreamReader(context.Request.Body);
+                    var contentFromBody = reader.ReadToEnd();
+                    if (contentFromBody != "")
+                    {
+                        dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(contentFromBody);
+                    }
+
+                    foreach (KeyValuePair<string, object> kv in dict)
+                    {
+                        if (auth != "")
+                        {
+                            auth += "_";
+                        }
+                        auth += kv.Key;
+                    } 
+                }
+                else if (method == "get")
+                {
+                    dict = new Dictionary<string, object>();
+                    foreach (KeyValuePair<string, StringValues> kv in context.Request.Query)
+                    {
+                        if (!dict.ContainsKey(kv.Key))
+                        {
+                            if (auth != "")
+                            {
+                                auth += "_";
+                            } 
+                            auth += kv.Key; 
+                            dict.Add(kv.Key, kv.Value[0]);
+                        } 
+                    }
+                }
+                else
+                {
+                    await this.InvokeException("此平台只支持post,get");
+                    return;
+                }
+
+                auth = auth.ToLower();
+                if (response.Auth != auth)
+                {
+                    await this.InvokeException("接收参数[" + response.Auth + "]与规则["+auth+"]不匹配" );
+                    return;
+                }
+
                 SqlConnection connection = new SqlConnection(SqlConnStr);
                 SqlTransaction tran = null;
                 try
@@ -119,7 +191,7 @@ namespace ApiDoc.Middleware
                     }
 
                     //执行第一步 
-                    string text = this.InvokeFistStep(response, connection, tran, out exceMsg);
+                    string text = this.InvokeFistStep(response, connection, tran, dict, out exceMsg);
 
                     if (exceMsg != "")
                     {
@@ -154,89 +226,37 @@ namespace ApiDoc.Middleware
             }
         }
 
-        private string InvokeFistStep(DBInterfaceModel response, SqlConnection connection, SqlTransaction tran, out string exceMsg)
+        private string InvokeFistStep(DBInterfaceModel response, SqlConnection connection, SqlTransaction tran, Dictionary<string, object> dict, out string exceMsg)
         {
             exceMsg = "";
 
-            FlowStepModel flow = response.Steps[0];
-            if (flow.CommandText == "")
+            DataRow dataPre = null;
+            string result = "";
+            int rowIndex = 0;
+            int count = response.Steps.Count; 
+            foreach (FlowStepModel step in response.Steps)
             {
-                exceMsg = flow.StepName + " 没有数据库语句，请维护";
-                return "";
-            }
-
-            connection.ChangeDatabase(flow.DataBase);
-            SqlCommand cmd = new SqlCommand();
-            cmd.CommandTimeout = 0;
-            cmd.Connection = connection;
-            SqlDataAdapter sqlDA = new SqlDataAdapter();
-            sqlDA.SelectCommand = cmd;
-            cmd.Transaction = tran;
-
-            //初始化参数
-            switch (flow.CommandType)
-            {
-                case "Text":
-                    cmd.CommandType = CommandType.Text;
-                    break;
-                case "StoredProcedure":
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    break;
-            }
-
-            cmd.CommandText = flow.CommandText;
-            cmd.Parameters.Clear();
-            if (response.Method.ToLower() == "get")
-            {
-                foreach (string key in context.Request.Query.Keys)
+                if (step.CommandText == "")
                 {
-                    StringValues value = new StringValues();
-                    bool value1 = context.Request.Query.TryGetValue(key, out value);
-                    cmd.Parameters.AddWithValue(key, value[0]);
-                }
-            }
-            else if (response.Method.ToLower() == "post")
-            {
-                var reader = new StreamReader(context.Request.Body);
-                var contentFromBody = reader.ReadToEnd();
-                if (contentFromBody != "")
-                {
-                    Dictionary<string, object> dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(contentFromBody);
-                    foreach (KeyValuePair<string, object> kv in dict)
-                    {
-                        cmd.Parameters.AddWithValue(kv.Key, kv.Value);
-                    }
-                }
-            }
-
-            //执行Sql
-            string result = this.ExecSql(response, connection, sqlDA, cmd);
-            this.InvokeOtherStep(response, connection, tran);
-
-            return result;
-        }
-
-        private string InvokeOtherStep(DBInterfaceModel response, SqlConnection connection, SqlTransaction tran)
-        {
-            SqlCommand cmd = new SqlCommand();
-            cmd.CommandTimeout = 0;
-            cmd.Connection = connection;
-            SqlDataAdapter sqlDA = new SqlDataAdapter();
-            sqlDA.SelectCommand = cmd;
-            cmd.Transaction = tran;
-
-            string exceMsg = "";
-            for (int i = 1; i < response.Steps.Count; i++)
-            {
-                FlowStepModel flow = response.Steps[i];
-                if (flow.CommandText == "")
-                {
-                    exceMsg = flow.StepName + " 没有数据库语句，请维护";
-                    return exceMsg;
+                    exceMsg = step.StepName + " 没有数据库语句，请维护";
+                    return "";
                 }
 
-                connection.ChangeDatabase(flow.DataBase);
-                switch (flow.CommandType)
+                connection.ChangeDatabase(step.DataBase);
+                SqlCommand cmd = new SqlCommand();
+                cmd.CommandTimeout = 0;
+                cmd.Connection = connection;
+
+                if (response.IsTransaction)
+                {
+                    cmd.Transaction = tran;
+                }
+
+                SqlDataAdapter sqlDA = new SqlDataAdapter();
+                sqlDA.SelectCommand = cmd;
+
+                //初始化参数
+                switch (step.CommandType)
                 {
                     case "Text":
                         cmd.CommandType = CommandType.Text;
@@ -245,44 +265,35 @@ namespace ApiDoc.Middleware
                         cmd.CommandType = CommandType.StoredProcedure;
                         break;
                 }
-
-                cmd.CommandText = flow.CommandText;
+                cmd.CommandText = step.CommandText;
                 cmd.Parameters.Clear();
-
-                if (response.Method.ToLower() == "get")
+                bool bOK = CreateParam(response, cmd, dataPre, step, dict, out exceMsg);
+                if (!bOK)
                 {
-                    foreach (string key in context.Request.Query.Keys)
+                    return "";
+                }
+
+                //执行Sql
+                if (rowIndex == count - 1) //最后一步
+                {
+                    result = this.ExecSql(response, connection, sqlDA, cmd);
+                }
+                else
+                {
+                    //如果不是最后一步，存储当前步结果
+                    DataTable dt = new DataTable();
+                    sqlDA.Fill(dt);
+                    if (dt.Rows.Count > 0)
                     {
-                        StringValues value = new StringValues();
-                        bool value1 = context.Request.Query.TryGetValue(key, out value);
-                        cmd.Parameters.AddWithValue(key, value[0]);
+                        dataPre = dt.Rows[0];
                     }
                 }
-                else if (response.Method.ToLower() == "post")
-                {
-                    try
-                    {
-                        var reader = new StreamReader(context.Request.Body);
-                        var contentFromBody = reader.ReadToEnd();
-                        if (contentFromBody != "")
-                        {
-                            Dictionary<string, object> dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(contentFromBody);
-                            foreach (KeyValuePair<string, object> kv in dict)
-                            {
-                                cmd.Parameters.AddWithValue(kv.Key, kv.Value);
-                            }
-                        }
-                    }
-                    catch (System.Exception ex)
-                    {
-                        throw ex;
-                    }
-                }
-            }
 
-            return exceMsg;
+                rowIndex++;
+            } 
+            return result;
         }
-
+ 
         private string ExecSql(DBInterfaceModel response, SqlConnection connection, SqlDataAdapter sqlDA, SqlCommand cmd)
         {
             string json = "";
@@ -297,8 +308,7 @@ namespace ApiDoc.Middleware
                 case "Int":
                     objResutl = cmd.ExecuteNonQuery();
                     break;
-                case "DataSet":
-
+                case "DataSet": 
                     DataSet ds = new DataSet();
                     sqlDA.Fill(ds);
                     objResutl = ds;
@@ -320,6 +330,52 @@ namespace ApiDoc.Middleware
             return json;
         }
 
+        private bool CreateParam(DBInterfaceModel response, SqlCommand cmd, DataRow dataPre, FlowStepModel step, Dictionary<string, object> dict,  out string exceMsg)
+        {
+            exceMsg = "";
+            foreach (FlowStepParamModel param in step.Params)
+            {
+                string str = step.StepName + ">>参数" + param.ParamName;
+                object value = null;
+
+                if (param.IsPreStep) //如果从上一步取值
+                {
+                    if (dataPre == null)
+                    {
+                        exceMsg = str + "无法从上一步取值值";
+                        return false;
+                    } 
+                    value = dataPre[param.ParamName]; 
+                }
+                else //从Request中取值 
+                {
+                    if (response.Method.ToLower() == "get")
+                    { 
+                        StringValues value1 = new StringValues();
+                        bool bOK = context.Request.Query.TryGetValue(param.ParamName, out value1);
+                        if (bOK)
+                        {
+                            value = value1[0]; 
+                        }
+                        else
+                        {
+                            exceMsg = str + "没有在Request中获取到值";
+                            return false;
+                        }
+                    }
+                    else if (response.Method.ToLower() == "post")
+                    { 
+                        if (dict.ContainsKey(param.ParamName))
+                        {
+                            value = dict[param.ParamName]; 
+                        } 
+                    }
+
+                    cmd.Parameters.AddWithValue(param.ParamName, value);
+                } 
+            }
+            return true;
+        }
         private async Task InvokeException(string exception)
         {
 

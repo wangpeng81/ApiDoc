@@ -7,6 +7,6 @@ namespace ApiDoc.IBLL
 {
     public interface IInterfaceBLL : IBaseBLL
     {
-        DBInterfaceModel GetInterfaceModel(int SN);
+        DBInterfaceModel GetInterfaceModel(int SN); 
     }
 }

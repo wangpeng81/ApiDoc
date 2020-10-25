@@ -10,5 +10,7 @@ namespace ApiDoc.Models
     public class DBInterfaceModel : InterfaceModel
     {   
         public List<FlowStepModel> Steps;
+        public string Auth;// 验证接口参数是否正确
+
     }
 }

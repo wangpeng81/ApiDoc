@@ -34,9 +34,7 @@ namespace ApiDoc.DAL
         public List<FlowStepModel> Query(int fksn)
         {
             List<FlowStepModel> list = new List<FlowStepModel>();
-
-            try
-            {  
+             
                 string strSql = string.Format("select * from {0} where FKSN= {1} order by StepOrder", tableName, fksn);
                 DataTable dt = db.FillTable(strSql);
 
@@ -45,12 +43,33 @@ namespace ApiDoc.DAL
                     FlowStepModel info = this.CreateModel<FlowStepModel>(dataRow);
                     list.Add(info);
                 } 
-            }
-            catch (Exception ex)
+            
+            return list;
+        }
+
+        public List<FlowStepModel> QueryOfParam(int fksn)
+        {
+            List<FlowStepModel> list = new List<FlowStepModel>();
+
+            string strSql = string.Format("select * from {0} where FKSN= {1} order by StepOrder", tableName, fksn);
+            DataTable dt = db.FillTable(strSql);
+
+            foreach (DataRow dataRow in dt.Rows)
             {
-                _logger.LogError("DbCommand->api_interface=>Insert(s) 出错\r\n" + ex.Message);
-                throw ex;
+                FlowStepModel info = this.CreateModel<FlowStepModel>(dataRow);
+
+                string strSql1 = "select * from api_flow_step_param where fksn =" + info.SN.ToString();
+                info.Params = new List<FlowStepParamModel>();
+
+                foreach (DataRow dataRow1 in db.FillTable(strSql1).Rows)
+                {
+                    FlowStepParamModel model1 = base.CreateModel<FlowStepParamModel>(dataRow1);
+                    info.Params.Add(model1);
+                } 
+
+                list.Add(info);
             }
+
             return list;
         }
 

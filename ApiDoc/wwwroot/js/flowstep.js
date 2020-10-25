@@ -42,12 +42,16 @@ function loadStepData(innerHtml) {
 }
 
 //弹出主信息窗口
-function btnShowFlowStep(FKSN) { 
-
+function showFlowStep(FKSN) { 
+     
     if (FKSN == 0) {
 
         //修改
         if (selectFlowStep != null) {
+
+            //var dgv = $("#dgSPList_" + selectFlowStep.SN);
+            //dgv.xnTable();
+
             $('#txtStepSN').val(selectFlowStep.SN);
             $('#txtStepName').val(selectFlowStep.StepName);
             $('#txtStepFKSN').val(selectFlowStep.FKSN);
