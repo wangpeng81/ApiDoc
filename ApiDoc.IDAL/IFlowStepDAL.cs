@@ -10,5 +10,6 @@ namespace ApiDoc.IDAL
     {
         List<FlowStepModel> Query(int fksn);
         int SaveCmdText(int SN, string CommandType, string CommandText, string DataBase);
+        int DeleteAll(int SN);
     }
 }

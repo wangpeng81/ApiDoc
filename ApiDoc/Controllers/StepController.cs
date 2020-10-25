@@ -32,6 +32,7 @@ namespace ApiDoc.Controllers
             List<FlowStepModel> list = this.flowStepDAL.Query(FKSN);
             return PartialView("/Views/Interface/FlowStepList.cshtml", list);
         }
+
         public IActionResult FlowStepList(int FKSN)
         {
             return this.Redist(FKSN);
@@ -59,7 +60,7 @@ namespace ApiDoc.Controllers
 
         public IActionResult DeleteFlowStep(FlowStepModel model)
         {
-            int resutl = this.flowStepDAL.Delete(model);
+            int resutl = this.flowStepDAL.DeleteAll(model.SN);
             return this.Redist(model.FKSN);
         }
 

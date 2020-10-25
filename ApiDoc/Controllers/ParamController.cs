@@ -11,10 +11,12 @@ namespace ApiDoc.Controllers
     public class ParamController : Controller
     {
         private readonly IParamDAL paramDAL;
+        private readonly IFlowStepParamDAL flowStepParamDAL;
 
-        public ParamController(IParamDAL paramDAL)
+        public ParamController(IParamDAL paramDAL, IFlowStepParamDAL flowStepParamDAL)
         {
             this.paramDAL = paramDAL;
+            this.flowStepParamDAL = flowStepParamDAL;
         }
 
         public IActionResult Index()
@@ -56,6 +58,46 @@ namespace ApiDoc.Controllers
             }
 
             return ParamList(FKSN);
+        }
+
+        #endregion
+
+
+        #region 步骤参数
+
+        [HttpPost]
+        public IActionResult StepParamList(int FKSN)
+        {
+            ViewData.Add("FKSN", FKSN);
+
+            List<FlowStepParamModel> list = this.flowStepParamDAL.Query(FKSN);
+            return PartialView("/Views/Interface/FlowStepParamList.cshtml", list);
+        }
+
+        [HttpPost]
+        public IActionResult StepParamSave(FlowStepParamModel model)
+        {
+            if (model.SN > 0)
+            {
+                this.flowStepParamDAL.Update(model);
+            }
+            else
+            {
+                this.flowStepParamDAL.Insert(model);
+            }
+            return StepParamList(model.FKSN);
+        }
+
+        [HttpPost]
+        public IActionResult StepParamDelete(List<int> ids, int FKSN)
+        {
+            foreach (int SN in ids)
+            {
+                FlowStepParamModel model = new FlowStepParamModel();
+                model.SN = SN;
+                int i = this.flowStepParamDAL.Delete(model);
+            } 
+            return StepParamList(FKSN);
         }
 
         #endregion

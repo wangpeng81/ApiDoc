@@ -90,7 +90,15 @@ namespace ApiDoc.DAL
                         sbColumns.Append(",");
                         sbValues.Append(",");
                     }
-                    sbColumns.Append(pro.Name);
+                    if (pro.Name == "DataBase")
+                    {
+                        sbColumns.Append("[" + pro.Name + "]");
+                    }
+                    else
+                    {
+                        sbColumns.Append(pro.Name);
+                    }
+                   
                     sbValues.Append("@" + pro.Name);
                 }
                 else

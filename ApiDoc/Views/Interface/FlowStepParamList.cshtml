@@ -1,0 +1,44 @@
+﻿@model List<ApiDoc.Models.FlowStepParamModel>
+
+<table class="table table-sm m-0 p-0 no-gutters">
+    <thead>
+        <tr class="row no-gutters fs-14">
+            <th class="col-2  text-center border-top-0">
+                <div class="custom-control custom-checkbox ml-1">
+                    <input type="checkbox" class="custom-control-input" name="chkHis" id="stepParam_@ViewData["FKSN"]_CheckAll" onchange="checkAll(this,'myStepParam_@ViewData["FKSN"]')" />
+                    <label class="custom-control-label" for="stepParam_@ViewData["FKSN"]_CheckAll"></label>
+                </div>
+            </th>
+            <th class="col-10 border-top-0">参数名</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var stepParam in Model)
+        {
+            <tr class="row no-gutters fs-14">
+                <td class="col-2 text-center">
+                    <div class="custom-control custom-checkbox ml-1">
+                        <input type="checkbox"
+                               class="custom-control-input"
+                               id="StepParam_@stepParam.SN"
+                               name="myStepParam_@ViewData["FKSN"]"
+                               value="{SN:@stepParam.SN,
+                               ParamName:'@stepParam.ParamName',
+                               DataType:'@stepParam.DataType',
+                               DefaultValue:'@stepParam.DefaultValue',
+                               Remark:'@stepParam.Remark',
+                               FKSN:@stepParam.FKSN,
+                               IsPreStep:'@stepParam.IsPreStep'}">
+                        <label class="custom-control-label" for="StepParam_@stepParam.SN"></label>
+                    </div>
+                </td>
+                <td class="col-10">
+                    @stepParam.ParamName
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+
+

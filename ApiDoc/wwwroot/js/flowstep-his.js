@@ -83,8 +83,7 @@ function showStepHisDelete() {
         $('#myDelete').toast('show');
         return;
     }  
-    $("#myHisModalDelete").modal("show");
-
+    showModalDelete(btnDeleteStepHis_Click); 
 }
 
 //删除接口

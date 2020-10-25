@@ -31,25 +31,7 @@
         </div>
     </div>
 </div>
-
-<!-- 步骤删除提示 -->
-<div class="modal fade" id="myModalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">提示信息</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            </div>
-            <div class="modal-body"> 请确认是否要删除 </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="btnSaveFlowStepDelete(@ViewData["FKSN"])"><span class="fa fa-save" aria-hidden="true"></span>确认</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
+ 
 <!-- 测试 -->
 <div class="modal fade bd-example-modal-lg" id="myModalCS" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -72,7 +54,6 @@
     </div>
 </div>
 
-
 <!-- 历史Sql窗口 -->
 <div class="modal fade" id="myStepHisModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -93,7 +74,7 @@
                         <br />
                         例如: Proc_Fun-2020-10-10.sql
                     </div>
-                   
+
                 </div>
             </div>
             <div class="modal-footer">
@@ -102,37 +83,18 @@
         </div>
     </div>
 </div>
-
-<!-- 历史Sql删除窗口 -->
-<div class="modal fade" id="myHisModalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">提示信息</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            </div>
-            <div class="modal-body">
-                请确认是否要删除
-                <input id="txtStepHisFKSN" type="hidden" />
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="btnDeleteStepHis_Click()">确认</button>
-            </div>
-        </div>
-    </div>
-</div>
+ 
 
 <!-- 历史Sql 查看 -->
 <div class="modal fade" id="myHisModalInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-        <div class="modal-content"> 
-            <div class="modal-body "> 
-                <textarea class="form-control" rows="10" >
+        <div class="modal-content">
+            <div class="modal-body ">
+                <textarea class="form-control" rows="10">
 </textarea>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button> 
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
             </div>
         </div>
     </div>
@@ -186,21 +148,66 @@
         </div>
     </div>
 </div>
-
-<!-- 参数删除窗口 -->
-<div class="modal fade" id="myParamModalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+ 
+<!-- 步骤参数维护窗口 -->
+<div class="modal fade" id="myStepParamModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">提示信息</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h5 class="modal-title" id="exampleModalCenterTitle">维护步骤参数</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="modal-body"> 请确认是否要删除 </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="btnDeleteParam_Click()">确认</button>
+            <input id="txtStepParamSN" type="hidden" value="0" />
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label for="txtParamName" class="col-3 col-form-label">参数名称</label>
+                    <div class="col-9">
+                        <input class="form-control" id="txtStepParamName">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="txtParamRemark" class="col-3 col-form-label">参数描述</label>
+                    <div class="col-9">
+                        <input class="form-control" id="txtStepParamRemark">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="cbxParamDataType" class="col-3 col-form-label">数据类型</label>
+                    <div class="col-9">
+                        <select class="custom-select mr-sm" id="cbxStepParamDataType">
+                            @foreach (string dataType in (List<string>)ViewData["DataType"])
+                            {
+                                <option value="@dataType">@dataType</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="txtParamDefault" class="col-3 col-form-label">默认值</label>
+                    <div class="col-9">
+                        <input class="form-control" id="txtStepParamDefault">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="cbxParamDataType" class="col-3 col-form-label"></label>
+                    <div class="custom-control custom-checkbox col-9">
+                        <input type="checkbox" class="custom-control-input" id="chkIsPreStep">
+                        <label class="custom-control-label" for="chkIsPreStep">是否从前一步取值</label>
+                    </div>
+                </div>
             </div>
-        </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="btnSaveStepParam_Click()"><i class="fa fa-save"></i></button>
+                </div>
+            </div>
     </div>
 </div>
+
+
+
+
+
+
 

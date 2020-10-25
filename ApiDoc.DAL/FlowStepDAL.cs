@@ -20,7 +20,17 @@ namespace ApiDoc.DAL
         {
             
         }
- 
+
+        public int DeleteAll(int SN)
+        {
+            string vSN = SN.ToString();
+            string cmdText = "delete from api_flow_step where SN = " + vSN;
+            cmdText += ";delete from api_flow_step_param where fksn = " + vSN;
+            cmdText += ";delete from api_flow_step_his where fksn = " + vSN;
+            int result = db.ExecuteSql(cmdText);
+            return result;
+        }
+
         public List<FlowStepModel> Query(int fksn)
         {
             List<FlowStepModel> list = new List<FlowStepModel>();

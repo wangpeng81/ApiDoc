@@ -85,7 +85,7 @@ function btnSaveParam_Click() {
 }
 
 //弹出参数删除窗口
-function showDeleteModal() {
+function showParamDelete() {
 
     var selList = document.getElementsByName("chkParam_");
     var ids = [];
@@ -102,8 +102,7 @@ function showDeleteModal() {
         return;
     }
 
-    $("#myParamModalDelete").modal('show');
-
+    showModalDelete(btnDeleteParam_Click);
 }
 
 //删除参数

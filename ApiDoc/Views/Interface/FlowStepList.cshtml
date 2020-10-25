@@ -12,19 +12,7 @@
            data-isload="0">
             @step.StepOrder. @step.StepName
         </a> 
-    </li>
-
-    <li class="nav-item py-1"> 
-        <a class="nav-link py-1"
-           data-toggle="pill"
-           href="#tab-step2"
-           role="tab"  
-           data-data="{SN:@step.SN,StepName:'@step.StepName',FKSN: @step.FKSN,StepOrder:@step.StepOrder}"
-           data-isload="0">
-            @step.StepOrder. @step.StepName
-        </a>
-    </li>
-
+    </li> 
     }
 </ul>
 
@@ -32,8 +20,27 @@
     @foreach (var step in Model)
     {
         <div class="tab-pane" id="tab_step_@step.SN" role="tabpanel"  >
-            <div class="container-fluid row no-gutters p-0 mt-2"> 
-                <div class="col-10">
+            <div class="container-fluid row no-gutters p-0 mt-2">
+
+                <!-- 参数 -->
+                <div class="col-2 pr-2">
+                    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                        <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Second group">
+                            <button type="button" class="btn btn-info">步骤参数</button>
+                            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="选择" onclick="showStepParam(0)"><i class="fa fa-folder-open-o"></i></button>
+                            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="添加" onclick="showStepParam(0)"><i class="fa fa-plus"></i></button>
+                            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="修改" onclick="showStepParam(1)"><i class="fa fa-edit"></i></button>
+                            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="删除" onclick="showStepParamDelete()"><i class="fa fa-trash-o"></i></button>
+                        </div>
+                    </div>
+
+                    <div id="myStepParam_@step.SN" class="border bg-light" style="height:calc(100vh - 190px);">
+
+                    </div>
+                </div>
+
+                <!-- 内容 -->
+                <div class="col-8">
                     <div class="input-group input-group-sm bg-white mb-2">
                         <div class="input-group-prepend">
                             <div class="input-group-text w-lab">数据库</div>
@@ -69,9 +76,13 @@
 
                         <button class="btn btn-sm btn-default  ml-2" data-toggle="tooltip" data-placement="bottom" title="保存Sql" onclick="btnSaveCmdText(@step.SN)"><i class="fa fa-save"></i></button>
                     </div>
-                    <textarea id="txtCommandText" name="commandText" class="form-control bg-light " rows="10">@step.CommandText</textarea>
+                    <textarea id="txtCommandText"
+                              name="commandText"
+                              class="form-control bg-light bg-light border overflow-auto"
+                              style="height:calc(100vh - 190px);">@step.CommandText</textarea>
                 </div>
 
+                <!-- His -->
                 <div class="col-2 pl-2">
                     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                         <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Second group">
@@ -82,16 +93,13 @@
                             <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="内容" onclick="showText()"><i class="fa fa-code"></i></button>
                         </div>
                     </div>
-                    <div id="myHis_@step.SN" class="container-fluid p-0 no-gutters overflow-auto" style="height:250px;">
+                    <div id="myHis_@step.SN" class="bg-light border overflow-auto" style="height:calc(100vh - 190px);">
 
                     </div>
                 </div>
 
             </div>
-        </div>
-        <div class="tab-pane" id="tab-step2" role="tabpanel"  >
-            2
-        </div>
+        </div> 
     } 
 </div>
  
