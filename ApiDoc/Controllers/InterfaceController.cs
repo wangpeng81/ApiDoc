@@ -177,7 +177,7 @@ namespace ApiDoc.Controllers
 
             return model.SN;
         }
-        
+         
     }
 }
 

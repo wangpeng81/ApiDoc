@@ -31,6 +31,8 @@ var urlFlowStepHisSmoExecute = urlRoot + "/His/SmoExecute";
 var urlFlowStepParamList = urlRoot + "/Param/StepParamList";
 var urlFlowStepParamSave = urlRoot + "/Param/StepParamSave";
 var urlFlowStepParamDelete = urlRoot + "/Param/StepParamDelete";
+var urlFlowStepInterParamList= urlRoot + "/Param/InterParamList";
+var urlFlowStepParamSaveList = urlRoot + "/Param/StepParamSaveList";
 
 //
 var urlRouteUpLoad = urlRoot + "/RouteValue/UpLoad";

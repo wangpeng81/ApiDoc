@@ -27,14 +27,14 @@
                     <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                         <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Second group">
                             <button type="button" class="btn btn-info">步骤参数</button>
-                            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="选择" onclick="showStepParam(0)"><i class="fa fa-folder-open-o"></i></button>
+                            <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="选择" onclick="showSelectParam()"><i class="fa fa-folder-open-o"></i></button>
                             <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="添加" onclick="showStepParam(0)"><i class="fa fa-plus"></i></button>
                             <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="修改" onclick="showStepParam(1)"><i class="fa fa-edit"></i></button>
                             <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="删除" onclick="showStepParamDelete()"><i class="fa fa-trash-o"></i></button>
                         </div>
                     </div>
 
-                    <div id="myStepParam_@step.SN" class="border bg-light" style="height:calc(100vh - 190px);">
+                    <div id="myStepParam_@step.SN" class="border bg-light overflow-auto" style="height:calc(100vh - 190px);">
 
                     </div>
                 </div>

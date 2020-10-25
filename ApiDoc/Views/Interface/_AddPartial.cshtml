@@ -31,7 +31,7 @@
         </div>
     </div>
 </div>
- 
+
 <!-- 测试 -->
 <div class="modal fade bd-example-modal-lg" id="myModalCS" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -83,7 +83,7 @@
         </div>
     </div>
 </div>
- 
+
 
 <!-- 历史Sql 查看 -->
 <div class="modal fade" id="myHisModalInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -148,7 +148,7 @@
         </div>
     </div>
 </div>
- 
+
 <!-- 步骤参数维护窗口 -->
 <div class="modal fade" id="myStepParamModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -198,16 +198,34 @@
                     </div>
                 </div>
             </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="btnSaveStepParam_Click()"><i class="fa fa-save"></i></button>
-                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="btnSaveStepParam_Click()"><i class="fa fa-save"></i></button>
             </div>
+        </div>
     </div>
 </div>
 
 
+<!-- 选择接口参数窗口 -->
+<div class="modal fade" id="myStepParamSelectModel" tabindex="-1" role="dialog" aaria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">选择接口参数</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div> 
+            <div class="modal-body">
+               <div id="dgvList" class="overflow-auto">
 
-
-
+               </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="btnSaveStepParamInter()"><i class="fa fa-save"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
 
 

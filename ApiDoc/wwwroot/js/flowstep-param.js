@@ -120,3 +120,52 @@ function btnDeleteStepParam() {
         $("#myStepParam_" + fksn).html(innerHtml);
     });
 }
+
+//选择接口参数
+function showSelectParam() {
+
+    var fksn = selectFlowStep.FKSN; //接口SN
+
+    $.post(urlFlowStepInterParamList,
+        { FKSN: fksn },
+        function (innerHtml) {
+
+            var dgvList = $("#myStepParamSelectModel #dgvList");
+            var heigth = $(document).height();
+
+            dgvList.height(heigth - 230);
+            dgvList.html(innerHtml);
+            
+            $("#myStepParamSelectModel").modal("show");
+
+    }); 
+}
+
+//保存步骤参数
+function btnSaveStepParamInter() {
+     
+    var fksn = selectFlowStep.SN;
+    var selList = document.getElementsByName("chkParam1_");
+    var idsList = [];
+    for (var i = 0; i < selList.length; i++) {
+        if (selList[i].checked) {
+            json = selList[i].value;
+            json = eval("(" + json + ")");
+            json.FKSN = fksn;
+            json.SN = 0;
+            idsList.push(json);
+        }
+    }
+
+    if (idsList.length == 0) {
+        popToastWarning("请选择要删除的参数");
+        return;
+    }
+
+    $.post(urlFlowStepParamSaveList,
+        { list: idsList },
+        function (innerHtml) {
+            $("#myStepParamSelectModel").modal("hide");
+            $("#myStepParam_" + fksn).html(innerHtml);
+    });
+}

@@ -1,0 +1,60 @@
+﻿@model List<ApiDoc.Models.ParamModel>
+
+<table class="table table-sm m-0 p-0 no-gutters">
+    <thead>
+        <tr class="row no-gutters fs-14 bg-light">
+            <th class="col-auto  text-center border-bottom-0">
+                <div class="custom-control custom-checkbox ml-1">
+                    <input type="checkbox" class="custom-control-input" id="ParamCheckAll1" onchange="checkAll(this,'chkParam1_')" />
+                    <label class="custom-control-label" for="ParamCheckAll1"></label>
+                </div>
+            </th>
+            <td class="col-1 text-center">
+               序号
+            </td> 
+            <th class="col border-bottom-0">参数名称</th>
+            <th class="col border-bottom-0">说明</th>
+            <th class="col  border-bottom-0">数据类型</th>
+            <th class="col border-bottom-0 ">默认值</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            var param = Model[i];
+            var rowIndex = @i + 1;
+        <tr class="row no-gutters fs-14">
+            <td class="col-auto text-center">
+                <div class="custom-control custom-checkbox ml-1">
+                    <input type="checkbox" class="custom-control-input"
+                           id="custCheckParam1_@param.SN"
+                           name="chkParam1_"
+                           value="{SN: @param.SN,
+                           FKSN: @param.FKSN,
+                           ParamName: '@param.ParamName',
+                           DataType: '@param.DataType',
+                           DefaultValue: '@param.DefaultValue',
+                           Remark: '@param.Remark'}">
+                    <label class="custom-control-label" for="custCheckParam1_@param.SN"></label>
+                </div>
+            </td>
+            <td class="col-1 text-center">
+                @rowIndex
+            </td>
+
+            <td class="col">
+                @param.ParamName
+            </td>
+            <td class="col">
+                @param.Remark
+            </td>
+            <td class="col">
+                @param.DataType
+            </td>
+            <td class="col">
+                @param.DefaultValue
+            </td>
+        </tr> 
+        }
+    </tbody>
+</table>

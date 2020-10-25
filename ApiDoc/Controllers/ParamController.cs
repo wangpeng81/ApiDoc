@@ -99,6 +99,27 @@ namespace ApiDoc.Controllers
             } 
             return StepParamList(FKSN);
         }
+         
+        [HttpPost]
+        public IActionResult InterParamList(int FKSN)
+        {
+            List<ParamModel> list = this.paramDAL.Query(FKSN);
+            return PartialView("/Views/Interface/ParamSelectList.cshtml", list);
+        }
+
+        [HttpPost]
+        public IActionResult StepParamSaveList(List<FlowStepParamModel> list)
+        {
+            int fksn = 0;
+            foreach (FlowStepParamModel model in list)
+            {
+                fksn = model.FKSN;
+                model.IsPreStep = false;
+                this.flowStepParamDAL.Insert(model);
+            }
+
+            return StepParamList(fksn);
+        }
 
         #endregion
 
