@@ -16,7 +16,7 @@ namespace ApiDoc.DAL
     public class FlowStepDAL: BaseDAL, IFlowStepDAL
     {
      
-        public FlowStepDAL(ILogger<BaseDAL> logger, IDbHelper db) : base(logger, db)
+        public FlowStepDAL(IDbHelper db) : base(db)
         {
             
         }
@@ -75,8 +75,7 @@ namespace ApiDoc.DAL
 
         public int SaveCmdText(int SN, string CommandType, string CommandText, string DataBase)
         {
-            try
-            {
+            
                 if (CommandText == null)
                 {
                     CommandText = "";
@@ -90,13 +89,7 @@ namespace ApiDoc.DAL
                 p.Add("DataBase", DataBase);
                 int iResult = db.ExecuteSql(strSql, p);
                 return iResult;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("DbCommand->api_interface=>Insert(s) 出错\r\n" + ex.Message);
-                throw ex;
-            }
-
+            
         }
  
     }

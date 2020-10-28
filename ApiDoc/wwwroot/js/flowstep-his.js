@@ -1,9 +1,19 @@
-﻿
+﻿var lstHisName = "dgvStepHis_";
 
 function loadHisData(SN) { 
     $.post(urlFlowStepHisList, { FKSN: SN }, function (html) {
-        $("#myHis_" + SN).html(html);
+    
+        drawStepHis(html);
     });
+}
+
+function drawStepHis(innerHtml) {
+
+    var fksn = selectFlowStep.SN;
+    $("#myHis_" + fksn).html(innerHtml);
+    var dgv = $("#" + lstHisName + fksn);
+    dgv.xnTable();
+
 }
 
 
@@ -57,7 +67,8 @@ function btnAddHis_Click() {
 
             $.post(urlFlowStepHisAdd, data, function (result) {
 
-                $("#myHis_" + vFKSN).html(result);
+                drawStepHis(result);
+
                 $("#myStepHisModel").modal('hide');
 
             });
@@ -68,18 +79,10 @@ function btnAddHis_Click() {
 //弹出删除窗口
 function showStepHisDelete() {
 
-    var fksn = selectFlowStep.SN; 
-    var arrayList = [];
-    var list = document.getElementsByName('chkHis_' + fksn);
-    for (var i = 0; i < list.length; i++) {
-        var checked = list[i].checked;
-        var value = list[i].value;
-        if (checked) {
-            arrayList.push(value);
-        }
-    };
+    var fksn = selectFlowStep.SN;  
+    var idsList = $("#" + lstHisName + fksn).xnTable("getSelections", "SN"); 
 
-    if (arrayList.length == 0) {
+    if (idsList.length == 0) {
         $('#myDelete').toast('show');
         return;
     }  
@@ -88,25 +91,16 @@ function showStepHisDelete() {
 
 //删除接口
 function btnDeleteStepHis_Click() {
-
-    var vFKSN = selectFlowStep.SN; 
-    var arrayList = [];
-
-    var list = document.getElementsByName('chkHis_' + vFKSN);
-    for (var i = 0; i < list.length; i++) {
-        var checked = list[i].checked;
-        var value = list[i].value;
-        if (checked) {
-            arrayList.push(value);
-        }
-    }
-   
-    if (arrayList.length > 0) {
+     
+    var fksn = selectFlowStep.SN;
+    var idsList = $("#" + lstHisName + fksn).xnTable("getSelections", "SN"); 
+     
+    if (idsList.length > 0) {
        
-        var data = { ids: arrayList, FKSN: vFKSN };
+        var data = { ids: idsList, FKSN: fksn };
         $.post(urlFlowStepHisDelete, data
-            , function (data) {
-                $("#myHis_" + vFKSN).html(data);
+            , function (result) {
+                drawStepHis(result);
             });
     }
 }
@@ -114,31 +108,24 @@ function btnDeleteStepHis_Click() {
 //执行历史sql
 function btnSmoExecute() {
 
-    var fksn = selectFlowStep.SN;  //步骤SN
-    var cmdText; //历史sql变量 
-    var idList = []; //历史 SN
-    var list = document.getElementsByName('chkHis_' + fksn);
-    for (var i = 0; i < list.length; i++) {
-        var chk = list[i];
-        var checked = chk.checked;
-        if (checked) {
-            cmdText = chk.attributes["data-text"].value;
-            idList.push(chk.value);
-        }
-    };
-
-    if (idList.length != 1) {
+    var fksn = selectFlowStep.SN;  //步骤SN 
+    var selectionItem = $("#" + lstHisName + fksn).xnTable("getSelectionItem");  
+    var json = $("#" + lstHisName + fksn).xnTable("getSelection","SN"); 
+    if (json == null) {
 
         popToastWarning("请选择一条数据");
         return;
-    }
+    } 
+
+    var cmdText = selectionItem[0].attributes["data-text"].value; //历史sql变量 
+    var idList = [];
+    idList.push(json.SN);
 
     var data = { FKSN: fksn, ids: idList };
 
     $.post(urlFlowStepHisSmoExecute, data, function (result) {
 
-        var html = $("#myHis_" + fksn);
-        html.html(result);
+        drawStepHis(result);
 
         //更新commandText内容
         var commandType = $("#tab_step_" + fksn + " [name = 'commandType']");
@@ -168,17 +155,13 @@ function showText() {
 }
 
 function selectedHisText() {
+ 
+    var fksn = selectFlowStep.SN;  //步骤SN 
+    var selectionItem = $("#" + lstHisName + fksn).xnTable("getSelectionItem");
+    if (selectionItem != null) {
+        var cmdText = selectionItem[0].attributes["data-text"].value; //历史sql变量 
 
-    var vFKSN = selectFlowStep.SN; 
-    var list = document.getElementsByName('chkHis_' + vFKSN); 
-    var cmdText; //历史sql变量 
-    for (var i = 0; i < list.length; i++) {
-        var chk = list[i]; 
-        var checked = chk.checked; 
-        if (checked) {
-            cmdText = chk.attributes["data-text"].value;
-        }
+        return cmdText;
     }
-
-    return cmdText;
+    return "";
 }

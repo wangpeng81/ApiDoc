@@ -15,8 +15,7 @@ namespace ApiDoc.DAL
     [Table("api_flow_step_his")]
     public class FlowStepHisDAL : BaseDAL, IFlowStepHisDAL
     { 
-        public FlowStepHisDAL(ILogger<BaseDAL> logger, 
-            IDbHelper db) : base(logger, db)
+        public FlowStepHisDAL(IDbHelper db) : base(db)
         {
             
         }

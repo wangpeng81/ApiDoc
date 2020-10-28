@@ -13,7 +13,7 @@ namespace ApiDoc.DAL
     [Table("api_folder")]
     public class FolderDAL : BaseDAL, IFolderDAL
     { 
-        public FolderDAL(ILogger<BaseDAL> logger, IDbHelper db) :base(logger, db)
+        public FolderDAL(IDbHelper db) :base(db)
         {
             
         }

@@ -48,10 +48,7 @@ function showFlowStep(FKSN) {
 
         //修改
         if (selectFlowStep != null) {
-
-            //var dgv = $("#dgSPList_" + selectFlowStep.SN);
-            //dgv.xnTable();
-
+             
             $('#txtStepSN').val(selectFlowStep.SN);
             $('#txtStepName').val(selectFlowStep.StepName);
             $('#txtStepFKSN').val(selectFlowStep.FKSN);

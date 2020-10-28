@@ -2,8 +2,18 @@
 function loadStepParamData(fksn) {
 
     $.post(urlFlowStepParamList, { FKSN: fksn }, function (html) {
-        $("#myStepParam_" + fksn).html(html);
-    });
+
+        drawStepParam(html);
+
+    }); 
+}
+
+function drawStepParam(innerHtml ) {
+
+    var fksn = selectFlowStep.SN; 
+    $("#myStepParam_" + fksn).html(innerHtml);
+    var dgv = $("#dgvSPList_" + fksn);
+    dgv.xnTable();
 
 }
 
@@ -17,25 +27,16 @@ function showStepParam(sn) {
     var txtStepParamDefault = $('#txtStepParamDefault');
     var chkIsPreStep = document.getElementById("chkIsPreStep");
 
-    if (sn > 0) {
+    if (sn > 0) { 
 
         var fksn = selectFlowStep.SN;
-        var selList = document.getElementsByName("myStepParam_" + fksn);
-        var json = null;
-        for (var i = 0; i < selList.length; i++) {
-            var selected = selList[i];
-            if (selected.checked) {
-                json = selected.value;
-                break;
-            }
-        }
-
+        var json = $("#dgvSPList_" + fksn).xnTable("getSelection");
+ 
         if (json == null) {
             popToastWarning("请选择要修改的数据");
             return;
         }
-        json = eval("(" + json + ")");
-
+       
         txtStepParamSN.val(json.SN);
         txtStepParamName.val(json.ParamName);
         txtStepParamRemark.val(json.Remark);
@@ -80,11 +81,10 @@ function btnSaveStepParam_Click() {
         IsPreStep: vIsPreStep
     };
 
-    $.post(urlFlowStepParamSave, vdata, function (result) {
+    $.post(urlFlowStepParamSave, vdata, function (html) {
 
-        $("#myStepParamModel").modal('hide');
-        $("#myStepParam_" + fksn).html(result);
-         
+        $("#myStepParamModel").modal('hide'); 
+        drawStepParam(html); 
     });
 
 }
@@ -92,32 +92,27 @@ function btnSaveStepParam_Click() {
 //弹出删除窗口
 function showStepParamDelete() {
 
+    var fksn = selectFlowStep.SN;
+    var idsList = $("#dgvSPList_" + fksn).xnTable("getSelections", "SN");
+
+    if (idsList.length == 0) {
+        popToastWarning("请选择要删除的参数");
+        return;
+    }
+
     showModalDelete(btnDeleteStepParam);
 
 }
 
 //删除步骤参数
 function btnDeleteStepParam() {
-
+     
     var fksn = selectFlowStep.SN;
-    var selList = document.getElementsByName("myStepParam_" + fksn );
-    var idsList = [];
-    for (var i = 0; i < selList.length; i++) {
-        if (selList[i].checked) {
-            json = selList[i].value;
-            json = eval("(" + json + ")");
-            idsList.push(json.SN);
-        }
-    }
+    var idsList = $("#dgvSPList_" + fksn).xnTable("getSelections", "SN"); 
 
-    if (idsList.length == 0) {
-        popToastWarning("请选择要删除的参数");
-        return;
-    }
- 
     var data = { ids: idsList, FKSN: fksn };
-    $.post(urlFlowStepParamDelete, data, function (innerHtml) {
-        $("#myStepParam_" + fksn).html(innerHtml);
+    $.post(urlFlowStepParamDelete, data, function (innerHtml) { 
+        drawStepParam(innerHtml); 
     });
 }
 
@@ -166,6 +161,6 @@ function btnSaveStepParamInter() {
         { list: idsList },
         function (innerHtml) {
             $("#myStepParamSelectModel").modal("hide");
-            $("#myStepParam_" + fksn).html(innerHtml);
+            drawStepParam(innerHtml); 
     });
 }

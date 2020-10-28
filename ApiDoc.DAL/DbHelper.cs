@@ -5,6 +5,7 @@ using ApiDoc.IDAL;
 using Microsoft.Extensions.Configuration; 
 using Autofac;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 
 namespace ApiDoc.DAL
 {
@@ -22,8 +23,7 @@ namespace ApiDoc.DAL
             this.config = config;
             this.componentContext = componentContext; 
             this.dbConnection = componentContext.Resolve<IDbConnection>();
-            this.dbConnection.ConnectionString = SqlConnStr;
-           
+            this.dbConnection.ConnectionString = SqlConnStr; 
         }
           
         //IDbHelper

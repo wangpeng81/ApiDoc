@@ -1,6 +1,7 @@
 ﻿using ApiDoc.IDAL;
 using ApiDoc.Models;
 using ApiDoc.Models.Attributes;
+using ApiDoc.Utility;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -14,17 +15,15 @@ namespace ApiDoc.DAL
 {
     public class BaseDAL : IBaseDAL
     {
-        protected string tableName = "";
-        protected readonly ILogger<BaseDAL> _logger;
+        protected string tableName = ""; 
         protected readonly IDbHelper db;
 
         public Logger<BaseDAL> Logger { get; set; }
 
-        public BaseDAL(ILogger<BaseDAL> logger, IDbHelper db)
-        { 
-            _logger = logger;
+        public BaseDAL(IDbHelper db)
+        { 　
             this.db = db;
-            this.GetTableName();
+            this.GetTableName(); 
         }
 
         public void Show()

@@ -14,7 +14,7 @@ namespace ApiDoc.DAL
     [Table("api_interface")]
     public class InterfaceDAL : BaseDAL, IInterfaceDAL
     {
-        public InterfaceDAL(ILogger<BaseDAL> logger, IDbHelper db) :base(logger, db)
+        public InterfaceDAL(IDbHelper db) :base(db)
         {
             
         }
@@ -37,9 +37,7 @@ namespace ApiDoc.DAL
         public List<InterfaceModel> All(string title, string url, int fksn)
         {
             List<InterfaceModel> list = new List<InterfaceModel>();
-
-            try
-            {
+ 
                 string strSql = "with temp as( select * from api_folder where SN =" + fksn.ToString();
                 strSql += " union all ";
                 strSql += "select b.* from temp a inner join api_folder b on b.[ParentSN] = a.SN ) ";
@@ -60,13 +58,7 @@ namespace ApiDoc.DAL
                     InterfaceModel info = base.CreateModel<InterfaceModel>(dataRow); 
                     list.Add(info);
                 }
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("DbCommand->api_interface=>Insert(s) 出错\r\n" + ex.Message);
-                throw ex;
-            }
+ 
             return list;
         }
 

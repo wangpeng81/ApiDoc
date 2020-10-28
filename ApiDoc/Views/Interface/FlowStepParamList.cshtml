@@ -1,6 +1,6 @@
 ﻿@model List<ApiDoc.Models.FlowStepParamModel>
 
-<table id="dgSPList_@ViewData["FKSN"]" class="table table-sm m-0 p-0 no-gutters" data-toggle="table">
+<table id="dgvSPList_@ViewData["FKSN"]" class="table table-sm m-0 p-0 no-gutters" data-toggle="table">
     <thead>
         <tr class="row no-gutters fs-14">
             <th class="col-2  text-center border-top-0">
@@ -15,7 +15,13 @@
     <tbody>
         @foreach (var stepParam in Model)
         {
-            <tr class="row no-gutters fs-14">
+            <tr class="row no-gutters fs-14 cur-pointer" data-data="{SN:@stepParam.SN,
+                               ParamName:'@stepParam.ParamName',
+                               DataType:'@stepParam.DataType',
+                               DefaultValue:'@stepParam.DefaultValue',
+                               Remark:'@stepParam.Remark',
+                               FKSN:@stepParam.FKSN,
+                               IsPreStep:'@stepParam.IsPreStep'}">
                 <td class="col-2 text-center">
                     <div class="custom-control custom-checkbox ml-1">
                         <input type="checkbox"

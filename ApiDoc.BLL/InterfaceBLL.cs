@@ -36,7 +36,9 @@ namespace ApiDoc.BLL
             dbInter.Method = model.Method;
             dbInter.IsTransaction = model.IsTransaction;
             dbInter.ExecuteType = model.ExecuteType;
-            dbInter.Steps = this.flowStepDAL.Query(model.SN);
+            dbInter.Title = model.Title;
+            dbInter.Url = model.Url;
+            dbInter.Steps = this.flowStepDAL.QueryOfParam(model.SN);
 
             //接口参数
             string auth = "";

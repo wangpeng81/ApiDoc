@@ -1,6 +1,6 @@
 ﻿@model List<ApiDoc.Models.FlowStepHisModel>
 
-<table class="table table-sm m-0 p-0 no-gutters">
+<table id="dgvStepHis_@ViewData["FKSN"]" class="table table-sm m-0 p-0 no-gutters">
     <thead>
         <tr class="row no-gutters fs-14" >
             <th class="col-2  text-center border-top-0">
@@ -15,7 +15,7 @@
     <tbody>
         @foreach (var stepHis in Model)
         {
-        <tr class="row no-gutters fs-14">
+        <tr class="row no-gutters fs-14 cur-pointer" data-data="{SN:@stepHis.SN}" data-text="@stepHis.Text">
             <td class="col-2 text-center">
                 <div class="custom-control custom-checkbox ml-1">
                     @if (stepHis.IsEnable)
@@ -23,19 +23,15 @@
                         <input type="checkbox"
                                class="custom-control-input"
                                id="custCheckHis_@stepHis.SN"
-                               name="chkHis_@ViewData["FKSN"]"
-                               value="@stepHis.SN"
-                               checked="checked"
-                               data-text="@stepHis.Text">
+                               name="chkHis_@ViewData["FKSN"]" 
+                               checked="checked">
                     }
                     else
                     {
                         <input type="checkbox"
                                class="custom-control-input"
                                id="custCheckHis_@stepHis.SN"
-                               name="chkHis_@ViewData["FKSN"]"
-                               value="@stepHis.SN"
-                               data-text="@stepHis.Text" >
+                               name="chkHis_@ViewData["FKSN"]"  >
                     }
                     <label class="custom-control-label" for="custCheckHis_@stepHis.SN"></label>
                 </div>

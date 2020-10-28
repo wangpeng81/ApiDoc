@@ -273,22 +273,32 @@ namespace ApiDoc.Middleware
                     return "";
                 }
 
-                //执行Sql
-                if (rowIndex == count - 1) //最后一步
+                try
                 {
-                    result = this.ExecSql(response, connection, sqlDA, cmd);
-                }
-                else
-                {
-                    //如果不是最后一步，存储当前步结果
-                    DataTable dt = new DataTable();
-                    sqlDA.Fill(dt);
-                    if (dt.Rows.Count > 0)
+                    //执行Sql
+                    if (rowIndex == count - 1) //最后一步
                     {
-                        dataPre = dt.Rows[0];
+                        result = this.ExecSql(response, connection, sqlDA, cmd);
                     }
-                }
+                    else
+                    {
+                        //如果不是最后一步，存储当前步结果
+                        DataTable dt = new DataTable();
+                        sqlDA.Fill(dt);
+                        if (dt.Rows.Count > 0)
+                        {
+                            dataPre = dt.Rows[0];
+                        }
+                    }
 
+                }
+                catch (Exception ex)
+                {
+                    string message = response.Url　+ ">>" + step.StepName + ">>" + ex.Message;
+                    this.logger.LogError(message);
+                    throw new Exception(message);
+                }
+                
                 rowIndex++;
             } 
             return result;
@@ -333,46 +343,38 @@ namespace ApiDoc.Middleware
         private bool CreateParam(DBInterfaceModel response, SqlCommand cmd, DataRow dataPre, FlowStepModel step, Dictionary<string, object> dict,  out string exceMsg)
         {
             exceMsg = "";
-            foreach (FlowStepParamModel param in step.Params)
-            {
-                string str = step.StepName + ">>参数" + param.ParamName;
-                object value = null;
+            if (step.Params != null)
+            { 
+                foreach (FlowStepParamModel param in step.Params)
+                {
+                    string str = step.StepName + ">>参数" + param.ParamName;
+                    object value = null;
 
-                if (param.IsPreStep) //如果从上一步取值
-                {
-                    if (dataPre == null)
+                    if (param.IsPreStep) //如果从上一步取值
                     {
-                        exceMsg = str + "无法从上一步取值值";
-                        return false;
-                    } 
-                    value = dataPre[param.ParamName]; 
-                }
-                else //从Request中取值 
-                {
-                    if (response.Method.ToLower() == "get")
-                    { 
-                        StringValues value1 = new StringValues();
-                        bool bOK = context.Request.Query.TryGetValue(param.ParamName, out value1);
-                        if (bOK)
+                        if (dataPre == null || !dataPre.Table.Columns.Contains(param.ParamName))
                         {
-                            value = value1[0]; 
+                            exceMsg = str + "无法从上一步取值值";
+                            return false;
+                        }
+
+                        value = dataPre[param.ParamName]; 
+                    }
+                    else //从Request中取值 
+                    {
+                        if (dict.ContainsKey(param.ParamName))
+                        {
+                            value = dict[param.ParamName]; 
                         }
                         else
                         {
                             exceMsg = str + "没有在Request中获取到值";
                             return false;
-                        }
-                    }
-                    else if (response.Method.ToLower() == "post")
-                    { 
-                        if (dict.ContainsKey(param.ParamName))
-                        {
-                            value = dict[param.ParamName]; 
                         } 
                     }
 
                     cmd.Parameters.AddWithValue(param.ParamName, value);
-                } 
+                }
             }
             return true;
         }

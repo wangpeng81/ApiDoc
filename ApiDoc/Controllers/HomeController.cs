@@ -10,6 +10,7 @@ using System.Data;
 using Autofac;
 using System.Data.SqlClient;
 using ApiDoc.DAL;
+using ApiDoc.Utility;
 
 namespace ApiDoc.Controllers
 {
@@ -22,9 +23,13 @@ namespace ApiDoc.Controllers
             this.componentContext = componentContext;
             IDbConnection dbConnection = componentContext.Resolve<IDbConnection>();
 
+            //Log4netHelper.Info("sss");
+
+            //Log4netHelper.Info("sss");
+
             //Dictionary<string, object> dict = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             //dict.Add("abc", 123);
-            
+
             //if (dict.ContainsKey("AbC"))
             //{
             //    object value = dict["abc"]; 
