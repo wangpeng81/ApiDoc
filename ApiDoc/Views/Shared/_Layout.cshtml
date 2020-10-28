@@ -15,6 +15,10 @@
 
 </head>
 <body>
+    <form method="post" action="~/a/b/c" >
+        <input type="hidden" value="1" name="SN" />
+        <input type="submit" value="submit" />
+    </form>
     <input type="hidden" id="txtHost" value="@Url.Content("~")" />
     <nav class="navbar sticky-top navbar-expand-sm navbar-light border-bottom box-shadow mb-3" style="padding-left:0px;">
         <a class="navbar-brand text-right w-240 font-weight-bold" style="color:var(--themecolor); " asp-area="" asp-controller="Home" asp-action="Index">ApiDoc 官方文档</a>
@@ -24,12 +28,13 @@
                 <ul class="navbar-nav flex-grow-1">
                     @foreach (NavItem item in (List<NavItem>)ViewData["Nav"])
                     {
-                    <li class="nav-item mr-3">
-                        <a class="nav-link" style="color:@item.ActiveColor;" asp-controller="@item.Controller" asp-action="Index">
-                            <i class="fa @item.Icon"></i>&nbsp;@item.Text</a>
-                    </li>
+                        <li class="nav-item mr-3">
+                            <a class="nav-link" style="color:@item.ActiveColor;" asp-controller="@item.Controller" asp-action="Index">
+                                <i class="fa @item.Icon"></i>&nbsp;@item.Text
+                            </a>
+                        </li>
                     }
-                    
+
                 </ul>
             </div>
         </div>
@@ -40,6 +45,6 @@
     <script src="~/js/url.js"></script>
 
     @RenderSection("Scripts", required: false)
- 
+
 </body>
 </html>

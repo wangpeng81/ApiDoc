@@ -71,7 +71,7 @@ namespace ApiDoc.Middleware
                 dbInter.ExecuteType = model.ExecuteType;
 
                 //接口参数
-                string auth = ""; 
+                string auth = "";
                 foreach (ParamModel param in this.paramDAL.Query(SN))
                 {
                     if (auth != "")
@@ -97,7 +97,6 @@ namespace ApiDoc.Middleware
         {
             this.context = context;
             string path = context.Request.Path.ToString();
-            this.logger.LogInformation(path);
             switch (path)
             {
                 case "/CS":
@@ -114,7 +113,7 @@ namespace ApiDoc.Middleware
             else
             {
                 await next(context);
-            } 
+            }
         }
 
         private async Task InvokeDB(HttpContext context)
@@ -132,40 +131,10 @@ namespace ApiDoc.Middleware
                 Dictionary<string, object> dict = null;
                 string method = response.Method.ToLower();
                 string auth = "";
-                if (method == "post")
+                if (method == "post" || method == "get")
                 {
-                    var reader = new StreamReader(context.Request.Body);
-                    var contentFromBody = reader.ReadToEnd();
-                    if (contentFromBody != "")
-                    {
-                        dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(contentFromBody);
-                    }
-
-                    foreach (KeyValuePair<string, object> kv in dict)
-                    {
-                        if (auth != "")
-                        {
-                            auth += "_";
-                        }
-                        auth += kv.Key;
-                    } 
-                }
-                else if (method == "get")
-                {
-                    dict = new Dictionary<string, object>();
-                    foreach (KeyValuePair<string, StringValues> kv in context.Request.Query)
-                    {
-                        if (!dict.ContainsKey(kv.Key))
-                        {
-                            if (auth != "")
-                            {
-                                auth += "_";
-                            } 
-                            auth += kv.Key; 
-                            dict.Add(kv.Key, kv.Value[0]);
-                        } 
-                    }
-                }
+                    dict = this.CreateDict(method, out auth);
+                } 
                 else
                 {
                     await this.InvokeException("此平台只支持post,get");
@@ -175,7 +144,7 @@ namespace ApiDoc.Middleware
                 auth = auth.ToLower();
                 if (response.Auth != auth)
                 {
-                    await this.InvokeException("接收参数[" + response.Auth + "]与规则["+auth+"]不匹配" );
+                    await this.InvokeException("接收参数[" + response.Auth + "]与规则[" + auth + "]不匹配");
                     return;
                 }
 
@@ -212,7 +181,7 @@ namespace ApiDoc.Middleware
                     if (response.IsTransaction)
                     {
                         tran.Rollback();
-                    } 
+                    }
                     await this.InvokeException(ex.Message);
                 }
                 finally
@@ -221,11 +190,75 @@ namespace ApiDoc.Middleware
                 }
             }
             else
-            { 
+            {
                 await this.WriteAsync(path + "没有任何步骤，请维护");
             }
         }
 
+        private Dictionary<string, object> CreateDict(string method, out string auth)
+        {
+            auth = "";
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            if (method == "post")
+            {
+                if (context.Request.ContentType == "application/x-www-form-urlencoded")
+                {
+                    foreach (KeyValuePair<string, StringValues> kv in context.Request.Form)
+                    {
+                        if (kv.Key == "__RequestVerificationToken")
+                        {
+                            continue;
+                        }
+                        if (!dict.ContainsKey(kv.Key))
+                        {
+                            if (auth != "")
+                            {
+                                auth += "_";
+                            }
+                            auth += kv.Key;
+                            dict.Add(kv.Key, kv.Value[0]);
+                        }
+                    }
+                }
+                else
+                {
+                    var reader = new StreamReader(context.Request.Body);
+                    var contentFromBody = reader.ReadToEnd();
+                    if (contentFromBody != "")
+                    {
+                        dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(contentFromBody);
+                    }
+
+                    foreach (KeyValuePair<string, object> kv in dict)
+                    {
+                        if (auth != "")
+                        {
+                            auth += "_";
+                        }
+                        auth += kv.Key;
+                    }
+                }
+            }
+            else if (method == "get")
+            {
+                dict = new Dictionary<string, object>();
+                foreach (KeyValuePair<string, StringValues> kv in context.Request.Query)
+                {
+                    if (!dict.ContainsKey(kv.Key))
+                    {
+                        if (auth != "")
+                        {
+                            auth += "_";
+                        }
+                        auth += kv.Key;
+                        dict.Add(kv.Key, kv.Value[0]);
+                    }
+                }
+            }
+
+            return dict;
+        }
+           
         private string InvokeFistStep(DBInterfaceModel response, SqlConnection connection, SqlTransaction tran, Dictionary<string, object> dict, out string exceMsg)
         {
             exceMsg = "";

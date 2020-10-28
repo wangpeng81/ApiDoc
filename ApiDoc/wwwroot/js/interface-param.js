@@ -1,4 +1,10 @@
-﻿$(function () {
+﻿//**************************************************
+//接口参数
+//**************************************************
+
+var dgvParam = "#dgvParam";
+
+$(function () {
       
     loadParam();
 
@@ -9,9 +15,16 @@ function loadParam() {
 
     var fksn = $('#txtSN').val();
     var data = { FKSN: fksn };
-    $.post(urlParamList, data, function (result) {
-        $("#myParamList").html(result);
+    $.post(urlParamList, data, function (innerHtml) {
+        drawParam(innerHtml);
     });
+}
+
+function drawParam(innerHtml) {
+
+    $("#myParamList").html(innerHtml);
+    var dgv = $(dgvParam);
+    dgv.xnTable();
 }
 
 //查询参数
@@ -24,20 +37,13 @@ function btnSeachParam_Click()
 function showParamWin(sn) {
      
     if (sn > 0) {
-        var selList = document.getElementsByName("chkParam_");
-        var json = null;
-        for (var i = 0; i < selList.length; i++) {
-            if (selList[i].checked) {
-               json = selList[i].value;
-            }
-        }
-
+        
+        var json = $(dgvParam).xnTable("getSelection"); 
         if (json == null) {
             popToastWarning("请选择要修改的数据");
             return;
         }
-        json = eval("(" + json + ")");
-
+         
         $('#txtParamSN').val(json.SN);
         $('#txtParamName').val(json.ParamName);
         $('#txtParamRemark').val(json.Remark);
@@ -78,26 +84,17 @@ function btnSaveParam_Click() {
         Remark: vRemark
     };
 
-    $.post(urlParamAdd, vdata , function (result) {
+    $.post(urlParamAdd, vdata, function (innerHtml) {
         $("#myParamModel").modal('hide');
-        $("#myParamList").html(result);
+        drawParam(innerHtml); 
     });
 }
 
 //弹出参数删除窗口
 function showParamDelete() {
-
-    var selList = document.getElementsByName("chkParam_");
-    var ids = [];
-    for (var i = 0; i < selList.length; i++) {
-        if (selList[i].checked) {
-            json = selList[i].value;
-            json = eval("(" + json + ")");
-            ids.push(json.SN);
-        }
-    }
-
-    if (ids.length == 0) {
+ 
+    var idsList = $(dgvParam).xnTable("getSelections", "SN"); 
+    if (idsList.length == 0) {
         popToastWarning("请选择要删除的参数"); 
         return;
     }
@@ -108,26 +105,12 @@ function showParamDelete() {
 //删除参数
 function btnDeleteParam_Click() {
 
-    var selList = document.getElementsByName("chkParam_");
-    var idsList = [];
-    for (var i = 0; i < selList.length; i++) {
-        if (selList[i].checked) {
-            json = selList[i].value;
-            json = eval("(" + json + ")");
-            idsList.push(json.SN);
-        }
-    }
-
-    if (idsList.length == 0) {
-        popToastWarning("请选择要删除的参数"); 
-        return;
-    }
-
+    var idsList = $(dgvParam).xnTable("getSelections", "SN");  
     var vfksn = $('#txtSN').val();
 
     var data = { ids: idsList, FKSN: vfksn };
-    $.post(urlParamDelete, data, function (result) {
-        $("#myParamList").html(result);
+    $.post(urlParamDelete, data, function (innerHtml) {
+        drawParam(innerHtml); 
     });
 }
  
