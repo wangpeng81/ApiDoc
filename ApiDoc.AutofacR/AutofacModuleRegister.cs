@@ -1,12 +1,11 @@
 ﻿
 
 using ApiDoc.Middleware;
-using ApiDoc.Models.Components;
-using ApiDoc.Utility;
 using Autofac;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+ 
 using MySql.Data.MySqlClient;
 using Oracle.ManagedDataAccess.Client;
 using System;
@@ -17,21 +16,16 @@ using System.IO;
 using System.Reflection;
 
 
-namespace ApiDoc
+namespace ApiDoc.AutofacR
 {
     public class AutofacModuleRegister : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {
-            // var assemblies = System.Web.Compilation.BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToArray();
-            //builder.RegisterAssemblyTypes(assemblies).Where(b => b.GetInterfaces().
-            // Any(c => c == baseType && b != baseType)).AsImplementedInterfaces().InstancePerLifetimeScope();
-            ////自动注册控制器
-            //builder.RegisterControllers(assemblies);
- 
-            string path = Assembly.GetExecutingAssembly().Location; 
+            string path = Assembly.GetExecutingAssembly().Location;
+
             string[] dllFiles = new string[] { "ApiDoc.DAL.dll", "ApiDoc.BLL.dll" };
-            var basePath = path.Replace("ApiDoc.dll", "");
+            var basePath = path.Replace("ApiDoc.AutofacR.dll", "");
             List<Assembly> assList = new List<Assembly>();
             foreach (string file in dllFiles)
             {
@@ -40,17 +34,15 @@ namespace ApiDoc
                 assList.Add(assemblysBusiness);
             }
             builder.RegisterAssemblyTypes(assList.ToArray())
-               .AsImplementedInterfaces() //对每一个依赖或每一次调用创建一个新的唯一的实例。这也是默认的创建实例的方式。
+               .AsImplementedInterfaces()
                .InstancePerDependency();
- 
+
+            //var dataAccess = Assembly.GetExecutingAssembly();
+            //builder.RegisterAssemblyTypes(dataAccess)
+            //    .AsImplementedInterfaces();//对每一个依赖或每一次调用创建一个新的唯一的实例。这也是默认的创建实例的方式。
+
             //注册路由集合
             builder.RegisterType<DBRouteValueDictionary>().SingleInstance();
-            //builder.RegisterType<MyConfig>().SingleInstance(); //配置文件，验证码，数据库的连接方式
- 
-            string jsonName = basePath + "MyConfig";
-            MyConfig  myConfig = new JsonFileHelper(jsonName).Read<MyConfig>();
-             
-            builder.RegisterInstance(myConfig).SingleInstance();
 
             //注册数据库
             builder.RegisterType<OracleConnection>().Named<IDbConnection>("Oracle");

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using ApiDoc.DAL;
+using System.Threading.Tasks; 
 using ApiDoc.IDAL;
 using ApiDoc.Models;
 using Microsoft.AspNetCore.Mvc;

@@ -8,17 +8,17 @@ using System.Reflection;
 
 namespace ApiDoc.Middleware
 {
-    public class DBRouteValueDictionary : IDictionary<string, DBInterfaceModel>, IReadOnlyDictionary<string, DBInterfaceModel>
+    public class DBRouteValueDictionary : IDictionary<string, InterfaceModel>, IReadOnlyDictionary<string, InterfaceModel>
     {
        
         private const int DefaultCapacity = 4;
 
-        internal KeyValuePair<string, DBInterfaceModel>[] _arrayStorage;　
+        internal KeyValuePair<string, InterfaceModel>[] _arrayStorage;　
         private int _count;
 
         public DBRouteValueDictionary()
         {
-            _arrayStorage = Array.Empty<KeyValuePair<string, DBInterfaceModel>>();
+            _arrayStorage = Array.Empty<KeyValuePair<string, InterfaceModel>>();
         }
 
 
@@ -38,22 +38,22 @@ namespace ApiDoc.Middleware
         //        if (count > 0)
         //        {
         //            var other = dictionary._arrayStorage;
-        //            var storage = new KeyValuePair<string, DBInterfaceModel>[count];
+        //            var storage = new KeyValuePair<string, InterfaceModel>[count];
         //            Array.Copy(other, 0, storage, 0, count);
         //            _arrayStorage = storage;
         //            _count = count;
         //        }
         //        else
         //        {
-        //            _arrayStorage = Array.Empty<KeyValuePair<string, DBInterfaceModel>>();
+        //            _arrayStorage = Array.Empty<KeyValuePair<string, InterfaceModel>>();
         //        }
 
         //        return;
         //    }
 
-        //    if (values is IEnumerable<KeyValuePair<string, DBInterfaceModel>> keyValueEnumerable)
+        //    if (values is IEnumerable<KeyValuePair<string, InterfaceModel>> keyValueEnumerable)
         //    {
-        //        _arrayStorage = Array.Empty<KeyValuePair<string, DBInterfaceModel>>();
+        //        _arrayStorage = Array.Empty<KeyValuePair<string, InterfaceModel>>();
 
         //        foreach (var kvp in keyValueEnumerable)
         //        {
@@ -83,14 +83,14 @@ namespace ApiDoc.Middleware
         //    }
         //    else
         //    {
-        //        _arrayStorage = Array.Empty<KeyValuePair<string, DBInterfaceModel>>();
+        //        _arrayStorage = Array.Empty<KeyValuePair<string, InterfaceModel>>();
         //    }
         //}
 
 
         #region IDictionary
 
-        public DBInterfaceModel this[string key]
+        public InterfaceModel this[string key]
         {
             get
             {
@@ -99,7 +99,7 @@ namespace ApiDoc.Middleware
                     ThrowArgumentNullExceptionForKey();
                 }
 
-                DBInterfaceModel value;
+                InterfaceModel value;
                 TryGetValue(key, out value);
                 return value;
             }
@@ -117,23 +117,23 @@ namespace ApiDoc.Middleware
                 if (index < 0)
                 {
                     EnsureCapacity(_count + 1);
-                    _arrayStorage[_count++] = new KeyValuePair<string, DBInterfaceModel>(key, value);
+                    _arrayStorage[_count++] = new KeyValuePair<string, InterfaceModel>(key, value);
                 }
                 else
                 {
-                    _arrayStorage[index] = new KeyValuePair<string, DBInterfaceModel>(key, value);
+                    _arrayStorage[index] = new KeyValuePair<string, InterfaceModel>(key, value);
                 }
             }
         }
 
-        public ICollection<DBInterfaceModel> Values
+        public ICollection<InterfaceModel> Values
         {
             get
             {
                 EnsureCapacity(_count);
 
                 var array = _arrayStorage;
-                var values = new DBInterfaceModel[_count];
+                var values = new InterfaceModel[_count];
                 for (var i = 0; i < values.Length; i++)
                 {
                     values[i] = array[i].Value;
@@ -160,7 +160,7 @@ namespace ApiDoc.Middleware
             }
         }
 
-        public void Add(string key, DBInterfaceModel value)
+        public void Add(string key, InterfaceModel value)
         {
             if (key == null)
             {
@@ -175,7 +175,7 @@ namespace ApiDoc.Middleware
                 throw new ArgumentException(message, nameof(key));
             }
 
-            _arrayStorage[_count] = new KeyValuePair<string, DBInterfaceModel>(key, value);
+            _arrayStorage[_count] = new KeyValuePair<string, InterfaceModel>(key, value);
             _count++;
         }
 
@@ -249,7 +249,7 @@ namespace ApiDoc.Middleware
             return false;
         }
 
-        public bool TryGetValue(string key, out DBInterfaceModel value)
+        public bool TryGetValue(string key, out InterfaceModel value)
         {
             if (key == null)
             {
@@ -261,9 +261,9 @@ namespace ApiDoc.Middleware
         }
 
 
-        IEnumerable<string> IReadOnlyDictionary<string, DBInterfaceModel>.Keys => Keys;
+        IEnumerable<string> IReadOnlyDictionary<string, InterfaceModel>.Keys => Keys;
 
-        IEnumerable<DBInterfaceModel> IReadOnlyDictionary<string, DBInterfaceModel>.Values => Values;
+        IEnumerable<InterfaceModel> IReadOnlyDictionary<string, InterfaceModel>.Values => Values;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void EnsureCapacity(int capacity)
@@ -275,7 +275,7 @@ namespace ApiDoc.Middleware
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool TryFindItem(string key, out DBInterfaceModel value)
+        private bool TryFindItem(string key, out InterfaceModel value)
         {
             var array = _arrayStorage;
             var count = _count;
@@ -301,7 +301,7 @@ namespace ApiDoc.Middleware
         #endregion
 
 
-        public static DBRouteValueDictionary FromArray(KeyValuePair<string, DBInterfaceModel>[] items)
+        public static DBRouteValueDictionary FromArray(KeyValuePair<string, InterfaceModel>[] items)
         {
             if (items == null)
             {
@@ -344,10 +344,10 @@ namespace ApiDoc.Middleware
          
         public int Count => _count;
          
-        bool ICollection<KeyValuePair<string, DBInterfaceModel>>.IsReadOnly => false;
+        bool ICollection<KeyValuePair<string, InterfaceModel>>.IsReadOnly => false;
        
         
-        void ICollection<KeyValuePair<string, DBInterfaceModel>>.Add(KeyValuePair<string, DBInterfaceModel> item)
+        void ICollection<KeyValuePair<string, InterfaceModel>>.Add(KeyValuePair<string, InterfaceModel> item)
         {
             Add(item.Key, item.Value);
         }
@@ -363,7 +363,7 @@ namespace ApiDoc.Middleware
             _count = 0;
         }
          
-        bool ICollection<KeyValuePair<string, DBInterfaceModel>>.Contains(KeyValuePair<string, DBInterfaceModel> item)
+        bool ICollection<KeyValuePair<string, InterfaceModel>>.Contains(KeyValuePair<string, InterfaceModel> item)
         {
             return TryGetValue(item.Key, out var value) && EqualityComparer<object>.Default.Equals(value, item.Value);
         }
@@ -377,8 +377,8 @@ namespace ApiDoc.Middleware
            
         }
          
-        void ICollection<KeyValuePair<string, DBInterfaceModel>>.CopyTo(
-            KeyValuePair<string, DBInterfaceModel>[] array,
+        void ICollection<KeyValuePair<string, InterfaceModel>>.CopyTo(
+            KeyValuePair<string, InterfaceModel>[] array,
             int arrayIndex)
         {
             if (array == null)
@@ -407,7 +407,7 @@ namespace ApiDoc.Middleware
             return new Enumerator(this);
         }
          
-        IEnumerator<KeyValuePair<string, DBInterfaceModel>> IEnumerable<KeyValuePair<string, DBInterfaceModel>>.GetEnumerator()
+        IEnumerator<KeyValuePair<string, InterfaceModel>> IEnumerable<KeyValuePair<string, InterfaceModel>>.GetEnumerator()
         {
             return GetEnumerator();
         }
@@ -418,7 +418,7 @@ namespace ApiDoc.Middleware
         }
 
         /// <inheritdoc />
-        bool ICollection<KeyValuePair<string, DBInterfaceModel>>.Remove(KeyValuePair<string, DBInterfaceModel> item)
+        bool ICollection<KeyValuePair<string, InterfaceModel>>.Remove(KeyValuePair<string, InterfaceModel> item)
         {
             if (Count == 0)
             {
@@ -440,7 +440,7 @@ namespace ApiDoc.Middleware
             return false;
         }
        
-        public bool TryAdd(string key, DBInterfaceModel value)
+        public bool TryAdd(string key, InterfaceModel value)
         {
             if (key == null)
             {
@@ -453,7 +453,7 @@ namespace ApiDoc.Middleware
             }
 
             EnsureCapacity(Count + 1);
-            _arrayStorage[Count] = new KeyValuePair<string, DBInterfaceModel>(key, value);
+            _arrayStorage[Count] = new KeyValuePair<string, InterfaceModel>(key, value);
             _count++;
             return true;
         }
@@ -470,7 +470,7 @@ namespace ApiDoc.Middleware
             if (_arrayStorage.Length < capacity)
             {
                 capacity = _arrayStorage.Length == 0 ? DefaultCapacity : _arrayStorage.Length * 2;
-                var array = new KeyValuePair<string, DBInterfaceModel>[capacity];
+                var array = new KeyValuePair<string, InterfaceModel>[capacity];
                 if (_count > 0)
                 {
                     Array.Copy(_arrayStorage, 0, array, 0, _count);
@@ -519,7 +519,7 @@ namespace ApiDoc.Middleware
             return false;
         }
  
-        public struct Enumerator : IEnumerator<KeyValuePair<string, DBInterfaceModel>>
+        public struct Enumerator : IEnumerator<KeyValuePair<string, InterfaceModel>>
         {
             private readonly DBRouteValueDictionary _dictionary;
             private int _index;
@@ -537,7 +537,7 @@ namespace ApiDoc.Middleware
                 _index = 0;
             }
 
-            public KeyValuePair<string, DBInterfaceModel> Current { get; private set; }
+            public KeyValuePair<string, InterfaceModel> Current { get; private set; }
 
             object IEnumerator.Current => Current;
 

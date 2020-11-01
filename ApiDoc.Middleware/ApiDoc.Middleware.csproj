@@ -6,13 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.91" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ApiDoc.BLL\ApiDoc.BLL.csproj" />
+    <ProjectReference Include="..\ApiDoc.IBLL\ApiDoc.IBLL.csproj" />
     <ProjectReference Include="..\ApiDoc.IDAL\ApiDoc.IDAL.csproj" />
     <ProjectReference Include="..\ApiDoc.Models\ApiDoc.Models.csproj" />
+    <ProjectReference Include="..\ApiDoc.Utility\ApiDoc.Utility.csproj" />
   </ItemGroup>
 
 </Project>

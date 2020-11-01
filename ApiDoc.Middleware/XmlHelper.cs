@@ -12,9 +12,9 @@ namespace ApiDoc.Middleware
 {
     public class XmlHelper
     {
-        public string SerializeXML(object value)
+        public string SerializeXML<T>(object value) where T:class
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(object));
+            XmlSerializer serializer = new XmlSerializer(typeof(T));
             StringWriter writer = new StringWriter(CultureInfo.InvariantCulture);
             serializer.Serialize(writer, value);
             string xml = writer.ToString();

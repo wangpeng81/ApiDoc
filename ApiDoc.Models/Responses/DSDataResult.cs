@@ -6,14 +6,10 @@ using System.Text;
 namespace ApiDoc.Models.Responses
 {
     //[Serializable]
-    public class DSDataResult : DataResult
-    {
-        public DSDataResult()
-        {
-
-        }
+    public class DSDataResult : BaseResult
+    { 
         private DataSet result; 
-        public new DataSet Result
+        public DataSet Result
         {
             get { return result; }
             set { result = value; }

@@ -20,9 +20,9 @@
     <nav class="navbar sticky-top navbar-expand-sm navbar-light border-bottom box-shadow mb-3" style="padding-left:0px;">
         <a class="navbar-brand text-right w-240 font-weight-bold" style="color:var(--themecolor); " asp-area="" asp-controller="Home" asp-action="Index">ApiDoc 官方文档</a>
 
-        <div class="container w-240 no-gutters">
+        <div class="container no-gutters">
             <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                <ul class="navbar-nav flex-grow-1">
+                <ul class="navbar-nav flex-grow-1 ">
                     @foreach (NavItem item in (List<NavItem>)ViewData["Nav"])
                     {
                         <li class="nav-item mr-3">

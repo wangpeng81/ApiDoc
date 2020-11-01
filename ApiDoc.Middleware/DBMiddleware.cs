@@ -6,37 +6,33 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using System.Collections.Generic; 
-using System.Data; 
-using System.IO;
-using System.IO.Pipelines;
+using System.Data;  
 using System.Net.Http;
 using System.Reflection;
 using System.Text;  
-using System.Threading.Tasks;
-
+using System.Threading.Tasks; 
 using System;
-using Newtonsoft.Json;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Logging;
-using ApiDoc.IBLL;
+using Newtonsoft.Json; 
+using Microsoft.Extensions.Logging; 
+using Autofac;
+using System.Data.Common;
+using System.IO;
+using ApiDoc.Models.Components;
 
 namespace ApiDoc.Middleware
 {
     public class DBMiddleware
     {
-
-        private string SqlConnStr;
-
+ 
         private readonly RequestDelegate next;
         private readonly IParamDAL paramDAL;
         private readonly IDbHelper dbHelp;
         private readonly DBRouteValueDictionary routeDict;
+        private readonly MyConfig myConfig;
         private readonly ILogger<DBMiddleware> logger;
+        private readonly IComponentContext componentContext;
         private HttpContext context;
-
-        private string ServerIP = "";
-        private string pwd = "";
-
+          
         public DBMiddleware(RequestDelegate _next,
                             IInterfaceDAL interfaceDAL,
                             IFlowStepDAL flowStepDAL,
@@ -44,16 +40,18 @@ namespace ApiDoc.Middleware
                             IDbHelper dbHelp,
                             DBRouteValueDictionary _routeDict,
                             IConfiguration config,
-                            ILogger<DBMiddleware> logger)
+                            MyConfig myConfig,
+                            ILogger<DBMiddleware> logger,
+                            IComponentContext componentContext)
         {
             this.next = _next;
             this.paramDAL = paramDAL;
             this.dbHelp = dbHelp;
             this.routeDict = _routeDict;
+            this.myConfig = myConfig;
             this.logger = logger;
-            SqlConnStr = config.GetConnectionString("ApiDocConnStr");
-            this.ServerIP = config.GetConnectionString("ServerIP");
-            this.pwd = config.GetConnectionString("pwd");
+            this.componentContext = componentContext;
+            string SqlConnStr = config.GetConnectionString("ApiDocConnStr");  
 
             //加载路由集合
 
@@ -63,12 +61,13 @@ namespace ApiDoc.Middleware
                 //加载步骤
                 int SN = model.SN;
                 string Url = model.Url;
-                DBInterfaceModel dbInter = new DBInterfaceModel();
+                InterfaceModel dbInter = new InterfaceModel();
                 dbInter.SerializeType = model.SerializeType;
                 dbInter.Method = model.Method;
                 dbInter.Steps = flowStepDAL.QueryOfParam(SN);
                 dbInter.IsTransaction = model.IsTransaction;
                 dbInter.ExecuteType = model.ExecuteType;
+                dbInter.DataType = model.DataType;
 
                 //接口参数
                 string auth = "";
@@ -121,7 +120,17 @@ namespace ApiDoc.Middleware
             this.context = context;
 
             string path = context.Request.Path.ToString();
-            DBInterfaceModel response = this.routeDict[path];
+            InterfaceModel response = this.routeDict[path];
+            if (response.DataType == "" || response.DataType == null)
+            {
+                await this.InvokeException("没有配置数据库类型");
+                return;
+            }
+            if (response.DataType != "SqlServer" && response.DataType != "Oracle" && response.DataType != "MySql")
+            {
+                await this.InvokeException("不支持数据库类型:" + response.DataType);
+                return;
+            }
 
             string exceMsg = ""; //存储异常的存储过程名  
             if (response.Steps.Count > 0)
@@ -148,8 +157,10 @@ namespace ApiDoc.Middleware
                     return;
                 }
 
-                SqlConnection connection = new SqlConnection(SqlConnStr);
-                SqlTransaction tran = null;
+                IDbConnection connection = this.componentContext.ResolveNamed<IDbConnection>(response.DataType);
+                string connStr = this.myConfig[response.DataType].ApiDocConnStr;
+                connection.ConnectionString = connStr;
+                IDbTransaction tran = null;
                 try
                 {
                     connection.Open();
@@ -160,11 +171,15 @@ namespace ApiDoc.Middleware
                     }
 
                     //执行第一步 
-                    string text = this.InvokeFistStep(response, connection, tran, dict, out exceMsg);
+                    string text = this.InvokeStep(response, connection, tran, dict, out exceMsg);
 
                     if (exceMsg != "")
                     {
-                        tran.Rollback();
+                        if (response.IsTransaction)
+                        {
+                            tran.Rollback();
+                        }
+
                         await this.InvokeException(exceMsg);
                         return;
                     }
@@ -259,7 +274,7 @@ namespace ApiDoc.Middleware
             return dict;
         }
            
-        private string InvokeFistStep(DBInterfaceModel response, SqlConnection connection, SqlTransaction tran, Dictionary<string, object> dict, out string exceMsg)
+        private string InvokeStep(InterfaceModel response, IDbConnection connection, IDbTransaction tran, Dictionary<string, object> dict, out string exceMsg)
         {
             exceMsg = "";
 
@@ -276,7 +291,8 @@ namespace ApiDoc.Middleware
                 }
 
                 connection.ChangeDatabase(step.DataBase);
-                SqlCommand cmd = new SqlCommand();
+                 
+                IDbCommand cmd = connection.CreateCommand();
                 cmd.CommandTimeout = 0;
                 cmd.Connection = connection;
 
@@ -285,12 +301,13 @@ namespace ApiDoc.Middleware
                     cmd.Transaction = tran;
                 }
 
-                SqlDataAdapter sqlDA = new SqlDataAdapter();
+                IDbDataAdapter sqlDA = this.componentContext.ResolveNamed<IDbDataAdapter>(response.DataType);
                 sqlDA.SelectCommand = cmd;
 
                 //初始化参数
                 switch (step.CommandType)
                 {
+                    case "Fun": 
                     case "Text":
                         cmd.CommandType = CommandType.Text;
                         break;
@@ -316,10 +333,12 @@ namespace ApiDoc.Middleware
                     else
                     {
                         //如果不是最后一步，存储当前步结果
-                        DataTable dt = new DataTable();
-                        sqlDA.Fill(dt);
-                        if (dt.Rows.Count > 0)
+                        DataSet ds = new DataSet();
+                        sqlDA.Fill(ds); 
+
+                        if (ds.Tables.Count > 0 && ds.Tables[ds.Tables.Count - 1].Rows.Count > 0 )
                         {
+                            DataTable dt = ds.Tables[ds.Tables.Count - 1]; 
                             dataPre = dt.Rows[0];
                         }
                     }
@@ -327,9 +346,9 @@ namespace ApiDoc.Middleware
                 }
                 catch (Exception ex)
                 {
-                    string message = response.Url　+ ">>" + step.StepName + ">>" + ex.Message;
-                    this.logger.LogError(message);
-                    throw new Exception(message);
+                    exceMsg = response.Url　+ ">>" + step.StepName + ">>" + ex.Message; 
+                    this.logger.LogError(exceMsg);
+                    return "";
                 }
                 
                 rowIndex++;
@@ -337,43 +356,68 @@ namespace ApiDoc.Middleware
             return result;
         }
  
-        private string ExecSql(DBInterfaceModel response, SqlConnection connection, SqlDataAdapter sqlDA, SqlCommand cmd)
+        private string ExecSql(InterfaceModel response, IDbConnection connection, IDbDataAdapter sqlDA, IDbCommand cmd)
         {
+            
+            XmlHelper xmlHelp = new XmlHelper(); 
             string json = "";
-            XmlHelper xmlHelp = new XmlHelper();
-
-            object objResutl = new object();
+            object dataResult = new object();
+            object result = new object(); 
             switch (response.ExecuteType)
             {
                 case "Scalar":
-                    objResutl = cmd.ExecuteScalar();
+                    DataResult dataResult1 = new DataResult();
+                    dataResult1.DataType = 200;
+                    dataResult1.Result = cmd.ExecuteScalar();
+                    dataResult = dataResult1;
+                    result = dataResult1.Result;
                     break;
                 case "Int":
-                    objResutl = cmd.ExecuteNonQuery();
+                    IntDataResult intDataResult = new IntDataResult();
+                    intDataResult.Result = cmd.ExecuteNonQuery();
+                    intDataResult.DataType = 200;
+                    dataResult = intDataResult;
+                    result = intDataResult.Result;
                     break;
-                case "DataSet": 
+                case "DataSet":
                     DataSet ds = new DataSet();
                     sqlDA.Fill(ds);
-                    objResutl = ds;
+                    DSDataResult dSDataResult = new DSDataResult();
+                    dSDataResult.Result = ds;
+                    dSDataResult.DataType = 200;
+                    dataResult = dSDataResult;
                     break;
             }
-
+             
             if (response.SerializeType == "Xml")
             {
-                json = xmlHelp.SerializeXML(objResutl);
+                switch (response.ExecuteType)
+                {
+                    case "Scalar":
+                        json = xmlHelp.SerializeXML<DataResult>(dataResult);
+                        break;
+                    case "Int":
+                        json = xmlHelp.SerializeXML<IntDataResult>(dataResult);
+                        break;
+                    case "DataSet":
+                        json = xmlHelp.SerializeXML<DSDataResult>(dataResult);
+                        break;
+                }
+                
             }
             else if (response.SerializeType == "Json")
             {
-                json = JsonConvert.SerializeObject(objResutl);
+                json = JsonConvert.SerializeObject(dataResult);
             }
             else
             {
-                json = objResutl.ToString();
+                json = result.ToString();
             }
+            
             return json;
         }
 
-        private bool CreateParam(DBInterfaceModel response, SqlCommand cmd, DataRow dataPre, FlowStepModel step, Dictionary<string, object> dict,  out string exceMsg)
+        private bool CreateParam(InterfaceModel response, IDbCommand cmd, DataRow dataPre, FlowStepModel step, Dictionary<string, object> dict,  out string exceMsg)
         {
             exceMsg = "";
             if (step.Params != null)
@@ -406,21 +450,25 @@ namespace ApiDoc.Middleware
                         } 
                     }
 
-                    cmd.Parameters.AddWithValue(param.ParamName, value);
+                    DbParameter dbParameter = this.componentContext.ResolveNamed<DbParameter>(response.DataType);
+                    dbParameter.ParameterName = param.ParamName;
+                    dbParameter.Value = value;
+                    cmd.Parameters.Add(dbParameter);
                 }
             }
             return true;
         }
+        
         private async Task InvokeException(string exception)
         {
 
             DataResult returnValue = new DataResult();
-            returnValue.DataType = 1;
+            returnValue.DataType = -1;
             returnValue.Exception = exception;
             this.logger.LogError(exception);
             string json = JsonConvert.SerializeObject(returnValue);
             await this.WriteAsync(json);
-        }
+        } 
 
         private async Task WriteAsync(string text)
         {

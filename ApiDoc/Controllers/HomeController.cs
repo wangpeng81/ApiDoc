@@ -8,22 +8,22 @@ using Microsoft.Extensions.Logging;
 using ApiDoc.Models;
 using System.Data;
 using Autofac;
-using System.Data.SqlClient;
-using ApiDoc.DAL;
+using System.Data.SqlClient; 
 using ApiDoc.Utility;
+using ApiDoc.Utility.Filter;
 
 namespace ApiDoc.Controllers
 {
+    [ServiceFilter(typeof(CustomExceptionFilterAttribute))]
     public class HomeController : BaseController
     { 
         private readonly IComponentContext componentContext;
 　
-        public HomeController(IComponentContext componentContext )
-        { 
+        public HomeController(IComponentContext componentContext)
+        {
             this.componentContext = componentContext;
-            IDbConnection dbConnection = componentContext.Resolve<IDbConnection>();
-
-            //Log4netHelper.Info("sss");
+             
+           
 
             //Log4netHelper.Info("sss");
 

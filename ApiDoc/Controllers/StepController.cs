@@ -4,20 +4,26 @@ using System.Linq;
 using System.Threading.Tasks;
 using ApiDoc.IDAL;
 using ApiDoc.Models;
+using ApiDoc.Models.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 namespace ApiDoc.Controllers
 {
+    /// <summary>
+    /// 步骤相当操作
+    /// </summary>
     public class StepController : Controller
     {
+        private readonly IInterfaceDAL interfaceDAL;
         private readonly IFlowStepDAL flowStepDAL;
-        private readonly IConfiguration config;
+        private readonly MyConfig myConfig;
 
-        public StepController(IFlowStepDAL flowStepDAL, IConfiguration config)
+        public StepController(IInterfaceDAL interfaceDAL, IFlowStepDAL flowStepDAL, MyConfig myConfig )
         {
+            this.interfaceDAL = interfaceDAL;
             this.flowStepDAL = flowStepDAL;
-            this.config = config;
+            this.myConfig = myConfig;
         }
 
         public IActionResult Index()
@@ -25,16 +31,29 @@ namespace ApiDoc.Controllers
             return View();
         }
 
+        //返回步骤页面 
         private IActionResult Redist(int FKSN)
         {
-            string[] dataBase = this.config.GetSection("DataBase").Get<string[]>();
-            ViewData["DataBase"] = dataBase;
-            List<FlowStepModel> list = this.flowStepDAL.Query(FKSN);
+            if( FKSN > 0 )
+            {
+                string DataBaseType = this.interfaceDAL.Get<InterfaceModel>(FKSN).DataType;
+                List<string> DataBases = this.myConfig[DataBaseType].DataBases;
+                ViewData["DataBase"] = DataBases;
+            } 
+
+            //数据库
+            List<string> CommandType = new List<string>();
+            CommandType.Add("Text");
+            CommandType.Add("StoredProcedure");
+            CommandType.Add("Fun");
+            ViewData["CommandType"] = CommandType;
+
+            List <FlowStepModel> list = this.flowStepDAL.Query(FKSN);
             return PartialView("/Views/Interface/FlowStepList.cshtml", list);
         }
 
         public IActionResult FlowStepList(int FKSN)
-        {
+        { 
             return this.Redist(FKSN);
         }
 

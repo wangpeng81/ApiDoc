@@ -1,0 +1,42 @@
+{
+  "Authorize": "281fdf7c-7cd9-4a47-9de6-2d752d90aa5e",
+  "DataBases": {
+    "SqlServer": {
+      "ApiDocConnStr": "server=.;uid=sa;pwd=china_2020;database=ApiDoc;",
+      "DataBases": [
+        "YZ_Med_InfoCenter",
+        "YZ_Med_LMSystem",
+        "YZ_Med_EleArchivesSystem",
+        "YZRegistry",
+        "YZ_Med_BPSystem",
+        "YZ_Med_GSP",
+        "YZ_Med_FMSystem"
+      ]
+    },
+    "MySql": {
+      "ApiDocConnStr": "server=.;database=cs_test;user id=root;password=123456;charset=utf8",
+      "DataBases": [
+        "YZ_Med_InfoCenter",
+        "YZ_Med_LMSystem",
+        "YZ_Med_EleArchivesSystem",
+        "YZRegistry",
+        "YZ_Med_BPSystem",
+        "YZ_Med_GSP",
+        "YZ_Med_FMSystem"
+      ]
+    },
+    "Oracle": {
+      "ApiDocConnStr": "Data Source=TDS_XC_XC_CS;User ID=tds_xc_cs;Password=tds_xc_cs;Unicode=True",
+      "DataBases": [
+        "YZ_Med_InfoCenter",
+        "YZ_Med_LMSystem",
+        "YZ_Med_EleArchivesSystem",
+        "YZRegistry",
+        "YZ_Med_BPSystem",
+        "YZ_Med_GSP",
+        "YZ_Med_FMSystem"
+      ]
+    }
+  }
+
+}

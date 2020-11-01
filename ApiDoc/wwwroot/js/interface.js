@@ -13,7 +13,8 @@ function btnSaveIntterface_Click() {
     var vFKSN = $("#txtFKSN").val();
     var vExecuteType = $("#cbxExecuteType").val();
     var vIsTransaction = document.getElementById("txtStepIsTransaction").checked;
-    var vIsStop = $("#txtIsStop").val();  
+    var vIsStop = $("#txtIsStop").val();
+    var vDataType = $("#cbxDataType").val();
 
     $.post(urlInterfaceSave, {
         SN: vSN,
@@ -24,7 +25,8 @@ function btnSaveIntterface_Click() {
         SerializeType: vSerializeType,
         IsTransaction: vIsTransaction,
         ExecuteType: vExecuteType,
-        IsStop: vIsStop
+        IsStop: vIsStop,
+        DataType: vDataType
     }, function (data) {
 
             popToastSuccess("保存成功!");
@@ -149,16 +151,22 @@ function btnShow_CS_Click() {
 function btnSendCS() {
 
     var url = window.location.protocol + "//" + window.location.host + urlRoot + $("#txtUrl").val();
-    var txtInput = $("#txtInput").val();
+    var vdata = $("#txtInput").val();
     var txtResult = $("#txtResult");
     var method = $("#cbxMethod").val();
+    if (method == "Get") { 
+        if (txtInput != "") {
+            url = url + "?" + txtInput;
+             
+        }
+    }
 
-    if (method == "Post") {
+    $.get(urlAuthor, function (author) {
 
-        var vdata = txtInput;
         $.ajax({
+            headers: { 'Authorize': author },
             url: url,
-            type: "POST",
+            type: method,
             datType: "JSON",
             contentType: "application/json",
             data: vdata,
@@ -167,19 +175,9 @@ function btnSendCS() {
                 txtResult.val(result);
             }
         })
-    }
-    else if (method == "Get") {
 
-        if (txtInput != "") {
-            url = url + "?" + txtInput;
-
-            $.get(url, function (result) {
-                txtResult.val(result);
-            });
-
-        }
-    }
-
+    });
+    
 }
 
 function checkAll(sender, checkName) {
@@ -193,7 +191,7 @@ function checkAll(sender, checkName) {
 $(function () {
 
     //初始化提示信息
-    var option = { animation: true, delay: 3000 };
+    var option = { animation: true, delay: 2000 };
     $('.toast').toast(option); 
     $('[data-toggle="tooltip"]').tooltip();
 

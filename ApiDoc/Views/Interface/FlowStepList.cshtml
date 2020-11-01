@@ -3,23 +3,24 @@
 
     @foreach (var step in Model)
     {
-    <li class="nav-item py-1">  
-        <a class="nav-link py-1"
-           data-toggle="pill"
-           href="#tab_step_@step.SN"
-           role="tab"  
-           data-data="{SN: @step.SN,StepName:'@step.StepName',FKSN:@step.FKSN, StepOrder:@step.StepOrder}"
-           data-isload="0">
-            @step.StepOrder. @step.StepName
-        </a> 
-    </li> 
+        <li class="nav-item py-1">
+            <a class="nav-link py-1"
+               data-toggle="pill"
+               href="#tab_step_@step.SN"
+               role="tab"
+               data-data="{SN: @step.SN,StepName:'@step.StepName',FKSN:@step.FKSN, StepOrder:@step.StepOrder}"
+               data-isload="0">
+                @step.StepOrder. @step.StepName
+            </a>
+        </li>
+
     }
 </ul>
 
 <div class="tab-content" id="myTabContent">
     @foreach (var step in Model)
     {
-        <div class="tab-pane" id="tab_step_@step.SN" role="tabpanel"  >
+        <div class="tab-pane" id="tab_step_@step.SN" role="tabpanel">
             <div class="container-fluid row no-gutters p-0 mt-2">
 
                 <!-- 参数 -->
@@ -46,7 +47,7 @@
                             <div class="input-group-text w-lab">数据库</div>
                         </div>
                         <select id="cbxDataBase" name="dataBase" class="custom-select custom-select-sm ">
-                            @foreach (string dataBase in (string[])ViewData["DataBase"])
+                            @foreach (string dataBase in (List<string>)ViewData["DataBase"])
                             {
                                 if (step.DataBase == @dataBase)
                                 {
@@ -62,16 +63,17 @@
                             <div class="input-group-text w-lab ml-2">执行类型</div>
                         </div>
                         <select id="cbxCommandType" name="commandType" class="custom-select custom-select-sm ">
-                            @if (step.CommandType == "Text")
+                            @foreach (string commandType in (List<string>)ViewData["CommandType"])
                             {
-                                <option value="Text" selected="selected">Text</option>
-                                <option value="StoredProcedure">StoredProcedure</option>
-                            }
-                            else
-                            {
-                                <option value="Text">Text</option>
-                                <option value="StoredProcedure" selected="selected">StoredProcedure</option>
-                            }
+                                if (step.CommandType == @commandType)
+                                {
+                                    <option value="@commandType" selected="selected">@commandType</option>
+                                }
+                                else
+                                {
+                                    <option value="@commandType">@commandType</option>
+                                }
+                            } 
                         </select>
 
                         <button class="btn btn-sm btn-default  ml-2" data-toggle="tooltip" data-placement="bottom" title="保存Sql" onclick="btnSaveCmdText(@step.SN)"><i class="fa fa-save"></i></button>
@@ -99,8 +101,8 @@
                 </div>
 
             </div>
-        </div> 
-    } 
+        </div>
+    }
 </div>
- 
+
 

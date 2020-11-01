@@ -21,7 +21,17 @@
 
         var btnDelete = $("#myModalDelete #btnDelete");
         btnDelete.click(callBack); 
-        $("#mymyModalDelete").modal("show");
+        $("#myModalDelete").modal("show");
+
+    }
+
+    function showModalInfo(title, callBack) {
+         
+        var body = $("#myModalDelete .modal-body"); 
+        body[0].innerHTML = title; 
+        var btnDelete = $("#myModalDelete #btnDelete");
+        btnDelete.click(callBack);
+        $("#myModalDelete").modal("show");
 
     }
  

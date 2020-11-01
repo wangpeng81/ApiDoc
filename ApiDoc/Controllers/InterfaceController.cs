@@ -4,20 +4,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Unicode;
-using System.Threading.Tasks; 
-using ApiDoc.DAL;
+using System.Threading.Tasks;  
 using ApiDoc.IBLL;
 using ApiDoc.IDAL;
 using ApiDoc.Middleware;
-using ApiDoc.Models;
-using ApiDoc.Utility.Filter;
+using ApiDoc.Models; 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace ApiDoc.Controllers
-{
-    [CustomExceptionFilterAttribute]
+{ 
     public class InterfaceController : Controller
     {
         private readonly IInterfaceDAL infterfaceDAL; 
@@ -65,11 +62,19 @@ namespace ApiDoc.Controllers
             DataType.Add("float");
             ViewData.Add("DataType", DataType);
 
+            //数据格式
             List<string> stList = new List<string>();
             stList.Add("");
             stList.Add("Json");
             stList.Add("Xml");
             ViewData.Add("SerializeType", stList);
+
+            //数据库类型
+            List<string> dataBaseType = new List<string>();
+            dataBaseType.Add("SqlServer");
+            dataBaseType.Add("Oracle");
+            dataBaseType.Add("MySql");
+            ViewData.Add("DataBaseType", dataBaseType);
 
             InterfaceModel model = new InterfaceModel();
             model.SN = SN;
@@ -123,7 +128,7 @@ namespace ApiDoc.Controllers
             //更新路由
             if (!model.IsStop)
             {
-                DBInterfaceModel dbInter = this.interfaceBLL.GetInterfaceModel(SN);
+                InterfaceModel dbInter = this.interfaceBLL.GetInterfaceModel(SN);
                 string url = model.Url;
                 if (this.routeDict.ContainsKey(url))
                 {
@@ -164,7 +169,7 @@ namespace ApiDoc.Controllers
             }
             else //启用
             {
-                DBInterfaceModel dbInter = this.interfaceBLL.GetInterfaceModel(SN);
+                InterfaceModel dbInter = this.interfaceBLL.GetInterfaceModel(SN);
                 if (this.routeDict.ContainsKey(url))
                 {
                     this.routeDict[url] = dbInter;

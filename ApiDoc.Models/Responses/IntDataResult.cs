@@ -4,14 +4,10 @@ using System.Text;
 
 namespace ApiDoc.Models.Responses
 { 
-    public class IntDataResult : DataResult
-    {
-        public IntDataResult()
-        {
-
-        }
+    public class IntDataResult : BaseResult
+    {  
         private int result = 0;
-        public new int Result
+        public int Result
         {
             get { return result; }
             set { result = value; }

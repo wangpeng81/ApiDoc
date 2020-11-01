@@ -177,6 +177,26 @@
 
                         </select>
                     </div>
+
+                    <!-- 数据库类型-->
+                    <div class="col input-group input-group-sm">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">数据库类型</div>
+                        </div>
+                        <select class="custom-select mr-sm" id="cbxDataType">
+                            @foreach (string value in (List<string>)ViewData["DataBaseType"])
+                            {
+                                if (Model.DataType == value)
+                                {
+                                    <option value="@value" selected>@value</option>
+                                }
+                                else
+                                {
+                                    <option value="@value">@value</option>
+                                }
+                            }
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -197,20 +217,17 @@
     </div>
     <div class="tab-pane" id="tab-step" role="tabpanel" aria-labelledby="profile-tab">
         <div class="container-fluid">
-            <!--Step -->
-            @if (Model.SN > 0)
-            {
-                <div class="btn-toolbar my-2" role="toolbar" aria-label="Toolbar with button groups">
-                    <div class="btn-group btn-group-sm" role="group" aria-label="Second group">
-                        <button type="button" class="btn btn-info">接口步骤</button>
-                        <button type="button" class="btn btn-default" data-toggle="tooltip" onclick="showFlowStep(@Model.SN)"><i class="fa fa-plus"></i></button>
-                        <button type="button" class="btn btn-default" data-toggle="tooltip" onclick="showFlowStep(0)"><i class="fa fa-edit"></i></button>
-                        <button type="button" class="btn btn-default" data-toggle="tooltip" onclick="btnShowFlowStepDelete()"><i class="fa fa-trash-o"></i></button>
-                    </div>
+            <!--Step --> 
+            <div class="btn-toolbar my-2" role="toolbar" aria-label="Toolbar with button groups">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Second group">
+                    <button type="button" class="btn btn-info">接口步骤</button>
+                    <button type="button" class="btn btn-default" data-toggle="tooltip" onclick="showFlowStep(0)"><i class="fa fa-plus"></i></button>
+                    <button type="button" class="btn btn-default" data-toggle="tooltip" onclick="showFlowStep(1)"><i class="fa fa-edit"></i></button>
+                    <button type="button" class="btn btn-default" data-toggle="tooltip" onclick="btnShowFlowStepDelete()"><i class="fa fa-trash-o"></i></button>
                 </div>
-                <div id="myStepList">
-                </div>
-            }
+            </div>
+            <div id="myStepList">
+            </div>
         </div>
     </div>
 </div>

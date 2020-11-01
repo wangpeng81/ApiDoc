@@ -1,7 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <OutputPath>E:\.NetCore3.1\ApiDoc\ApiDoc\bin\Debug\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

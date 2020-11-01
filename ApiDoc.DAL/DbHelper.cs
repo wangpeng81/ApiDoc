@@ -1,12 +1,10 @@
 ﻿ using System.Collections.Generic; 
-  using System.Data;
-  using System;  
+ using System.Data;
+ using System;  
 using ApiDoc.IDAL;
 using Microsoft.Extensions.Configuration; 
 using Autofac;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Logging;
-
+ 
 namespace ApiDoc.DAL
 {
     public class DbHelper : IDbHelper
@@ -21,8 +19,8 @@ namespace ApiDoc.DAL
         { 
             string SqlConnStr = config.GetConnectionString("ApiDocConnStr");
             this.config = config;
-            this.componentContext = componentContext; 
-            this.dbConnection = componentContext.Resolve<IDbConnection>();
+            this.componentContext = componentContext;
+            this.dbConnection = componentContext.ResolveNamed<IDbConnection>("SqlServer");
             this.dbConnection.ConnectionString = SqlConnStr; 
         }
           
@@ -137,19 +135,13 @@ namespace ApiDoc.DAL
         
         private IDbDataAdapter CreateSqlAdapter(string cmdText)
         {
-            try
-            {
-                IDbDataAdapter dataAdapter = componentContext.Resolve<IDbDataAdapter>();
+           
+                IDbDataAdapter dataAdapter = componentContext.ResolveNamed<IDbDataAdapter>("SqlServer");
                 IDbCommand dbCommand = this.dbConnection.CreateCommand();
                 dbCommand.CommandText = cmdText;
                 dbCommand.Connection = this.dbConnection;
                 dataAdapter.SelectCommand = dbCommand; 
-                return dataAdapter;
-            }
-            catch (System.Exception ex)
-            { 
-                throw new Exception(ex.Message);
-            }
+                return dataAdapter; 
         }
         private IDbDataAdapter CreateSqlAdapter(string cmdText, DbParameters p)
         {
@@ -173,20 +165,7 @@ namespace ApiDoc.DAL
                 throw new Exception(ex.Message);
             }
         }
-
-        private DataSet GetDataTable(SqlDataAdapter adapter)
-        {
-            
-            DataSet dt = new DataSet();
-            adapter.Fill(dt);
-            if (adapter.SelectCommand.Connection.State == ConnectionState.Open)
-            {
-                adapter.SelectCommand.Connection.Close();
-            }
-            adapter.Dispose();
-            return dt; 
-        }
-
+ 
         public void Open()
         {
             this.dbConnection.Open();

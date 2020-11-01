@@ -31,7 +31,7 @@ namespace ApiDoc.Controllers
 
             InterfaceModel model = this.infterfaceDAL.Get<InterfaceModel>(SN);
           
-            DBInterfaceModel dbInter = new DBInterfaceModel();
+            InterfaceModel dbInter = new InterfaceModel();
             dbInter.SerializeType = model.SerializeType;
             dbInter.Method = model.Method;
             dbInter.IsTransaction = model.IsTransaction;

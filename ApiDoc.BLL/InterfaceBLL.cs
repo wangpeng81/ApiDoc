@@ -21,24 +21,11 @@ namespace ApiDoc.BLL
             this.flowStepDAL = flowStepDAL;
         }
 
-        public DBInterfaceModel GetInterfaceModel(int SN)
+        public InterfaceModel GetInterfaceModel(int SN)
         {
-          
-            InterfaceModel model = this.infterfaceDAL.Get<InterfaceModel>(SN);
-            DBInterfaceModel dbInter = CreateModel(model); 
-            return dbInter;
-        }
- 
-        private DBInterfaceModel CreateModel(InterfaceModel model)
-        {
-            DBInterfaceModel dbInter = new DBInterfaceModel();
-            dbInter.SerializeType = model.SerializeType;
-            dbInter.Method = model.Method;
-            dbInter.IsTransaction = model.IsTransaction;
-            dbInter.ExecuteType = model.ExecuteType;
-            dbInter.Title = model.Title;
-            dbInter.Url = model.Url;
-            dbInter.Steps = this.flowStepDAL.QueryOfParam(model.SN);
+
+            InterfaceModel model = this.infterfaceDAL.Get<InterfaceModel>(SN); 
+            model.Steps = this.flowStepDAL.QueryOfParam(model.SN);
 
             //接口参数
             string auth = "";
@@ -51,8 +38,10 @@ namespace ApiDoc.BLL
                 auth += param.ParamName;
             }
             auth = auth.ToLower();
-            dbInter.Auth = auth;
-            return dbInter;
+            model.Auth = auth;
+            return model;
         }
+ 
+        
     }
 }

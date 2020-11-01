@@ -1,9 +1,4 @@
-﻿
-$(function () {
-    //var option = { animation: true, delay: 1500 };
-    //$('.toast').toast(option); 
-});
-
+﻿ 
 function checkAll(sender, checkName) {
 
     var objList = document.getElementsByName(checkName)

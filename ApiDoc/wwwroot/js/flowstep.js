@@ -3,7 +3,7 @@ var selectFlowStep = null;
 
 $(function () {
      
-    var fksn = $('#txtSN').val();
+    var fksn = $('#txtSN').val(); 
     var data = {  
         FKSN: fksn 
     };
@@ -42,9 +42,9 @@ function loadStepData(innerHtml) {
 }
 
 //弹出主信息窗口
-function showFlowStep(FKSN) { 
+function showFlowStep(flag) { 
      
-    if (FKSN == 0) {
+    if (flag == 1) {
 
         //修改
         if (selectFlowStep != null) {
@@ -63,9 +63,13 @@ function showFlowStep(FKSN) {
     }
     else { //添加
 
+        if (_SN == 0) {
+            popToastSuccess("请先维护接口信息");
+            return;
+        }
         $('#txtStepSN').val(0);
-        $('#txtStepName').val(""); 
-        $('#txtStepFKSN').val(FKSN);
+        $('#txtStepName').val("");
+        $('#txtStepFKSN').val(_SN);
         $('#txtStepOrder').val(1); 
     }
 

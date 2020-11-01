@@ -1,25 +1,10 @@
-﻿using System; 
+﻿using System;
+using System.Data;
+
 namespace ApiDoc.Models.Responses
 { 
-    public class DataResult
+    public class DataResult : BaseResult
     {
-        public DataResult()
-        {
-            
-        }
-        private int dataType = 0;
-        public int DataType
-        {
-            get { return dataType; }
-            set { dataType = value; }
-        }
-
-        private string exception = "";
-        public string Exception
-        {
-            get { return exception; }
-            set { exception = value; }
-        }
 
         private object result;
         public object Result

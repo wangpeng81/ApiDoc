@@ -1,12 +1,10 @@
 using System; 
 using System.IO;
-using System.Reflection;
-using ApiDoc.DAL; 
+using System.Reflection; 
 using ApiDoc.Middleware;
+using ApiDoc.Utility;
 using ApiDoc.Utility.Filter;
-using Autofac;
-using log4net.Config;
-using log4net.Repository;
+using Autofac; 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -14,8 +12,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.Hosting; 
 
 namespace ApiDoc
 {
@@ -40,9 +37,13 @@ namespace ApiDoc
                        .AllowAnyOrigin(); //允许任何来源的主机访问 ;
                }));
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(options=> {
+                //options.Filters.Add(typeof(CustomExceptionFilterAttribute));
+            });
             services.AddSession();
- 
+
+            services.AddTransient(typeof(CustomExceptionFilterAttribute));
+
             //services.AddMvc(options=> {
             //    options.Filters.Add<CustomExceptionFilterAttribute>();
 
@@ -73,9 +74,7 @@ namespace ApiDoc
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            
-            
+        { 
             app.UseSession(); 
             if (env.IsDevelopment())
             {
@@ -94,18 +93,9 @@ namespace ApiDoc
             });
 
             app.UseMiddleware<MyCorsMiddleware>();
+            app.UseMiddleware<AuthorizeMiddleware>();
             app.UseMiddleware<DBMiddleware>();
-            //app.Use((context, next) => {
-            //    if (context.Request.Path.ToString().Contains("cs2"))
-            //    {
-            //        return context.Response.WriteAsync("400");
-            //    }
-            //    else
-            //    {
-            //        return next();
-            //    }
-            //});
-
+            
             app.UseRouting();
             app.UseCors("CorsPolicy");
             app.UseAuthorization();

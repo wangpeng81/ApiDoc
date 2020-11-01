@@ -38,3 +38,7 @@ var urlFlowStepParamSaveList = urlRoot + "/Param/StepParamSaveList";
 var urlRouteUpLoad = urlRoot + "/RouteValue/UpLoad";
 var urlRouteDelete = urlRoot + "/RouteValue/Delete";
 
+//MyConfig
+var urlMyConfigSaveAuthorize = urlRoot + "/MyConfig/SaveAuthorize";
+var urlAuthor = urlRoot + "/Author";
+
