@@ -12,6 +12,7 @@ namespace ApiDoc
     {
         public static void Main(string[] args)
         {
+           
             IHostBuilder hostBilder = CreateHostBuilder(args);
             IHost host = hostBilder.Build();
             host.Run();

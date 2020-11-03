@@ -57,15 +57,44 @@ namespace ApiDoc.DAL
             foreach (DataRow dataRow in dt.Rows)
             {
                 FlowStepModel info = this.CreateModel<FlowStepModel>(dataRow);
-
+                
+                //加载步骤参数
                 string strSql1 = "select * from api_flow_step_param where fksn =" + info.SN.ToString();
                 info.Params = new List<FlowStepParamModel>();
 
+                string strFunParam = "";
+                string strFunTableParm = "";
                 foreach (DataRow dataRow1 in db.FillTable(strSql1).Rows)
-                {
+                {  
                     FlowStepParamModel model1 = base.CreateModel<FlowStepParamModel>(dataRow1);
+                    string paraName = model1.ParamName;
+
+                    if (strFunParam != "")
+                    {
+                        strFunParam += ",";
+                    }
+
+                    if (strFunTableParm != "")
+                    {
+                        strFunTableParm += ",";
+                    }
                     info.Params.Add(model1);
-                } 
+                    strFunParam += "@" + paraName;
+                    strFunTableParm += paraName = "@" + paraName;
+                }
+
+                if (info.CommandType == "Fun") //标量函数
+                {
+                    info.CommandText = "select " + info.CommandText + "(" + strFunParam + ")";
+                }
+                else if (info.CommandType == "FunTable") //表函数
+                {
+                    info.CommandText = "select * from " + info.CommandText;
+                    if (strFunTableParm != "")
+                    {
+                        info.CommandText += " where " + strFunParam;
+                    }
+                }
 
                 list.Add(info);
             }

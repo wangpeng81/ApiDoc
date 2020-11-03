@@ -10,26 +10,26 @@ namespace ApiDoc.Models.Components
         /// 验证码
         /// </summary>
         public string Authorize { get; set; }
-        public DataBases DataBases { get; set; }
+        public DataBases DataType { get; set; }
 
-        public DataBase this[string dataBase]
+        public DataBase this[string dataType]
         {
             get
             {
-                DataBase dataBase1 = null;
-                switch (dataBase)
+                DataBase dataBase = null;
+                switch (dataType)
                 {
                     case "SqlServer":
-                        dataBase1 = this.DataBases.SqlServer;
+                        dataBase = this.DataType.SqlServer;
                         break;
                     case "MySql":
-                        dataBase1 = this.DataBases.MySql;
+                        dataBase = this.DataType.MySql;
                         break;
                     case "Oracle":
-                        dataBase1 = this.DataBases.Oracle;
+                        dataBase = this.DataType.Oracle;
                         break;
                 }
-                return dataBase1;
+                return dataBase;
             }
         }
     }

@@ -477,5 +477,188 @@ namespace ApiDoc.Middleware
             await this.context.Response.WriteAsync(text);
         }
 
+        private string CreateFileterString(List<FilterCondition> filters, out string msg)
+        {
+            msg = "";
+            StringBuilder tempBracket = new StringBuilder("");//用来校验括号的临时字符串
+            StringBuilder tempFilterStr = new StringBuilder("");//过滤字符串临时内容
+            int i = 0;
+            foreach (FilterCondition filter in filters)
+            {
+                //记录用来校验括号的临时字符串
+                if (filter.BracketL == "(")
+                {
+                    tempBracket.Append("(");
+                    tempFilterStr.Append(" ( ");
+                }
+
+                if (filter.BracketR == ")")
+                {
+                    tempBracket.Append(")");
+                }
+
+                //列名
+                tempFilterStr.Append(" ").Append(filter.ColumnName);
+
+                //条件
+                if (filter.ValueType == "List")
+                {
+                    if (filter.Condition == ConditionTypeEnum.NotContain || filter.Condition == ConditionTypeEnum.NotEqual)
+                    {
+                        tempFilterStr.Append(" NOT ");
+                    }
+                    tempFilterStr.Append(" IN (");
+
+                    string[] _list = filter.Value.Split(",");
+                    bool bFist = true;
+                    foreach (string _item in _list)
+                    {
+                        if (!bFist)
+                        {
+                            tempFilterStr.Append(",");
+                            bFist = false;
+                        }
+                        tempFilterStr.Append("'").Append(_item.Replace("%", "[%]")).Append("'");
+                    }
+                    tempFilterStr.Append(") ");
+                }
+                else //其他的按照不同的值类型做不同的比对
+                {
+                    string sql = CreateFileterString(filter, out msg);
+                    if (msg != "")
+                    {
+                        break;
+                    }
+                    tempFilterStr.Append(sql);
+                }
+                if (filter.BracketR == ")")
+                {
+                    tempFilterStr.Append(" ) ");
+                }
+
+                if (!string.IsNullOrEmpty(filter.JoinType) && i != filters.Count - 1)
+                {
+                    tempFilterStr.Append(" ").Append(filter.JoinType).Append(" ");
+                }
+
+                #region 查看括号有没有不全的
+                string tempBracketStr = tempBracket.ToString();
+                while (tempBracketStr.Contains("(") || tempBracketStr.Contains(")"))
+                {
+                    if (tempBracketStr.Contains("()"))
+                    {
+                        tempBracketStr = tempBracketStr.Replace("()", "");
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                if (!string.IsNullOrEmpty(tempBracketStr))
+                {
+                    msg = "左右括号不匹配，请检验！";
+                    break;
+                }
+                #endregion
+                i++;
+            }
+            return tempFilterStr.ToString();
+        }
+
+        private string CreateFileterString(FilterCondition _filterCol, out string msg)
+        {
+            msg = "";
+            
+            StringBuilder tempFilterStr = new StringBuilder("");
+            if (_filterCol.ValueType == nameof(String))
+            {
+                if (_filterCol.Condition == ConditionTypeEnum.Equal)
+                {
+                    tempFilterStr.Append(" = '").Append(_filterCol.Value).Append("' ");
+                }
+                else if (_filterCol.Condition == ConditionTypeEnum.Contain)
+                {
+                    tempFilterStr.Append(" like '%").Append(_filterCol.Value).Append("%' ");
+                }
+                else if (_filterCol.Condition == ConditionTypeEnum.NotEqual)
+                {
+                    tempFilterStr.Append(" <> '").Append(_filterCol.Value).Append("' ");
+                }
+                else if (_filterCol.Condition == ConditionTypeEnum.MatchLeft)
+                {
+                    tempFilterStr.Append(" like '").Append(_filterCol.Value).Append("%' ");
+                }
+                else if (_filterCol.Condition == ConditionTypeEnum.MatchRight)
+                {
+                    tempFilterStr.Append(" like '%").Append(_filterCol.Value).Append("' ");
+                }
+                else if (_filterCol.Condition == ConditionTypeEnum.NotContain)
+                {
+                    tempFilterStr.Append(" not like '%").Append(_filterCol.Value).Append("%' ");
+                }
+                else
+                {
+                    tempFilterStr.Append(" like '%' ");
+                }
+            }
+            else if (_filterCol.ValueType == nameof(Decimal) || _filterCol.ValueType == nameof(Int32))
+            {
+                decimal _num = 0;
+                if (!decimal.TryParse(_filterCol.Value, out _num))
+                {
+                    msg = "数据类型转换错误";
+                    return "";
+                }
+
+                if (_filterCol.Condition == ConditionTypeEnum.Equal)
+                {
+                    tempFilterStr.Append(" = ").Append(_filterCol.Value).Append(" ");
+                }
+                else if (_filterCol.Condition == ConditionTypeEnum.NotEqual)
+                {
+                    tempFilterStr.Append(" <> ").Append(_filterCol.Value).Append(" ");
+                }
+                else if (_filterCol.Condition == ConditionTypeEnum.Greater)
+                {
+                    tempFilterStr.Append(" > ").Append(_filterCol.Value).Append(" ");
+                }
+                else if (_filterCol.Condition == ConditionTypeEnum.Less)
+                {
+                    tempFilterStr.Append(" < ").Append(_filterCol.Value).Append(" ");
+                }
+                else
+                {
+                    tempFilterStr.Append(" = 0 ");
+                }
+            }
+            else if (_filterCol.ValueType == nameof(DateTime))
+            {
+                if (_filterCol.Condition == ConditionTypeEnum.Equal)
+                {
+                    tempFilterStr.Append(" = #").Append(_filterCol.Value).Append("# ");
+                }
+                else if (_filterCol.Condition == ConditionTypeEnum.Greater)
+                {
+                    tempFilterStr.Append(" > #").Append(_filterCol.Value).Append("# ");
+                }
+                else if (_filterCol.Condition == ConditionTypeEnum.Less)
+                {
+                    tempFilterStr.Append(" < #").Append(_filterCol.Value).Append("# ");
+                }
+                else
+                {
+                    tempFilterStr.Append(" = #").Append(DateTime.Now.Date.ToString()).Append("# ");
+                }
+            }
+            else if (_filterCol.ValueType == nameof(Boolean))
+            {
+                if (_filterCol.Condition == ConditionTypeEnum.Equal)
+                {
+                    tempFilterStr.Append(" = '").Append(_filterCol.Value).Append("' ");
+                }
+            }
+
+            return tempFilterStr.ToString();
+        }
     }
 }

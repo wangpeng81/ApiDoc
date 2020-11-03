@@ -18,12 +18,17 @@ namespace ApiDoc.Controllers
         private readonly IInterfaceDAL interfaceDAL;
         private readonly IFlowStepDAL flowStepDAL;
         private readonly MyConfig myConfig;
+        private readonly IConfiguration configuration;
 
-        public StepController(IInterfaceDAL interfaceDAL, IFlowStepDAL flowStepDAL, MyConfig myConfig )
+        public StepController(IInterfaceDAL interfaceDAL, 
+            IFlowStepDAL flowStepDAL, 
+            MyConfig myConfig,
+            IConfiguration configuration )
         {
             this.interfaceDAL = interfaceDAL;
             this.flowStepDAL = flowStepDAL;
             this.myConfig = myConfig;
+            this.configuration = configuration;
         }
 
         public IActionResult Index()
@@ -39,13 +44,10 @@ namespace ApiDoc.Controllers
                 string DataBaseType = this.interfaceDAL.Get<InterfaceModel>(FKSN).DataType;
                 List<string> DataBases = this.myConfig[DataBaseType].DataBases;
                 ViewData["DataBase"] = DataBases;
-            } 
+            }
 
             //数据库
-            List<string> CommandType = new List<string>();
-            CommandType.Add("Text");
-            CommandType.Add("StoredProcedure");
-            CommandType.Add("Fun");
+            List<string> CommandType = configuration.GetSection("CommandType").Get<List<string>>();
             ViewData["CommandType"] = CommandType;
 
             List <FlowStepModel> list = this.flowStepDAL.Query(FKSN);

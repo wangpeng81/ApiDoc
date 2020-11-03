@@ -1,6 +1,6 @@
 {
   "Authorize": "281fdf7c-7cd9-4a47-9de6-2d752d90aa5e",
-  "DataBases": {
+  "DataType": {
     "SqlServer": {
       "ApiDocConnStr": "server=.;uid=sa;pwd=china_2020;database=ApiDoc;",
       "DataBases": [
@@ -14,7 +14,7 @@
       ]
     },
     "MySql": {
-      "ApiDocConnStr": "server=.;database=cs_test;user id=root;password=123456;charset=utf8",
+      "ApiDocConnStr": "Server=192.168.3.57;Port=3307;Database=captest;Uid=root;Pwd=123123;",
       "DataBases": [
         "YZ_Med_InfoCenter",
         "YZ_Med_LMSystem",
