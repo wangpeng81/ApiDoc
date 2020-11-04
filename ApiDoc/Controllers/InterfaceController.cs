@@ -48,32 +48,19 @@ namespace ApiDoc.Controllers
  
         public IActionResult Add(int FKSN, int SN)
         {
-            List<string> list = new List<string>();
-            list.Add("DataSet");
-            list.Add("Int");
-            list.Add("Scalar");
+            List<string> list = this.config.GetSection("ExecuteType").Get<List<string>>(); 
             ViewData.Add("ExecuteType", list); //执行集合类型
 
             //参数类型
-            List<string> DataType = new List<string>();
-            DataType.Add("varchar");
-            DataType.Add("int");
-            DataType.Add("datetime");
-            DataType.Add("float");
+            List<string> DataType = this.config.GetSection("DataType").Get<List<string>>(); 
             ViewData.Add("DataType", DataType);
 
-            //数据格式
-            List<string> stList = new List<string>();
-            stList.Add("");
-            stList.Add("Json");
-            stList.Add("Xml");
+            //序列化格式
+            List<string> stList = this.config.GetSection("SerializeType").Get<List<string>>(); 
             ViewData.Add("SerializeType", stList);
 
             //数据库类型
-            List<string> dataBaseType = new List<string>();
-            dataBaseType.Add("SqlServer");
-            dataBaseType.Add("Oracle");
-            dataBaseType.Add("MySql");
+            List<string> dataBaseType = this.config.GetSection("DataBaseType").Get<List<string>>(); 
             ViewData.Add("DataBaseType", dataBaseType);
 
             InterfaceModel model = new InterfaceModel();

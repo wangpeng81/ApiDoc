@@ -428,14 +428,24 @@ namespace ApiDoc.Middleware
                     object value = null;
 
                     if (param.IsPreStep) //如果从上一步取值
-                    {
+                    {　
                         if (dataPre == null || !dataPre.Table.Columns.Contains(param.ParamName))
                         {
-                            exceMsg = str + "无法从上一步取值值";
-                            return false;
+                            //如果有默认值
+                            if (param.DefaultValue != "")
+                            {
+                                value = param.DefaultValue;
+                            }
+                            else
+                            {
+                                exceMsg = str + "无法从上一步取值值";
+                                return false;
+                            } 
                         }
-
-                        value = dataPre[param.ParamName]; 
+                        else
+                        {
+                            value = dataPre[param.ParamName];
+                        } 
                     }
                     else //从Request中取值 
                     {
@@ -445,8 +455,16 @@ namespace ApiDoc.Middleware
                         }
                         else
                         {
-                            exceMsg = str + "没有在Request中获取到值";
-                            return false;
+                            //如果有默认值
+                            if (param.DefaultValue != "")
+                            {
+                                value = param.DefaultValue;
+                            } 
+                            else
+                            {
+                                exceMsg = str + "没有在Request中获取到值";
+                                return false;
+                            } 
                         } 
                     }
 
