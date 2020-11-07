@@ -62,7 +62,7 @@
                         <div class="input-group-prepend">
                             <div class="input-group-text w-lab ml-2">执行类型</div>
                         </div>
-                        <select id="cbxCommandType" name="commandType" class="custom-select custom-select-sm ">
+                        <select id="cbxCommandType" name="commandType" class="custom-select custom-select-sm" onchange="onchange_">
                             @foreach (string commandType in (List<string>)ViewData["CommandType"])
                             {
                                 if (step.CommandType == @commandType)

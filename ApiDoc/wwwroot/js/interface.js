@@ -161,23 +161,46 @@ function btnSendCS() {
         }
     }
 
-    $.get(urlAuthor, function (author) {
+    var strUserName = $("#myModalCS #txtUserName").val();
+    var strPassword = $("#myModalCS #txtPassword").val();
 
-        $.ajax({
-            headers: { 'Authorize': author },
-            url: url,
-            type: method,
-            datType: "JSON",
-            contentType: "application/json",
-            data: vdata,
-            async: false,
-            success: function (result) {
-                txtResult.val(result);
-            }
-        })
+    if (strUserName == "") {
+        return;
+    }
+    if (strPassword == "") {
+        return;
+    }
 
-    });
-    
+    var data = {
+        UserName:strUserName,
+        Password:strPassword
+    };
+
+    $.ajax({
+        url: urlAuthorLogin,
+        dataType: 'json',
+        type: 'Post',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function (author) {
+
+            if (author.result == true) {
+                $.ajax({
+                    headers: { 'Authorization': author.token },
+                    url: url,
+                    type: method,
+                    datType: "JSON",
+                    contentType: "application/json",
+                    data: vdata,
+                    async: false,
+                    success: function (result) {
+                        txtResult.val(result);
+                    }
+                })
+            } 
+        }
+    })
+ 
 }
 
 function checkAll(sender, checkName) {

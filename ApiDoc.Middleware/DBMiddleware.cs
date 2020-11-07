@@ -18,12 +18,15 @@ using Autofac;
 using System.Data.Common;
 using System.IO;
 using ApiDoc.Models.Components;
+using Newtonsoft.Json.Linq;
 
 namespace ApiDoc.Middleware
 {
     public class DBMiddleware
     {
- 
+
+        private const string _ReqFilter = "SQLTEXT_"; //接收的是复杂语句
+
         private readonly RequestDelegate next;
         private readonly IParamDAL paramDAL;
         private readonly IDbHelper dbHelp;
@@ -51,10 +54,35 @@ namespace ApiDoc.Middleware
             this.myConfig = myConfig;
             this.logger = logger;
             this.componentContext = componentContext;
-            string SqlConnStr = config.GetConnectionString("ApiDocConnStr");  
+            string SqlConnStr = config.GetConnectionString("ApiDocConnStr");
 
-            //加载路由集合
+            //List<FilterCondition> filters = new List<FilterCondition>();
+            //FilterCondition filter = new FilterCondition();
+            //filter.BracketL = "(";
+            //filter.BracketR = ")";
+            //filter.ColumnName = "SN";
+            //filter.Condition = ConditionTypeEnum.Equal;
+            //filter.Value = "123";
+            //filter.ValueType = "";
+            //filter.JoinType = "And";
+            //filters.Add(filter);
 
+            //filter = new FilterCondition();
+            //filter.BracketL = "(";
+            //filter.BracketR = ")";
+            //filter.ColumnName = "SN";
+            //filter.Condition = ConditionTypeEnum.Equal;
+            //filter.Value = "123";
+            //filter.JoinType = "";
+            //filters.Add(filter);
+
+            //Dictionary<string, object> dist = new Dictionary<string, object>();
+            //dist.Add("SN", 1);
+            //dist.Add(_ReqFilter, filters);
+
+            //string json = JsonConvert.SerializeObject(dist);
+
+            //加载路由集合 
             List<InterfaceModel> dtInterface = interfaceDAL.Query(false);
             foreach (InterfaceModel model in dtInterface)
             {
@@ -121,42 +149,21 @@ namespace ApiDoc.Middleware
 
             string path = context.Request.Path.ToString();
             InterfaceModel response = this.routeDict[path];
-            if (response.DataType == "" || response.DataType == null)
-            {
-                await this.InvokeException("没有配置数据库类型");
-                return;
-            }
-            if (response.DataType != "SqlServer" && response.DataType != "Oracle" && response.DataType != "MySql")
-            {
-                await this.InvokeException("不支持数据库类型:" + response.DataType);
-                return;
-            }
 
+            string msg;
+
+            Dictionary<string, object> dict = null; 
+            bool bOK = this.CheckDataBase(response, out dict, out msg);
+            if (!bOK)
+            {
+                await this.InvokeException(msg);
+                return;
+            }
+             
             string exceMsg = ""; //存储异常的存储过程名  
             if (response.Steps.Count > 0)
             {
-                //参数验证
-                //从Request中获取参数集合
-                Dictionary<string, object> dict = null;
-                string method = response.Method.ToLower();
-                string auth = "";
-                if (method == "post" || method == "get")
-                {
-                    dict = this.CreateDict(method, out auth);
-                } 
-                else
-                {
-                    await this.InvokeException("此平台只支持post,get");
-                    return;
-                }
-
-                auth = auth.ToLower();
-                if (response.Auth != auth)
-                {
-                    await this.InvokeException("接收参数[" + response.Auth + "]与规则[" + auth + "]不匹配");
-                    return;
-                }
-
+                
                 IDbConnection connection = this.componentContext.ResolveNamed<IDbConnection>(response.DataType);
                 string connStr = this.myConfig[response.DataType].ApiDocConnStr;
                 connection.ConnectionString = connStr;
@@ -210,6 +217,48 @@ namespace ApiDoc.Middleware
             }
         }
 
+        /// <summary>
+        /// 验证数据库类型
+        /// </summary> 
+        private bool CheckDataBase(InterfaceModel response, out Dictionary<string,object> dict, out string msg)
+        {
+            msg = "";
+            dict = new Dictionary<string, object>();
+
+            if (response.DataType == "" || response.DataType == null)
+            {
+                msg = "没有配置数据库类型";
+                return false;
+            }
+
+            if (response.DataType != "SqlServer" && response.DataType != "Oracle" && response.DataType != "MySql")
+            {
+                msg = "不支持数据库类型:" + response.DataType;
+                return false;
+            }
+
+            string method = response.Method.ToLower();
+            if (method != "post" && method != "get")
+            {
+                msg = "此平台只支持post,get";
+                return false;
+            }
+
+            //参数验证
+            string auth;  //参数规则  
+            //从Request中获取参数集合 
+            dict = this.CreateDict(method, out auth);
+            auth = auth.ToLower();
+            if (response.Auth != auth)
+            {
+                msg = "接收参数[" + response.Auth + "]与规则[" + auth + "]不匹配"; 
+                return false;
+            } 
+
+            return true;
+        }
+
+        //解析接收的参数
         private Dictionary<string, object> CreateDict(string method, out string auth)
         {
             auth = "";
@@ -241,16 +290,19 @@ namespace ApiDoc.Middleware
                     var contentFromBody = reader.ReadToEnd();
                     if (contentFromBody != "")
                     {
-                        dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(contentFromBody);
+                        dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(contentFromBody); 
                     }
 
                     foreach (KeyValuePair<string, object> kv in dict)
                     {
-                        if (auth != "")
+                        if( kv.Key != _ReqFilter)
                         {
-                            auth += "_";
-                        }
-                        auth += kv.Key;
+                            if (auth != "")
+                            {
+                                auth += "_";
+                            }
+                            auth += kv.Key;
+                        } 
                     }
                 }
             }
@@ -327,8 +379,15 @@ namespace ApiDoc.Middleware
                 {
                     //执行Sql
                     if (rowIndex == count - 1) //最后一步
-                    {
-                        result = this.ExecSql(response, connection, sqlDA, cmd);
+                    { 
+                        List<FilterCondition> filters = null;
+                        if (dict.ContainsKey(_ReqFilter))
+                        {
+                            JArray ja = (JArray)dict[_ReqFilter];
+                            filters = ja.ToObject<List<FilterCondition>>();
+                        } 
+
+                        result = this.ExecSql(response, connection, sqlDA, cmd, filters);
                     }
                     else
                     {
@@ -356,9 +415,10 @@ namespace ApiDoc.Middleware
             return result;
         }
  
-        private string ExecSql(InterfaceModel response, IDbConnection connection, IDbDataAdapter sqlDA, IDbCommand cmd)
-        {
-            
+
+        //执行最后的sql
+        private string ExecSql(InterfaceModel response, IDbConnection connection, IDbDataAdapter sqlDA, IDbCommand cmd, List<FilterCondition> filters)
+        { 
             XmlHelper xmlHelp = new XmlHelper(); 
             string json = "";
             object dataResult = new object();
@@ -379,13 +439,42 @@ namespace ApiDoc.Middleware
                     dataResult = intDataResult;
                     result = intDataResult.Result;
                     break;
-                case "DataSet":
-                    DataSet ds = new DataSet();
-                    sqlDA.Fill(ds);
+                case "DataSet": 
+                    DataSet ds = new DataSet(); 
                     DSDataResult dSDataResult = new DSDataResult();
-                    dSDataResult.Result = ds;
-                    dSDataResult.DataType = 200;
+                    if (filters != null)
+                    {
+                        //复杂查询需要再过滤一下最后一个表
+                        int lastIndex = ds.Tables.Count - 1;
+                        string msg;
+                        string filter = this.CreateFileterString(filters, out msg);
+                        if (msg != "")
+                        {
+                            throw new Exception(msg); 
+                        }
+
+                        sqlDA.Fill(ds);
+                        if (ds.Tables.Count > 0 && ds.Tables[lastIndex].Rows.Count > 0)
+                        {
+                            DataTable table = ds.Tables[ds.Tables.Count - 1]; 
+                            table.DefaultView.RowFilter = filter;
+                            DataTable dtNew = table.DefaultView.ToTable();
+                            ds.Tables.RemoveAt(lastIndex);
+                            ds.Tables.Add(dtNew); 
+                            dSDataResult.Result = ds; 
+                        }
+                        else
+                        {
+                            dSDataResult.Result = ds;
+                        }
+                    }
+                    else
+                    {
+                        sqlDA.Fill(ds);
+                        dSDataResult.Result = ds;  
+                    }
                     dataResult = dSDataResult;
+                    dSDataResult.DataType = 200;
                     break;
             }
              
@@ -402,8 +491,7 @@ namespace ApiDoc.Middleware
                     case "DataSet":
                         json = xmlHelp.SerializeXML<DSDataResult>(dataResult);
                         break;
-                }
-                
+                } 
             }
             else if (response.SerializeType == "Json")
             {
@@ -417,13 +505,14 @@ namespace ApiDoc.Middleware
             return json;
         }
 
+        //创建参数
         private bool CreateParam(InterfaceModel response, IDbCommand cmd, DataRow dataPre, FlowStepModel step, Dictionary<string, object> dict,  out string exceMsg)
         {
             exceMsg = "";
             if (step.Params != null)
             { 
                 foreach (FlowStepParamModel param in step.Params)
-                {
+                { 
                     string str = step.StepName + ">>参数" + param.ParamName;
                     object value = null;
 

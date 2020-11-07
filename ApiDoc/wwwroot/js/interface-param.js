@@ -5,7 +5,7 @@
 var dgvParam = "#dgvParam";
 
 $(function () {
-      
+ 
     loadParam();
 
 });
@@ -112,5 +112,30 @@ function btnDeleteParam_Click() {
     $.post(urlParamDelete, data, function (innerHtml) {
         drawParam(innerHtml); 
     });
+}
+
+//选择参数类型时，写默认值
+function onchange_ParamDataType(sender) {
+
+    var txtParamDefault = $('#txtParamDefault');
+
+    var value = sender.value;
+    if (value == "Int" || value == "Decimal") {
+
+        txtParamDefault.val("0");
+    }
+
+    if (value == "Text") {
+
+        txtParamDefault.val("");
+
+    }
+
+    if (value == "DateTime") {
+
+        var time2 = new Date().Format("yyyy-MM-dd HH:mm:ss");
+        txtParamDefault.val(time2);
+
+    }
 }
  

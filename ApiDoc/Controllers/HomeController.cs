@@ -13,8 +13,7 @@ using ApiDoc.Utility;
 using ApiDoc.Utility.Filter;
 
 namespace ApiDoc.Controllers
-{
-    [ServiceFilter(typeof(CustomExceptionFilterAttribute))]
+{  
     public class HomeController : BaseController
     { 
         private readonly IComponentContext componentContext;

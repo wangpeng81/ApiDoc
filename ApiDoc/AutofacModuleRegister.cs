@@ -1,5 +1,6 @@
 ﻿
 
+using ApiDoc.AuthenticationCenter;
 using ApiDoc.Middleware;
 using ApiDoc.Models.Components;
 using ApiDoc.Utility;
@@ -69,6 +70,15 @@ namespace ApiDoc
             //builder.RegisterType<Logger<BaseDAL>>();
             //builder.RegisterType<BaseDAL>().PropertiesAutowired();
 
+            #region RS256 
+            builder.RegisterType<JWTHSService>().
+                As<IJWTService>().
+                InstancePerLifetimeScope(); //对等验证
+
+            //builder.RegisterType<JWTRSService>().
+            //    As<IJWTService>().
+            //    InstancePerLifetimeScope(); //非对等验证
+            #endregion
         }
     }
 

@@ -40,5 +40,5 @@ var urlRouteDelete = urlRoot + "/RouteValue/Delete";
 
 //MyConfig
 var urlMyConfigSaveAuthorize = urlRoot + "/MyConfig/SaveAuthorize";
-var urlAuthor = urlRoot + "/Author";
+var urlAuthorLogin = urlRoot + "/Author/Login";
 

@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDoc.IBLL", "ApiDoc.IBLL\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDoc.BLL", "ApiDoc.BLL\ApiDoc.BLL.csproj", "{EFB6981C-0C02-45D9-BE85-2CBBE4146F9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiDoc.AutofacR", "ApiDoc.AutofacR\ApiDoc.AutofacR.csproj", "{3E415921-F9CB-449A-806F-5F9495B99E22}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiDoc.AutofacR", "ApiDoc.AutofacR\ApiDoc.AutofacR.csproj", "{3E415921-F9CB-449A-806F-5F9495B99E22}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

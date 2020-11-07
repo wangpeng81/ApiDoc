@@ -9,14 +9,14 @@ namespace ApiDoc.Models.Components
     { 
         public string BracketL { get; set; }    // (
         public string ColumnName { get; set; }  //数据列名  
-        public string ValueType { get; set; }   //数据类型:List String DateTime Decimal Int32 Booleanbool
+        public string ValueType { get; set; }   //数据类型:List String DateTime Decimal Int32 Boolean
 
         /// <summary>
-        /// List: NotContain(not in), NotEqual(not in), Contain(in)
-        /// String: Equal(=), Contain(like '%'), NotEqual(<>), MatchLeft(like '%), MatchRight, NotContain(not like '%), 其它 like '%'
-        /// Decimal Int32: Equal(=), NotEqual(<>),  Greater(>)， Less(<)
+        /// List:     NotContain(not in), NotEqual(not in), Contain(in)
+        /// String:   Equal(=), Contain(like '%'), NotEqual(<>), MatchLeft(like '%), MatchRight, NotContain(not like '%), 其它 like '%'
+        /// Decimal   Int32: Equal(=), NotEqual(<>),  Greater(>)， Less(<)
         /// DateTime: Equal(= ), Greater(>), Less(<)
-        /// Boolean: Equal
+        /// Boolean:  Equal
         /// </summary>
         public ConditionTypeEnum Condition { get; set; }   //比较条件 
         public string Value { get; set; }       //值

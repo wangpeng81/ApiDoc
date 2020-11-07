@@ -122,10 +122,11 @@ function btnSaveFlowStepDelete() {
 //保存SQL
 function btnSaveCmdText(SN) {
 
-    var cbx = $('#cbxCommandType');
-    var cmdType = $('#cbxCommandType').val();
-    var cmdText = $('#txtCommandText').val();
-    var cmdDataBase = $('#cbxDataBase').val();
+    var stepID = "#tab_step_" + SN;
+     
+    var cmdType = $(stepID + ' #cbxCommandType').val();
+    var cmdText = $(stepID + ' #txtCommandText').val();
+    var cmdDataBase = $(stepID + ' #cbxDataBase').val();
     var data = {
         SN: SN,
         CommandType: cmdType,

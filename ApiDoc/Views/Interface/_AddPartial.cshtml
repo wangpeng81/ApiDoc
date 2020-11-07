@@ -37,6 +37,14 @@
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-body">
+                <div class="form-inline">
+                    <label id="lblUseName" for="txtUserName" class="mr-2">用户名:</label>
+                    <input id="txtUserName" class="form-control form-control-sm mr-2" />
+
+                    <label id="lblPassword" for="txtPassword" class="mr-2">密码:</label>
+                    <input id="txtPassword" class="form-control form-control-sm" />
+                </div>
+
                 <div class="form-group">
                     <label id="lblUrl" for="txtInput">:</label>
                     <textarea id="txtInput" class="form-control bg-light p-0" style="min-width: 90%" rows="5"></textarea>
@@ -127,7 +135,7 @@
                 <div class="form-group row">
                     <label for="cbxParamDataType" class="col-3 col-form-label">数据类型</label>
                     <div class="col-9">
-                        <select class="custom-select mr-sm" id="cbxParamDataType">
+                        <select class="custom-select mr-sm" id="cbxParamDataType" onchange="onchange_ParamDataType(this)">
                             @foreach (string dataType in (List<string>)ViewData["DataType"])
                             {
                                 <option value="@dataType">@dataType</option>
