@@ -29,10 +29,14 @@ namespace ApiDoc.Controllers
             return View(myConfig1);
         }
 
-        public int SaveAuthorize(string Authorize)
-        { 
-            jsonFileHelper.Write<string>("Authorize", Authorize);
-            myConfig.Authorize = Authorize;
+        public int SaveAuthorize(string SecurityKey)
+        {
+            JWTTokenOptions jWTTokenOptions = new JWTTokenOptions();
+            jWTTokenOptions.Audience = myConfig.JWTTokenOptions.Audience;
+            jWTTokenOptions.Issuer = myConfig.JWTTokenOptions.Issuer;
+            jWTTokenOptions.SecurityKey = SecurityKey;
+            jsonFileHelper.Write<JWTTokenOptions>("JWTTokenOptions", jWTTokenOptions);
+            myConfig.JWTTokenOptions = jWTTokenOptions;
             return 100;
         }
     }

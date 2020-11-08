@@ -36,7 +36,7 @@ namespace ApiDoc.Middleware
             string path = context.Request.Path.ToString();
             if (this.routeDict.ContainsKey(path))
             {
-                if (this.myConfig.Authorize != "")
+                if (this.myConfig.JWTTokenOptions.SecurityKey != "")
                 {
                     if (!context.Request.Headers.ContainsKey("Authorize"))
                     {
@@ -45,7 +45,7 @@ namespace ApiDoc.Middleware
                     else
                     {
                         string authorize = context.Request.Headers["Authorize"];
-                        if (authorize == this.myConfig.Authorize)
+                        if (authorize == this.myConfig.JWTTokenOptions.SecurityKey)
                         {
                             await next(context);
                         }

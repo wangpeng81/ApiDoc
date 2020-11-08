@@ -8,27 +8,27 @@
     <link rel="stylesheet" href="~/css/areas.css" />
 
 }
- 
-    <div class="absolute-left-58 w-width-180 border-right padding bg-light">
 
-        <div id="treeview7" ></div>
+<div class="absolute-left-58 w-width-180 border-right padding bg-light">
 
+    <div id="treeview7"></div>
+
+</div>
+
+
+<main class="absolute-right-58 w-180 ">
+    <div class="tool-title">文件夹</div>
+    <div class="tool-items">
+        <div onclick="btnAdd()" class="tool-item"><div class="fa fa-plus mr-3"></div>添加文件夹</div>
+        <div onclick="btnUpdate()" class="tool-item"><div class="fa fa-edit mr-3"></div>修改文件夹</div>
+        <div onclick="showDeleteFolder()" class="tool-item"><div class="fa fa-trash mr-3"></div>删除文件夹</div>
     </div>
- 
-
-<main class="absolute-right-58 w-180 "> 
-        <div class="tool-title">文件夹</div>
-        <div class="tool-items">
-            <div onclick="btnAdd()" class="tool-item" ><div class="fa fa-plus mr-3"></div>添加文件夹</div>
-            <div onclick="btnUpdate()" class="tool-item"><div class="fa fa-edit mr-3"></div>修改文件夹</div>
-            <div onclick="btnDelete()"  class="tool-item"><div class="fa fa-trash mr-3"></div>删除文件夹</div>
-        </div> 
 </main>
 
 <div class="modal fade" id="myModalAdd" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content"> 
-            <div class="modal-body"> 
+        <div class="modal-content">
+            <div class="modal-body">
                 <div class="form-group">
                     <label for="txtFolderName">文件夹名称</label>
                     <input type="text" name="txtFolderName" class="form-control" id="txtFolderName" placeholder="文件夹名称">
@@ -46,31 +46,13 @@
     </div>
 </div>
 
-<div class="modal fade" id="myModalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">提示信息</h4>
-
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-
-            </div>
-            <div class="modal-body">
-
-                请确认是否要删除
-                  
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="btnDeleteIntterface_Click()">确认</button>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="~/Views/Shared/_ToastPartial.cshtml" />
+<partial name="~/Views/Shared/_ModalPartial.cshtml" />
+ 
 
 @section Scripts
-{ 
+{
     <script src="~/js/bootstrap-treeview.js"></script>
     <script src="~/js/folder.js"></script>
-    
+
 }

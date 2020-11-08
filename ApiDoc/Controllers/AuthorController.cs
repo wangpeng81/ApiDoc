@@ -31,7 +31,7 @@ namespace ApiDoc.Controllers
         [Authorize]
         public string Index()
         {
-            return this.myConfig.Authorize;
+            return this.myConfig.JWTTokenOptions.SecurityKey;
         }
 
         [Route("Login")]

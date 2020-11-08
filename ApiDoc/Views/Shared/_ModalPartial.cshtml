@@ -15,11 +15,29 @@
     </div>
 </div>
 
+<!-- 消息确认窗口 -->
+<div class="modal fade" id="myModalInfo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">提示信息</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button id="btnModelOK" type="button" class="btn btn-primary" data-dismiss="modal">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
 
     function showModalDelete(callBack) {
-
+ 
         var btnDelete = $("#myModalDelete #btnDelete");
+        btnDelete.unbind("click");
         btnDelete.click(callBack); 
         $("#myModalDelete").modal("show");
 
@@ -27,12 +45,15 @@
 
     function showModalInfo(title, callBack) {
          
-        var body = $("#myModalDelete .modal-body"); 
-        body[0].innerHTML = title; 
-        var btnDelete = $("#myModalDelete #btnDelete");
-        btnDelete.click(callBack);
-        $("#myModalDelete").modal("show");
+        var body = $("#myModalInfo .modal-body");
+        body[0].innerHTML = title;
+        var btnSubmit = $("#myModalInfo #btnModelOK");
+        btnSubmit.unbind("click");
+        //btnSubmit.removeAttr("onclick");
+        btnSubmit.click(callBack); 
+         
+        $("#myModalInfo").modal("show");
 
     }
- 
+
 </script>

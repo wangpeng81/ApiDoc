@@ -14,6 +14,9 @@ using System.Threading.Tasks;
 
 namespace ApiDoc.Middleware.Author
 {
+    /// <summary>
+    /// JWT-SA 算法
+    /// </summary>
     public class JWTHSAuthorizeMiddleware
     {
         private readonly RequestDelegate _next;
@@ -44,8 +47,8 @@ namespace ApiDoc.Middleware.Author
                 }
 
                 //进行验证与自定义验证 
-                //string encodeJwt = authStr.ToString().Substring("Bearer ".Length).Trim();
-                string encodeJwt = authStr.ToString().Trim();
+                string encodeJwt = authStr.ToString().Substring("Bearer ".Length).Trim();
+                //string encodeJwt = authStr.ToString().Trim();
 
                 string msg = Validate(encodeJwt , jWTTokenOptions);
                 if (msg != "")
@@ -72,33 +75,42 @@ namespace ApiDoc.Middleware.Author
         public string Validate(string encodeJwt, JWTTokenOptions setting)
         {
             string msg = "";
-            var success = true;
-            var jwtArr = encodeJwt.Split('.');
-            var header = JsonConvert.DeserializeObject<Dictionary<string, string>>(Base64UrlEncoder.Decode(jwtArr[0]));
-            var payLoad = JsonConvert.DeserializeObject<Dictionary<string, string>>(Base64UrlEncoder.Decode(jwtArr[1]));
 
-            //首先验证签名是否正确（必须的） 
-            var hs256 = new HMACSHA256(Encoding.ASCII.GetBytes(setting.SecurityKey));
-            byte[] buffer = Encoding.UTF8.GetBytes(string.Concat(jwtArr[0], ".", jwtArr[1]));
-            string encode = Base64UrlEncoder.Encode(hs256.ComputeHash(buffer));
-            string sign = jwtArr[2];
-
-            success = string.Equals(sign, encode);
-            if (!success)
+            try
             {
-                msg = "签名不正确";
-                return msg;//签名不正确直接返回 
-            }
+                var success = true;
+                var jwtArr = encodeJwt.Split('.');
+                var header = JsonConvert.DeserializeObject<Dictionary<string, string>>(Base64UrlEncoder.Decode(jwtArr[0]));
+                var payLoad = JsonConvert.DeserializeObject<Dictionary<string, string>>(Base64UrlEncoder.Decode(jwtArr[1]));
 
-            //其次验证是否在有效期内（也应该必须） 
-            var now = ToUnixEpochDate(DateTime.UtcNow);
-            success = (now < long.Parse(payLoad["exp"].ToString()));
-            if (!success)
+                //首先验证签名是否正确（必须的） 
+                var hs256 = new HMACSHA256(Encoding.ASCII.GetBytes(setting.SecurityKey));
+                byte[] buffer = Encoding.UTF8.GetBytes(string.Concat(jwtArr[0], ".", jwtArr[1]));
+                string encode = Base64UrlEncoder.Encode(hs256.ComputeHash(buffer));
+                string sign = jwtArr[2];
+
+                success = string.Equals(sign, encode);
+                if (!success)
+                {
+                    msg = "签名不正确";
+                    return msg;//签名不正确直接返回 
+                }
+
+                //其次验证是否在有效期内（也应该必须） 
+                var now = ToUnixEpochDate(DateTime.UtcNow);
+                success = (now < long.Parse(payLoad["exp"].ToString()));
+                if (!success)
+                {
+                    msg = "授权码不在有效期内";
+                    return msg;//签名不正确直接返回 
+                }
+
+            }
+            catch (Exception ex)
             {
-                msg = "授权码不在有效期内";
-                return msg;//签名不正确直接返回 
+                msg = ex.Message;
             }
-
+            
             return msg;
         }
  

@@ -8,8 +8,7 @@ namespace ApiDoc.Models.Components
     {
         /// <summary>
         /// 验证码
-        /// </summary>
-        public string Authorize { get; set; }
+        /// </summary> 
         public JWTTokenOptions JWTTokenOptions { get; set; }
         public DataBases DataType { get; set; }
 

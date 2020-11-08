@@ -79,11 +79,16 @@ function btnUpdate() {
 }
 
 //----------Delete
-function btnDelete() {
+function showDeleteFolder() {
+
+   
+    showModalDelete(btnDeleteFolder);
+
     $("#myModalDelete").modal('show');
+
 }
 
-function DeleteHandler() {
+function btnDeleteFolder() {
 
     var selectedNode = GetSelected();
     var nodeId = selectedNode.nodeId;

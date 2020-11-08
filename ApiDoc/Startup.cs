@@ -45,56 +45,10 @@ namespace ApiDoc
                        .AllowAnyHeader()
                        .AllowAnyOrigin(); //允许任何来源的主机访问 ;
                }));
-
-            #region jwt校验 
-
-            //增加读取配置信息  
-
-            string path = Assembly.GetExecutingAssembly().Location;
-            var basePath = path.Replace("ApiDoc.dll", "");
-            string jsonName = basePath + "MyConfig";
-            MyConfig myConfig = new JsonFileHelper(jsonName).Read<MyConfig>();
-
-            //RS
-            //在中间件管道中启用authentication中间件
-            //string path1 = Path.Combine(Directory.GetCurrentDirectory(), "key.public.json");
-            //string key = File.ReadAllText(path1);
-            //var keyParams = JsonConvert.DeserializeObject<RSAParameters>(key);
-            //SecurityKey issuerSigningKey = new RsaSecurityKey(keyParams);
-
-            //HS----
-            SecurityKey issuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(myConfig.JWTTokenOptions.SecurityKey));
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,  //是否验证SecurityKey
-                    ValidateIssuer = false,          //是否验证Issuer 
-                    ValidateAudience = false,       //是否验证Audience
-                    ValidateLifetime = false,        //是否验证失效时间
-                    IssuerSigningKey = issuerSigningKey,
-                    ValidIssuer = myConfig.JWTTokenOptions.Issuer,
-                    ValidAudience = myConfig.JWTTokenOptions.Audience  //是否验证Audience 
-                };
-            });
-
-            #endregion
-
-            //services.AddScoped<IAuthenticateService, TokenAuthenticationService>();
-           
-
-            services.AddControllersWithViews(options => {
-                //options.Filters.Add(typeof(CustomExceptionFilterAttribute));
-                //options.Filters.Add<JWTAuthorizeFilter>();
-            });
  
-
+            services.ConfigureServicesApiDoc();
+            
+            services.AddControllersWithViews(); 
             // If using Kestrel:
             services.Configure<KestrelServerOptions>(options =>
             {
@@ -137,14 +91,8 @@ namespace ApiDoc
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot"))
             });
 
-            app.UseMiddleware<MyCorsMiddleware>();
-            //app.UseMiddleware<JWTRSAuthorizeMiddleware>(); //验证
-            app.UseMiddleware<JWTHSAuthorizeMiddleware>();
-            //app.UseMiddleware<JWTMiddleware>();
-            //app.UseMiddleware<AuthorizeMiddleware>();//JWTMiddleware
-            app.UseMiddleware<DBMiddleware>();
-
-            app.UseAuthentication(); //鉴权：解析信息--就是读取token，解密token 
+            app.ConfigureApdDoc();
+              
             app.UseRouting(); 
             app.UseAuthorization();
 

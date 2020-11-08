@@ -186,8 +186,11 @@ function btnSendCS() {
 
             if (author.result == true) {
                 $.ajax({
-                    headers: { 'Authorization': author.token },
+                    //headers: { 'Authorization': author.token },
                     url: url,
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("Authorization", "Bearer " + author.token);
+                    },
                     type: method,
                     datType: "JSON",
                     contentType: "application/json",

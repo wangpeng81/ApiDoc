@@ -145,14 +145,18 @@ namespace ApiDoc.Utility
                             jObj[section] = JObject.Parse(json); ;
                         } 
                     }
-                        
+
+                    file.Close();
                 }
 
                 using (var writer = new StreamWriter(_path))
-                using (var jsonWriter = new JsonTextWriter(writer))
                 {
-                    jObj.WriteTo(jsonWriter);
-                }
+                    using (var jsonWriter = new JsonTextWriter(writer))
+                    {
+                        jObj.WriteTo(jsonWriter);
+                    }
+                    writer.Close(); 
+                } 
             }
             catch (System.Exception ex)
             {

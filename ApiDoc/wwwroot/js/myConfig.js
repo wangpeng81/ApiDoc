@@ -2,25 +2,29 @@
 
 function showCreateAuthorize() {
      
-    showModalInfo("请确认是否要保存，保存后将更改码", btnSaveAuthorize_Click);
+    showModalInfo("请确认是否要保存，保存后将更改码?", btnSaveAuthorize_Click);
 
 }
 
 //保存授权码
 function btnSaveAuthorize_Click() {
-
-    var txtAuthorize = $("#txtAuthorize");
+     
+    var txtAuthorize = $("#txtSecurityKey");
     var Authorize = txtAuthorize.val();
-    var url = urlMyConfigSaveAuthorize + "?Authorize=" + Authorize;
-  
-    $.get(url, function (result) {
+    var uri = urlMyConfigSaveAuthorize + "?SecurityKey=" + Authorize + "&random=" + Math.random();
 
-        if (result > 0) {
-            popToastSuccess("保存成功!");
+    $.ajax({
+        cache: false,
+        url: uri,
+        type: "GET", 
+        success: function (result) {
+            if (result > 0) {
+                popToastSuccess("保存成功!");
+            }
         }
+    }); 
 
-    });
-    
+    return;
 }
 
 function btnCreateAuthorize_Click() {
