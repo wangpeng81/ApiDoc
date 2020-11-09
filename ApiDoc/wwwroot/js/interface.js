@@ -117,10 +117,10 @@ function btnShow_CS_Click() {
             if (csJson != "") {
                 csJson += "&";
             }
-            if (json.DataType == "varchar") {
-                csJson += json.ParamName + "='" + json.DefaultValue + "'";
+            if (json.DataType == "Varchar") {
+                csJson += json.ParamName + "=" + json.DefaultValue + "";
             }
-            else if (json.DataType == "int") {
+            else if (json.DataType == "Int") {
                 csJson += json.ParamName + "=" + json.DefaultValue;
             }
             else {
@@ -155,9 +155,8 @@ function btnSendCS() {
     var txtResult = $("#txtResult");
     var method = $("#cbxMethod").val();
     if (method == "Get") { 
-        if (txtInput != "") {
-            url = url + "?" + txtInput;
-             
+        if (vdata != "") {
+            url = url + "?" + vdata; 
         }
     }
 
@@ -191,11 +190,9 @@ function btnSendCS() {
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader("Authorization", "Bearer " + author.token);
                     },
-                    type: method,
-                    datType: "JSON",
+                    type: method, 
                     contentType: "application/json",
-                    data: vdata,
-                    async: false,
+                    data: vdata, 
                     success: function (result) {
                         txtResult.val(result);
                     }

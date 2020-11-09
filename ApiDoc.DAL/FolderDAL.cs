@@ -29,15 +29,18 @@ namespace ApiDoc.DAL
                 strSql += "select b.* from temp a inner join api_folder b on b.SN = a.ParentSN ) ";
                 strSql += "select * from temp"; 
 
-                DataTable dt = db.FillTable(strSql);
+                DataTable dataTable = db.FillTable(strSql);
+                DataView dataView = dataTable.DefaultView;
 
-                DataRow[] rows = dt.Select("ParentSN=0");
+                DataTable dataTableDistinct = dataView.ToTable(true);
+
+                DataRow[] rows = dataTableDistinct.Select("ParentSN=0");
                 if (rows.Length > 0)
                 {
                     foreach (DataRow dataRow in rows)
                     {
                         TreeViewItem tvItem = CreateTreeViewItem(dataRow);
-                        tvItem.nodes = GetChildFolders(dt, int.Parse(dataRow["SN"].ToString()));
+                        tvItem.nodes = GetChildFolders(dataTableDistinct, int.Parse(dataRow["SN"].ToString()));
                         list.Add(tvItem);
                     }
                 }

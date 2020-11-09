@@ -558,7 +558,7 @@ namespace ApiDoc.Middleware
                     }
 
                     DbParameter dbParameter = this.componentContext.ResolveNamed<DbParameter>(response.DataType);
-                    dbParameter.ParameterName = param.ParamName;
+                    dbParameter.ParameterName ="@" + param.ParamName;
                     dbParameter.Value = value;
                     cmd.Parameters.Add(dbParameter);
                 }
