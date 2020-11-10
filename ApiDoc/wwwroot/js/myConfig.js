@@ -33,10 +33,44 @@ function btnCreateAuthorize_Click() {
     txtAuthorize.val(vguid);
 }
 
-function guid() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
+//数据库保存
+function btnSaveDataBase() {
+
+    //SqlServer
+    var txtSqlServerApiDocConnStr = $("#txtSqlServerApiDocConnStr");
+    var txtSqlServerDataBases = $("#txtSqlServerDataBases"); 
+    var dbSqlServer = txtSqlServerDataBases.val().split("\n"); 
+     
+    //MySql
+    var txtMySqlApiDocConnStr = $("#txtMySqlApiDocConnStr");
+    var txtMySqlDataBases = $("#txtMySqlDataBases");
+    var dbMySqlServer = txtMySqlDataBases.val().split("\n"); 
+
+    var txtOracleApiDocConnStr = $("#txtOracleApiDocConnStr");
+    var txtOracleDataBases = $("#txtOracleDataBases");
+    var dbOracle = txtOracleDataBases.val().split("\n"); 
+    
+    var data = {
+        DataType: {
+            SqlServer: {
+                ApiDocConnStr: txtSqlServerApiDocConnStr.val(),
+                DataBases: dbSqlServer
+            },
+            MySql: {
+                ApiDocConnStr: txtMySqlApiDocConnStr.val(),
+                DataBases: dbMySqlServer
+            },
+            Oracle: {
+                ApiDocConnStr: txtOracleApiDocConnStr.val(),
+                DataBases: dbOracle
+            }
+        }
+    };
+
+    $.post(urlMyConfigSaveDataType, data, function (result) {
+        if (result > 0) {
+            popToastSuccess("保存成功!");
+        }
     });
 }
 

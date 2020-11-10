@@ -9,6 +9,7 @@ var urlFolderSave = urlRoot + "/Folder/SaveFolder";
 var urlInterfaceSave = urlRoot + "/Interface/Save";
 var urlInterfaceDelete = urlRoot + "/Interface/Delete";
 var urlInterfaceStop = urlRoot + "/Interface/UpdateStop";
+var urlInterfaceBug = urlRoot + "/Interface/Bug";
 
 //参数 
 var urlParamList = urlRoot + "/Param/ParamList";
@@ -40,5 +41,8 @@ var urlRouteDelete = urlRoot + "/RouteValue/Delete";
 
 //MyConfig
 var urlMyConfigSaveAuthorize = urlRoot + "/MyConfig/SaveAuthorize";
+var urlMyConfigSaveDataType = urlRoot + "/MyConfig/SaveDataType";
+
+//Author
 var urlAuthorLogin = urlRoot + "/Author/Login";
 

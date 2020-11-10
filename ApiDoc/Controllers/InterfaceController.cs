@@ -169,7 +169,15 @@ namespace ApiDoc.Controllers
 
             return model.SN;
         }
-         
+
+        [HttpGet]
+        public IActionResult Bug(string path)
+        {
+            InterfaceModel model = this.routeDict[path]; 
+            return PartialView("/Views/Interface/Bug.cshtml", model);
+        }
+
+
     }
 }
 

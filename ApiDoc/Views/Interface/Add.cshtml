@@ -83,8 +83,8 @@
                             </button>
                         }
                         <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="发布接口" onclick="btnUpLoad_Click()"><i class="fa fa-upload"></i></button>
-                        <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="测试接口" onclick="btnShow_CS_Click()"><i class="fa fa-link"></i></button>
-
+                        <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="测试接口" onclick="showCS()"><i class="fa fa-link"></i></button>
+                        <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="检验接品" onclick="showBugInfo( '@Model.Url' )"><i class="fa fa-bug text-success"></i></button>
                     </div>
                 </div>
                 <div class="input-group input-group-sm mb-2">
@@ -224,6 +224,7 @@
                     <button type="button" class="btn btn-default" data-toggle="tooltip" onclick="showFlowStep(0)"><i class="fa fa-plus"></i></button>
                     <button type="button" class="btn btn-default" data-toggle="tooltip" onclick="showFlowStep(1)"><i class="fa fa-edit"></i></button>
                     <button type="button" class="btn btn-default" data-toggle="tooltip" onclick="btnShowFlowStepDelete()"><i class="fa fa-trash-o"></i></button>
+
                 </div>
             </div>
             <div id="myStepList">

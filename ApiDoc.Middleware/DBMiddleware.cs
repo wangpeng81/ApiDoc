@@ -105,7 +105,7 @@ namespace ApiDoc.Middleware
                     {
                         auth += "_";
                     }
-                    auth += param.ParamName;
+                    auth += param.ParamName.Trim();
                 }
                 auth = auth.ToLower();
                 dbInter.Auth = auth;
@@ -146,14 +146,20 @@ namespace ApiDoc.Middleware
         private async Task InvokeDB(HttpContext context)
         {
             this.context = context;
-
+             
+            string version = "";
+            bool bOK = context.Request.Headers.TryGetValue("Version", out StringValues strLayui);
+            if (bOK)
+            {
+                version = strLayui.ToString().ToLower();
+            }
+             
             string path = context.Request.Path.ToString();
-            InterfaceModel response = this.routeDict[path];
-
+            InterfaceModel response = this.routeDict[path]; 
             string msg;
 
             Dictionary<string, object> dict = null; 
-            bool bOK = this.CheckDataBase(response, out dict, out msg);
+            bOK = this.CheckDataBase(response, out dict, out msg);
             if (!bOK)
             {
                 await this.InvokeException(msg);
@@ -178,8 +184,7 @@ namespace ApiDoc.Middleware
                     }
 
                     //执行第一步 
-                    string text = this.InvokeStep(response, connection, tran, dict, out exceMsg);
-
+                    string text = this.InvokeStep(response, connection, tran, dict, version, out exceMsg); 
                     if (exceMsg != "")
                     {
                         if (response.IsTransaction)
@@ -326,7 +331,7 @@ namespace ApiDoc.Middleware
             return dict;
         }
            
-        private string InvokeStep(InterfaceModel response, IDbConnection connection, IDbTransaction tran, Dictionary<string, object> dict, out string exceMsg)
+        private string InvokeStep(InterfaceModel response, IDbConnection connection, IDbTransaction tran, Dictionary<string, object> dict, string version, out string exceMsg)
         {
             exceMsg = "";
 
@@ -385,9 +390,16 @@ namespace ApiDoc.Middleware
                         {
                             JArray ja = (JArray)dict[_ReqFilter];
                             filters = ja.ToObject<List<FilterCondition>>();
-                        } 
+                        }
 
-                        result = this.ExecSql(response, connection, sqlDA, cmd, filters);
+                        if (version == "layui")
+                        {
+                            result = this.ExecSqlV1(response, connection, sqlDA, cmd, filters);
+                        }
+                        else
+                        {
+                            result = this.ExecSql(response, connection, sqlDA, cmd, filters);
+                        }
                     }
                     else
                     {
@@ -496,12 +508,80 @@ namespace ApiDoc.Middleware
             else if (response.SerializeType == "Json")
             {
                 json = JsonConvert.SerializeObject(dataResult);
+                string jsonDataSet = JsonConvert.SerializeObject(dataResult);
+
+                //json = "{\"Result\":{\"Table\":[{\"ProductName\":\"止痛化癥胶囊\",\"Spec\":\"40粒\",\"Unit\":\"盒\"},{\"ProductName\":\"止痛化癥胶囊\",\"Spec\":\"24粒\",\"Unit\":\"盒\"}]},\"DataType\":200,\"Exception\":\"\"}";
+                DSDataResult ds1 = JsonConvert.DeserializeObject<DSDataResult>(json);
             }
             else
             {
                 json = result.ToString();
             }
             
+            return json;
+        }
+
+        private string ExecSqlV1(InterfaceModel response, IDbConnection connection, IDbDataAdapter sqlDA, IDbCommand cmd, List<FilterCondition> filters)
+        {
+            XmlHelper xmlHelp = new XmlHelper();
+            string json = "";
+            LayuiResult dataResult = new LayuiResult();
+            dataResult.code = 0;
+            dataResult.count = 0;
+            dataResult.msg = "";
+            dataResult.data = "{0}";
+
+            object result = new object(); 
+            switch (response.ExecuteType)
+            {
+                case "Scalar":
+                    result = cmd.ExecuteScalar(); 
+                    break;
+                case "Int": 
+                    result = cmd.ExecuteNonQuery();  
+                    break;
+                case "DataSet":
+                    DataSet ds = new DataSet();
+                    sqlDA.Fill(ds);
+                    DataTable table = new DataTable();
+                    if (filters != null)
+                    {
+                        //复杂查询需要再过滤一下最后一个表 
+                        string msg;
+                        string filter = this.CreateFileterString(filters, out msg);
+                        if (msg != "")
+                        {
+                            throw new Exception(msg);
+                        } 
+                        DataTable table0 = ds.Tables[0];
+                        table0.DefaultView.RowFilter = filter;
+                        DataTable dtNew = table0.DefaultView.ToTable();
+                        table = dtNew;
+                    }
+                    else
+                    { 
+                        table = ds.Tables[0];
+                    }
+
+                    dataResult.count = table.Rows.Count;
+                    result = table;
+                    break;
+            }
+
+            dataResult.data = result;
+            if (response.SerializeType == "Xml")
+            {
+                
+            }
+            else if (response.SerializeType == "Json")
+            {
+                json = JsonConvert.SerializeObject(dataResult); 
+            }
+            else
+            {
+                json = result.ToString();
+            }
+
             return json;
         }
 
@@ -515,10 +595,11 @@ namespace ApiDoc.Middleware
                 { 
                     string str = step.StepName + ">>参数" + param.ParamName;
                     object value = null;
-
+                    string paramName = param.ParamName.Trim();
                     if (param.IsPreStep) //如果从上一步取值
-                    {　
-                        if (dataPre == null || !dataPre.Table.Columns.Contains(param.ParamName))
+                    { 
+                        bool bParamName = dataPre.Table.Columns.Contains(paramName);
+                        if (dataPre == null || !bParamName)
                         {
                             //如果有默认值
                             if (param.DefaultValue != "")
@@ -533,14 +614,14 @@ namespace ApiDoc.Middleware
                         }
                         else
                         {
-                            value = dataPre[param.ParamName];
+                            value = dataPre[paramName];
                         } 
                     }
                     else //从Request中取值 
                     {
-                        if (dict.ContainsKey(param.ParamName))
+                        if (dict.ContainsKey(paramName))
                         {
-                            value = dict[param.ParamName]; 
+                            value = dict[paramName]; 
                         }
                         else
                         {
@@ -558,7 +639,7 @@ namespace ApiDoc.Middleware
                     }
 
                     DbParameter dbParameter = this.componentContext.ResolveNamed<DbParameter>(response.DataType);
-                    dbParameter.ParameterName ="@" + param.ParamName;
+                    dbParameter.ParameterName ="@" + paramName;
                     dbParameter.Value = value;
                     cmd.Parameters.Add(dbParameter);
                 }

@@ -1,4 +1,5 @@
-﻿ 
+﻿var dgvInterface = "dgvInterface";
+
 function checkAll(sender, checkName) {
 
     var objList = document.getElementsByName(checkName)
@@ -29,14 +30,12 @@ function btnShowAdd_Click() {
 //弹出添加接口窗口
 function btnShowUpdate_Click() {
 
-    var list = $('input[name="chk"]:checked').val();
-    if (list != undefined) {
-        var array = list.split(',');
-        if (array.length > 0) {
-            var id = array[0];
+    var json = $("#" + dgvInterface).xnTable("getSelection");
 
-            window.parent.showInterface(id, 0);
-        }
+    if (json != null) {
+        　
+        window.parent.showInterface(json.SN, 0);
+        //}
     }
     else {
         $("#mySelect").toast("show");
@@ -46,39 +45,31 @@ function btnShowUpdate_Click() {
 
 //弹出删除提示
 function btnShowDeleteInter_Click() {
-
-    var arrayList = [];
-    var list1 = document.getElementsByName('chk');
-    for (var i = 0; i < list1.length; i++) {
-        var checked = list1[i].checked;
-        var value = list1[i].value;
-        if (checked) {
-            arrayList.push(value);
-        }
-    };
-
-    if (arrayList.length == 0) {
-        $('#myDelete').toast('show');
+     
+    var idsList = $("#" + dgvInterface).xnTable("getSelections", "SN");
+    if (idsList.length == 0) {
+        popToastWarning("请选择要删除的参数");
         return;
     }
 
-    var model = $("#myModalDelete");
-    model.modal('show'); 
+    showModalDelete(btnDeleteIntterface_Click);
+
 }
 
 //删除接口
 function btnDeleteIntterface_Click() {
 
-    var arrayList = [];
-    var list1 = document.getElementsByName('chk');
-    for (var i = 0; i < list1.length; i++) {
-        var checked = list1[i].checked;
-        var value = list1[i].value;
-        if (checked) {
-            arrayList.push(value);
-        }
-    }
+    //var arrayList = [];
+    //var list1 = document.getElementsByName('chk');
+    //for (var i = 0; i < list1.length; i++) {
+    //    var checked = list1[i].checked;
+    //    var value = list1[i].value;
+    //    if (checked) {
+    //        arrayList.push(value);
+    //    }
+    //}
 
+    var arrayList = $("#" + dgvInterface).xnTable("getSelections", "SN");  
     if (arrayList.length > 0) {
 
         var data = { "ids": arrayList };
@@ -88,3 +79,10 @@ function btnDeleteIntterface_Click() {
             })
     }
 }
+
+$(function () {
+
+    var dgv = $("#" + dgvInterface);
+    dgv.xnTable();
+
+});

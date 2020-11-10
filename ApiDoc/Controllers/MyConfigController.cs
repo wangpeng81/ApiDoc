@@ -39,5 +39,13 @@ namespace ApiDoc.Controllers
             myConfig.JWTTokenOptions = jWTTokenOptions;
             return 100;
         }
+
+        [HttpPost]
+        public int SaveDataType(DataBases DataType)
+        { 
+            jsonFileHelper.Write<DataBases>("DataType", DataType);
+            myConfig.DataType = DataType;
+            return 100;
+        }
     }
 }

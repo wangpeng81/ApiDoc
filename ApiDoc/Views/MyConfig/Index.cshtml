@@ -7,13 +7,13 @@
 
 <ul class="nav nav-pills justify-content-center mb-3 border-bottom pb-2" id="pills-tab" role="tablist">
     <li class="nav-item">
-        <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">验证码</a>
+        <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">授权中心</a>
     </li>
     <li class="nav-item">
         <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">数据库</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Contact</a>
+        <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">分布式</a>
     </li>
 </ul>
 <div class="tab-content" id="pills-tabContent">
@@ -42,11 +42,93 @@
 
     <!-- 数据库配置 -->
     <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-        <div class="container-fluid">
-             
+        <div class="btn-toolbar ml-3 mb-3" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group btn-group-sm" role="group" aria-label="Second group">
+                <button type="button" class="btn btn-light">保存操作</button>
+                <button type="button" class="btn btn-info" data-toggle="tooltip" onclick="btnSaveDataBase()"><i class="fa fa-save"></i></button>
+            </div>
         </div>
+        <div class="container-fluid px-3 no-gutters row"> 
+            <div class="bg-light px-3 border col-4">
+
+                <div class="col-form-labela">SqlServer</div>
+                <div class="form-group row pr-2">
+                    <label for="txtSqlServerApiDocConnStr" class="col-2 col-form-label fs-14 p-0 pl-2 pt-1">ConnStr:</label>
+                    <input id="txtSqlServerApiDocConnStr" class="col-10 form-control" value="@Model.DataType.SqlServer.ApiDocConnStr" />
+                </div>
+                <div class="form-group row pr-2">
+                    <label for="txtSqlServerDataBases" class="col-2 col-form-label fs-14 p-0 pl-2 pt-1">数据库:</label>
+                    @{
+                        var dataBase = "";
+                        @foreach (string dbName in @Model.DataType.SqlServer.DataBases)
+                        {
+                            @if (dataBase != "")
+                            {
+                                dataBase += "\n";
+                            }
+                            dataBase += dbName;
+                        }
+
+                        <textarea id="txtSqlServerDataBases" wrap="hard" class="col-10 form-control" rows="20">@dataBase</textarea>
+                    }
+
+                </div>
+            </div>
+
+            <div class="bg-light px-3 border col-4">
+                <div class="col-form-label">MySql</div>
+                <div class="form-group row pr-2">
+                    <label for="txtMySqlApiDocConnStr" class="col-2 col-form-label fs-14 p-0 pl-2 pt-1">ConnStr:</label>
+                    <input id="txtMySqlApiDocConnStr" class="col-10 form-control" value="@Model.DataType.MySql.ApiDocConnStr" />
+                </div>
+                <div class="form-group row pr-2">
+                    <label for="txtMySqlDataBases" class="col-2 col-form-label fs-14 p-0 pl-2 pt-1">数据库:</label>
+
+                    @{
+                        var dataBase1 = "";
+                        @foreach (string dbName in @Model.DataType.MySql.DataBases)
+                        {
+                            @if (dataBase1 != "")
+                            {
+                                dataBase1 += "\n";
+                            }
+                            dataBase1 += dbName;
+                        }
+
+                        <textarea id="txtMySqlDataBases" class="col-10 form-control" rows="20">@dataBase1</textarea>
+                    }
+
+
+                </div>
+            </div>
+
+            <div class="bg-light px-3 border col-4">
+                <div class="col-form-label">Oracle</div>
+                <div class="form-group row pr-2">
+                    <label for="txtOracleApiDocConnStr" class="col-2 col-form-label fs-14 p-0 pl-2 pt-1">ConnStr:</label>
+                    <input id="txtOracleApiDocConnStr" class="col-10 form-control" value="@Model.DataType.Oracle.ApiDocConnStr" />
+                </div>
+                <div class="form-group row pr-2">
+                    <label for="txtOracleDataBases" class="col-2 col-form-label fs-14 p-0 pl-2 pt-1">数据库:</label>
+
+                    @{
+                        var dataBase2 = "";
+                        @foreach (string dbName in @Model.DataType.Oracle.DataBases)
+                        {
+                            @if (dataBase2 != "")
+                            {
+                                dataBase2 += "\n";
+                            }
+                            dataBase2 += dbName;
+                        }
+
+                        <textarea id="txtOracleDataBases" class="col-10 form-control" rows="20">@dataBase2</textarea>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>
     </div>
-    <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>
 </div>
 
 <partial name="~/Views/Shared/_ToastPartial.cshtml" />

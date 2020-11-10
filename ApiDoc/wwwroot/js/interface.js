@@ -100,7 +100,7 @@ function btnDownLoad_Click() {
 }
 
 //弹出测试窗口
-function btnShow_CS_Click() {
+function showCS() {
 
     var url = window.location.protocol + "//" + window.location.host + urlRoot + $("#txtUrl").val(); 
     $("#lblUrl").html(url); 
@@ -112,16 +112,19 @@ function btnShow_CS_Click() {
     for (var i = 0; i < paraList.length; i++) { 
         json = paraList[i].value;
         json = eval("(" + json + ")"); 
-         
+ 
         if (method == "Get") {
             if (csJson != "") {
                 csJson += "&";
             }
             if (json.DataType == "Varchar") {
-                csJson += json.ParamName + "=" + json.DefaultValue + "";
+                csJson += json.ParamName + "=" + json.DefaultValue.replace("\'", "").trim();
             }
             else if (json.DataType == "Int") {
-                csJson += json.ParamName + "=" + json.DefaultValue;
+                csJson += json.ParamName + "=" + json.DefaultValue.replace("\'", "").trim();
+            }
+            else if (json.dataType == "Decimal") {
+                csJson += json.ParamName + "=" + json.DefaultValue.replace("\'", "").trim();
             }
             else {
                 csJson += json.ParamName + "='" + json.DefaultValue + "'";
@@ -131,7 +134,24 @@ function btnShow_CS_Click() {
             if (csJson != "") {
                 csJson += ",";
             }
-            csJson += json.ParamName + ":'" + json.DefaultValue + "'"
+
+            var value1 = ''; 
+            if (json.DataType == "Varchar") {
+                value1 = json.DefaultValue.replace("\'", "").trim();
+            }
+            else if (json.DataType == "Int") {
+                value1 = json.DefaultValue.replace("\'", "").trim();
+            }
+            else if (json.dataType == "Decimal")
+            {
+                value1 = json.DefaultValue.replace("\'", "").trim();
+            }
+            else
+            {
+                csJson += json.ParamName + "='" + json.DefaultValue + "'";
+            }
+
+            csJson += json.ParamName + ":" + value1;
         }
     }
 
@@ -146,7 +166,6 @@ function btnShow_CS_Click() {
     model.modal('show');
         
 }
-
 //--------------------------------------------------测试
 function btnSendCS() {
 
@@ -183,13 +202,20 @@ function btnSendCS() {
         data: JSON.stringify(data),
         success: function (author) {
 
+            var version = "";
+            var chkVersion = document.getElementById("chkVersion");
+            if (chkVersion.checked) {
+                version = chkVersion.value;
+            }
+           
             if (author.result == true) {
                 $.ajax({
                     //headers: { 'Authorization': author.token },
                     url: url,
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader("Authorization", "Bearer " + author.token);
-                    },
+                        xhr.setRequestHeader("Version", version);
+                    }, 
                     type: method, 
                     contentType: "application/json",
                     data: vdata, 
@@ -201,6 +227,19 @@ function btnSendCS() {
         }
     })
  
+}
+
+//显示接口信息的完整性
+function showBugInfo(path) {
+     
+    var url = urlInterfaceBug + "?path=" + path;
+
+    $.get(url, function (html) {
+
+        $("#myModalBug .modal-body").html(html);
+        $("#myModalBug").modal('show');
+    });
+
 }
 
 function checkAll(sender, checkName) {

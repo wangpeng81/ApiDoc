@@ -42,7 +42,12 @@
                     <input id="txtUserName" class="form-control form-control-sm mr-2" />
 
                     <label id="lblPassword" for="txtPassword" class="mr-2">密码:</label>
-                    <input id="txtPassword" class="form-control form-control-sm" />
+                    <input id="txtPassword" class="form-control form-control-sm mr-2" />
+
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="chkVersion" value="Layui">
+                        <label class="custom-control-label" for="chkVersion">Layui</label>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -61,6 +66,21 @@
         </div>
     </div>
 </div>
+
+<!--Buginfo-->
+<div class="modal fade bd-example-modal-lg" id="myModalBug" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                
+            </div>
+            <div class="modal-footer"> 
+                <button type="button" class="btn btn-primary">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- 历史Sql窗口 -->
 <div class="modal fade" id="myStepHisModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
