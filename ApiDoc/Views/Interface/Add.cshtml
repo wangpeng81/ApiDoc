@@ -94,9 +94,28 @@
                     <input type="text" class="form-control" id="txtTitle" value="@Model.Title">
 
                     <!-- 事物 -->
-                    <div class="custom-control custom-checkbox ml-2">
-                        <input id="txtStepIsTransaction" type="checkbox" class="custom-control-input" checked="@Model.IsTransaction">
-                        <label class="custom-control-label" for="txtStepIsTransaction">事物</label>
+                    <div class="custom-control custom-radio custom-control-inline ml-2">
+                        <input type="radio" id="chkIsJms" name="customRadioTran" class="custom-control-input" checked="@Model.IsJms">
+                        <label class="custom-control-label" for="chkIsJms">JMS事物</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="txtStepIsTransaction" name="customRadioTran" class="custom-control-input" checked="@Model.IsTransaction">
+                        <label class="custom-control-label" for="txtStepIsTransaction">单机事物</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+
+                        @if (Model.IsJms == false && @Model.IsTransaction == false)
+                        {
+
+                            <input type="radio" id="txtStepNoTransaction" name="customRadioTran" class="custom-control-input" checked="checked">
+                        }
+                        else
+                        {
+
+                            <input type="radio" id="txtStepNoTransaction" name="customRadioTran" class="custom-control-input">
+                        }
+
+                        <label class="custom-control-label" for="txtStepNoTransaction">无事物</label>
                     </div>
                 </div>
 

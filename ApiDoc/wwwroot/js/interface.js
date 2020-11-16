@@ -13,6 +13,8 @@ function btnSaveIntterface_Click() {
     var vFKSN = $("#txtFKSN").val();
     var vExecuteType = $("#cbxExecuteType").val();
     var vIsTransaction = document.getElementById("txtStepIsTransaction").checked;
+    var vIsJms = document.getElementById("chkIsJms").checked;
+
     var vIsStop = $("#txtIsStop").val();
     var vDataType = $("#cbxDataType").val();
 
@@ -26,7 +28,8 @@ function btnSaveIntterface_Click() {
         IsTransaction: vIsTransaction,
         ExecuteType: vExecuteType,
         IsStop: vIsStop,
-        DataType: vDataType
+        DataType: vDataType,
+        IsJms: vIsJms
     }, function (data) {
 
             popToastSuccess("保存成功!");

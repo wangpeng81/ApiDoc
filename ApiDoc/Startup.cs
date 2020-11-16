@@ -91,7 +91,7 @@ namespace ApiDoc
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot"))
             });
 
-            app.ConfigureApdDoc();
+            app.ConfigureApiDoc();
               
             app.UseRouting(); 
             app.UseAuthorization();

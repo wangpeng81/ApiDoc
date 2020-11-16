@@ -24,22 +24,16 @@ namespace ApiDoc.Models
         }
         public int FKSN { get; set; }
 
-        private string serializeType = "Json";
-        /// <summary>
-        /// // 数据格式:xml , json  
-        /// </summary>
-        public string SerializeType
+        private string serializeType = "Json"; 
+        public string SerializeType // 数据格式:xml , json
         {
             get => serializeType;
             set => serializeType = value;
         }
-
-        /// <summary>
-        /// 结果集: Int, Scalar, DataSet
-        /// </summary>
-        public string ExecuteType { get; set; } 
+ 
+        public string ExecuteType { get; set; }  // 结果集: Int, Scalar, DataSet
         public bool IsTransaction { get; set; }
-
+        public bool IsJms { get; set; }         //分布式类型是否为Jms
         public bool IsStop { get; set; } //是否停用
 
         /// <summary>

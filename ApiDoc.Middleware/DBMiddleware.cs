@@ -19,6 +19,7 @@ using System.Data.Common;
 using System.IO;
 using ApiDoc.Models.Components;
 using Newtonsoft.Json.Linq;
+using JMS;
 
 namespace ApiDoc.Middleware
 {
@@ -89,13 +90,16 @@ namespace ApiDoc.Middleware
                 //加载步骤
                 int SN = model.SN;
                 string Url = model.Url;
-                InterfaceModel dbInter = new InterfaceModel();
-                dbInter.SerializeType = model.SerializeType;
-                dbInter.Method = model.Method;
-                dbInter.Steps = flowStepDAL.QueryOfParam(SN);
-                dbInter.IsTransaction = model.IsTransaction;
-                dbInter.ExecuteType = model.ExecuteType;
-                dbInter.DataType = model.DataType;
+                //InterfaceModel dbInter = new InterfaceModel();
+                //dbInter.SerializeType = model.SerializeType;
+                //dbInter.Method = model.Method; 
+                //dbInter.IsTransaction = model.IsTransaction;
+                //dbInter.ExecuteType = model.ExecuteType;
+                //dbInter.DataType = model.DataType;
+                //dbInter.Url = Url;
+                //dbInter.IsJms = model.IsJms;
+
+                model.Steps = flowStepDAL.QueryOfParam(SN);
 
                 //接口参数
                 string auth = "";
@@ -108,11 +112,11 @@ namespace ApiDoc.Middleware
                     auth += param.ParamName.Trim();
                 }
                 auth = auth.ToLower();
-                dbInter.Auth = auth;
+                model.Auth = auth;
 
                 if (!routeDict.ContainsKey(Url))
                 {
-                    routeDict.Add(Url, dbInter);
+                    routeDict.Add(Url, model);
                 }
             }
 
@@ -135,7 +139,26 @@ namespace ApiDoc.Middleware
 
             if (this.routeDict.ContainsKey(path))
             {
-                await InvokeDB(context);
+                InterfaceModel response = this.routeDict[path];
+                Dictionary<string, object> paramList = null; //接口参数
+                string msg;
+                bool bOK = this.CheckDataBase(response, out paramList, out msg);
+                if (!bOK) //如果验证失败
+                {
+                    await this.InvokeException(msg); 
+                }
+                else
+                {
+                    if (response.IsJms)
+                    {
+                        await this.InvokeJms(context, paramList);
+                    }
+                    else
+                    {
+
+                        await InvokeDB(context, paramList);
+                    }
+                } 
             }
             else
             {
@@ -143,89 +166,71 @@ namespace ApiDoc.Middleware
             }
         }
 
-        private async Task InvokeDB(HttpContext context)
-        {
-            this.context = context;
-             
+        private async Task InvokeDB(HttpContext context, Dictionary<string, object> paramList)
+        { 
             string version = "";
+
+            //检测返回结构: DataResult(默认), layui:
             bool bOK = context.Request.Headers.TryGetValue("Version", out StringValues strLayui);
             if (bOK)
             {
                 version = strLayui.ToString().ToLower();
             }
-             
+
             string path = context.Request.Path.ToString();
-            InterfaceModel response = this.routeDict[path]; 
-            string msg;
-
-            Dictionary<string, object> dict = null; 
-            bOK = this.CheckDataBase(response, out dict, out msg);
-            if (!bOK)
-            {
-                await this.InvokeException(msg);
-                return;
-            }
-             
+            InterfaceModel response = this.routeDict[path];
             string exceMsg = ""; //存储异常的存储过程名  
-            if (response.Steps.Count > 0)
+
+            IDbConnection connection = this.componentContext.ResolveNamed<IDbConnection>(response.DataType);
+            string connStr = this.myConfig[response.DataType].ApiDocConnStr;
+            connection.ConnectionString = connStr;
+            IDbTransaction tran = null;
+            try
             {
-                
-                IDbConnection connection = this.componentContext.ResolveNamed<IDbConnection>(response.DataType);
-                string connStr = this.myConfig[response.DataType].ApiDocConnStr;
-                connection.ConnectionString = connStr;
-                IDbTransaction tran = null;
-                try
+                connection.Open();
+
+                if (response.IsTransaction)
                 {
-                    connection.Open();
-
-                    if (response.IsTransaction)
-                    {
-                        tran = connection.BeginTransaction();
-                    }
-
-                    //执行第一步 
-                    string text = this.InvokeStep(response, connection, tran, dict, version, out exceMsg); 
-                    if (exceMsg != "")
-                    {
-                        if (response.IsTransaction)
-                        {
-                            tran.Rollback();
-                        }
-
-                        await this.InvokeException(exceMsg);
-                        return;
-                    }
-
-                    if (response.IsTransaction)
-                    {
-                        tran.Commit();
-                    }
-
-                    await this.WriteAsync(text);
+                    tran = connection.BeginTransaction();
                 }
-                catch (System.Exception ex)
+
+                //执行第一步 
+                string text = this.InvokeStep(response, connection, tran, paramList, version, out exceMsg);
+                if (exceMsg != "")
                 {
                     if (response.IsTransaction)
                     {
                         tran.Rollback();
                     }
-                    await this.InvokeException(ex.Message);
+
+                    await this.InvokeException(exceMsg);
+                    return;
                 }
-                finally
+
+                if (response.IsTransaction)
                 {
-                    connection.Close();
+                    tran.Commit();
                 }
+
+                await this.WriteAsync(text);
             }
-            else
+            catch (System.Exception ex)
             {
-                await this.WriteAsync(path + "没有任何步骤，请维护");
+                if (response.IsTransaction)
+                {
+                    tran.Rollback();
+                }
+                await this.InvokeException(ex.Message);
             }
+            finally
+            {
+                connection.Close();
+            }
+
         }
 
-        /// <summary>
-        /// 验证数据库类型
-        /// </summary> 
-        private bool CheckDataBase(InterfaceModel response, out Dictionary<string,object> dict, out string msg)
+        //验证数据库类型
+        private bool CheckDataBase(InterfaceModel response, out Dictionary<string, object> dict, out string msg)
         {
             msg = "";
             dict = new Dictionary<string, object>();
@@ -256,7 +261,14 @@ namespace ApiDoc.Middleware
             auth = auth.ToLower();
             if (response.Auth != auth)
             {
-                msg = "接收参数[" + response.Auth + "]与规则[" + auth + "]不匹配"; 
+                msg = "接收参数[" + response.Auth + "]与规则[" + auth + "]不匹配";
+                return false;
+            }
+
+            //步骤
+            if (response.Steps.Count == 0)
+            {
+                msg = response.Url + "没有任何步骤，请维护";
                 return false;
             } 
 
@@ -394,7 +406,7 @@ namespace ApiDoc.Middleware
 
                         if (version == "layui")
                         {
-                            result = this.ExecSqlV1(response, connection, sqlDA, cmd, filters);
+                            result = this.ExecSqlLayui(response, connection, sqlDA, cmd, filters);
                         }
                         else
                         {
@@ -507,11 +519,7 @@ namespace ApiDoc.Middleware
             }
             else if (response.SerializeType == "Json")
             {
-                json = JsonConvert.SerializeObject(dataResult);
-                string jsonDataSet = JsonConvert.SerializeObject(dataResult);
-
-                //json = "{\"Result\":{\"Table\":[{\"ProductName\":\"止痛化癥胶囊\",\"Spec\":\"40粒\",\"Unit\":\"盒\"},{\"ProductName\":\"止痛化癥胶囊\",\"Spec\":\"24粒\",\"Unit\":\"盒\"}]},\"DataType\":200,\"Exception\":\"\"}";
-                DSDataResult ds1 = JsonConvert.DeserializeObject<DSDataResult>(json);
+                json = JsonConvert.SerializeObject(dataResult); 
             }
             else
             {
@@ -521,7 +529,8 @@ namespace ApiDoc.Middleware
             return json;
         }
 
-        private string ExecSqlV1(InterfaceModel response, IDbConnection connection, IDbDataAdapter sqlDA, IDbCommand cmd, List<FilterCondition> filters)
+        //返因LayUI的结构
+        private string ExecSqlLayui(InterfaceModel response, IDbConnection connection, IDbDataAdapter sqlDA, IDbCommand cmd, List<FilterCondition> filters)
         {
             XmlHelper xmlHelp = new XmlHelper();
             string json = "";
@@ -646,7 +655,356 @@ namespace ApiDoc.Middleware
             }
             return true;
         }
-        
+      
+        #region jms
+
+        private Dictionary<string, object> CreateParamJms(DataRow dataPre, FlowStepModel step, Dictionary<string, object> dict, out string exceMsg)
+        {
+            Dictionary<string, object> keyValues = new Dictionary<string, object>();
+            exceMsg = "";
+            if (step.Params != null)
+            {
+                foreach (FlowStepParamModel param in step.Params)
+                {
+                    string str = step.StepName + ">>参数" + param.ParamName;
+                    object value = null;
+                    string paramName = param.ParamName.Trim();
+                    if (param.IsPreStep) //如果从上一步取值
+                    {
+                        bool bParamName = dataPre.Table.Columns.Contains(paramName);
+                        if (dataPre == null || !bParamName)
+                        {
+                            //如果有默认值
+                            if (param.DefaultValue != "")
+                            {
+                                value = param.DefaultValue;
+                            }
+                            else
+                            {
+                                exceMsg = str + "无法从上一步取值值";
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            value = dataPre[paramName];
+                        }
+                    }
+                    else //从Request中取值 
+                    {
+                        if (dict.ContainsKey(paramName))
+                        {
+                            value = dict[paramName];
+                        }
+                        else
+                        {
+                            //如果有默认值
+                            if (param.DefaultValue != "")
+                            {
+                                value = param.DefaultValue;
+                            }
+                            else
+                            {
+                                exceMsg = str + "没有在Request中获取到值";
+                                break;
+                            }
+                        }
+                    }
+
+                    keyValues.Add(paramName, value);
+                }
+            }
+            return keyValues;
+        }
+
+        private async Task InvokeJms(HttpContext context, Dictionary<string, object> paramList)
+        {
+            string version = "";
+
+            //检测返回结构: DataResult(默认), layui:
+            bool bOK = context.Request.Headers.TryGetValue("Version", out StringValues strLayui);
+            if (bOK)
+            {
+                version = strLayui.ToString().ToLower();
+            }
+
+            string path = context.Request.Path.ToString();
+            InterfaceModel response = this.routeDict[path];
+            string exceMsg = ""; //存储异常的存储过程名  
+
+            string Address = this.myConfig.GatewayAddress.Address;
+            int port = this.myConfig.GatewayAddress.Port;
+
+            JMSClient tran = new JMSClient(Address, port);
+            try
+            { 
+                DataRow dataPre = null;
+                string result = "";
+                int rowIndex = 0;
+                int count = response.Steps.Count;
+                foreach (FlowStepModel step in response.Steps)
+                {
+                    if (step.CommandText == "")
+                    {
+                        exceMsg = step.StepName + " 没有数据库语句，请维护";
+                        tran.Rollback();
+                        await this.InvokeException(exceMsg);
+                        return;
+                    }
+
+                    //初始化参数
+                    string CommandType = "Text";
+                    switch (step.CommandType)
+                    {
+                        case "Fun":
+                        case "Text":
+                            CommandType = "Text";
+                            break;
+                        case "StoredProcedure":
+                            CommandType = "StoredProcedure";
+                            break;
+                    }
+
+                    if (string.IsNullOrEmpty(step.ServiceName))
+                    {
+                        exceMsg = step.StepName + ">>没有选服务名称!";
+                        tran.Rollback();
+                        await this.InvokeException(exceMsg);
+                        return;
+                    }
+
+                    IMicroService service = tran.GetMicroService(step.ServiceName); 
+                    if (service == null)
+                    {
+                        tran.Rollback();
+                        await this.InvokeException($"无法从{Address}网关中获取服务>ErpService");
+                        return;
+                    }
+
+                    JmsCommand dbCommand = new JmsCommand();
+                    dbCommand.DataBase = step.DataBase;
+                    dbCommand.CommandType = CommandType;
+                    dbCommand.CommandText = step.CommandText;
+
+                    Dictionary<string, object> paralist = CreateParamJms(dataPre, step, paramList, out exceMsg);
+                    if (exceMsg != "")
+                    {
+                        //创建参数出错
+                        await this.InvokeException(exceMsg);
+                        return;
+                    }
+                    dbCommand.Parameters = paralist;
+
+                    try
+                    {
+                        //执行Sql
+                        if (rowIndex == count - 1) //最后一步
+                        {
+                            List<FilterCondition> filters = null;
+                            if (paramList.ContainsKey(_ReqFilter))
+                            {
+                                JArray ja = (JArray)paramList[_ReqFilter];
+                                filters = ja.ToObject<List<FilterCondition>>();
+                            }
+
+                            if (version == "layui")
+                            {
+                                result = this.ExecSqlJmsLayui(response, service, dbCommand, filters);
+                            }
+                            else
+                            {
+                                result = this.ExecSqlJms(response, service, dbCommand, filters);
+                            }
+                        }
+                        else
+                        {
+                            //如果不是最后一步，存储当前步结果
+                            DataSet ds = service.Invoke<DataSet>("Fill", dbCommand);
+                            if (ds.Tables.Count > 0 && ds.Tables[ds.Tables.Count - 1].Rows.Count > 0)
+                            {
+                                DataTable dt = ds.Tables[ds.Tables.Count - 1];
+                                dataPre = dt.Rows[0];
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        exceMsg = response.Url + ">>" + step.StepName + ">>" + ex.Message;
+                        this.logger.LogError(exceMsg);
+                        throw new Exception(exceMsg);
+                    }
+
+                    rowIndex++;
+                }
+
+                tran.Commit();
+
+                await this.WriteAsync(result);
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                await this.InvokeException(ex.Message);
+            }
+
+        }
+
+        //执行最后的sql
+        private string ExecSqlJms(InterfaceModel response, IMicroService service, JmsCommand dbCommand, List<FilterCondition> filters)
+        {
+            XmlHelper xmlHelp = new XmlHelper();
+            string json = "";
+            object dataResult = new object();
+            object result = new object();
+            switch (response.ExecuteType)
+            {
+                case "Scalar":
+                    DataResult dataResult1 = new DataResult();
+                    dataResult1.DataType = 200;
+                    dataResult1.Result = service.Invoke<object>("ExecuteScalar", dbCommand);
+                    dataResult = dataResult1;
+                    result = dataResult1.Result;
+                    break;
+                case "Int":
+                    IntDataResult intDataResult = new IntDataResult();
+                    intDataResult.Result = service.Invoke<int>("ExecuteNonQuery", dbCommand);  
+                    intDataResult.DataType = 200;
+                    dataResult = intDataResult;
+                    result = intDataResult.Result;
+                    break;
+                case "DataSet":
+                    DataSet ds = new DataSet();
+                    DSDataResult dSDataResult = new DSDataResult();
+                    if (filters != null)
+                    {
+                        //复杂查询需要再过滤一下最后一个表
+                        int lastIndex = ds.Tables.Count - 1;
+                        string msg;
+                        string filter = this.CreateFileterString(filters, out msg);
+                        if (msg != "")
+                        {
+                            throw new Exception(msg);
+                        }
+
+                        ds = service.Invoke<DataSet>("Fill", dbCommand); 
+                        if (ds.Tables.Count > 0 && ds.Tables[lastIndex].Rows.Count > 0)
+                        {
+                            DataTable table = ds.Tables[ds.Tables.Count - 1];
+                            table.DefaultView.RowFilter = filter;
+                            DataTable dtNew = table.DefaultView.ToTable();
+                            ds.Tables.RemoveAt(lastIndex);
+                            ds.Tables.Add(dtNew);
+                            dSDataResult.Result = ds;
+                        }
+                        else
+                        {
+                            dSDataResult.Result = ds;
+                        }
+                    }
+                    else
+                    {
+                        ds = service.Invoke<DataSet>("Fill", dbCommand);
+                        dSDataResult.Result = ds;
+                    }
+                    dataResult = dSDataResult;
+                    dSDataResult.DataType = 200;
+                    break;
+            }
+
+            if (response.SerializeType == "Xml")
+            {
+                switch (response.ExecuteType)
+                {
+                    case "Scalar":
+                        json = xmlHelp.SerializeXML<DataResult>(dataResult);
+                        break;
+                    case "Int":
+                        json = xmlHelp.SerializeXML<IntDataResult>(dataResult);
+                        break;
+                    case "DataSet":
+                        json = xmlHelp.SerializeXML<DSDataResult>(dataResult);
+                        break;
+                }
+            }
+            else if (response.SerializeType == "Json")
+            {
+                json = JsonConvert.SerializeObject(dataResult); 
+            }
+            else
+            {
+                json = result.ToString();
+            }
+
+            return json;
+        }
+
+        private string ExecSqlJmsLayui(InterfaceModel response, IMicroService service, JmsCommand dbCommand, List<FilterCondition> filters)
+        {
+            XmlHelper xmlHelp = new XmlHelper();
+            string json = "";
+            LayuiResult dataResult = new LayuiResult();
+            dataResult.code = 0;
+            dataResult.count = 0;
+            dataResult.msg = "";
+            dataResult.data = "{0}";
+
+            object result = new object();
+            switch (response.ExecuteType)
+            {
+                case "Scalar":
+                    result = service.Invoke<object>("ExecuteScalar", dbCommand);
+                    break;
+                case "Int":
+                    result = service.Invoke<int>("ExecuteNonQuery", dbCommand);
+                    break;
+                case "DataSet":
+                    DataSet ds = service.Invoke<DataSet>("Fill", dbCommand);
+                    DataTable table = new DataTable();
+                    if (filters != null)
+                    {
+                        //复杂查询需要再过滤一下最后一个表 
+                        string msg;
+                        string filter = this.CreateFileterString(filters, out msg);
+                        if (msg != "")
+                        {
+                            throw new Exception(msg);
+                        }
+                        DataTable table0 = ds.Tables[0];
+                        table0.DefaultView.RowFilter = filter;
+                        DataTable dtNew = table0.DefaultView.ToTable();
+                        table = dtNew;
+                    }
+                    else
+                    {
+                        table = ds.Tables[0];
+                    }
+
+                    dataResult.count = table.Rows.Count;
+                    result = table;
+                    break;
+            }
+
+            dataResult.data = result;
+            if (response.SerializeType == "Xml")
+            {
+
+            }
+            else if (response.SerializeType == "Json")
+            {
+                json = JsonConvert.SerializeObject(dataResult);
+            }
+            else
+            {
+                json = result.ToString();
+            }
+
+            return json;
+        }
+
+        #endregion
+
+
         private async Task InvokeException(string exception)
         {
 
@@ -656,7 +1014,7 @@ namespace ApiDoc.Middleware
             this.logger.LogError(exception);
             string json = JsonConvert.SerializeObject(returnValue);
             await this.WriteAsync(json);
-        } 
+        }
 
         private async Task WriteAsync(string text)
         {
@@ -756,7 +1114,7 @@ namespace ApiDoc.Middleware
         private string CreateFileterString(FilterCondition _filterCol, out string msg)
         {
             msg = "";
-            
+
             StringBuilder tempFilterStr = new StringBuilder("");
             if (_filterCol.ValueType == nameof(String))
             {
@@ -848,5 +1206,6 @@ namespace ApiDoc.Middleware
 
             return tempFilterStr.ToString();
         }
+
     }
 }

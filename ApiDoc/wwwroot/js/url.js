@@ -42,6 +42,8 @@ var urlRouteDelete = urlRoot + "/RouteValue/Delete";
 //MyConfig
 var urlMyConfigSaveAuthorize = urlRoot + "/MyConfig/SaveAuthorize";
 var urlMyConfigSaveDataType = urlRoot + "/MyConfig/SaveDataType";
+var urlMyConfigSaveGateWay = urlRoot + "/MyConfig/SaveGateWay";
+var urlMyConfigListMicroService = urlRoot + "/MyConfig/ListMicroService";
 
 //Author
 var urlAuthorLogin = urlRoot + "/Author/Login";

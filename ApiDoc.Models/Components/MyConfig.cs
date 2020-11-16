@@ -11,8 +11,9 @@ namespace ApiDoc.Models.Components
         /// </summary> 
         public JWTTokenOptions JWTTokenOptions { get; set; }
         public DataBases DataType { get; set; }
+        public NetAddress GatewayAddress { get; set; }
 
-        public DataBase this[string dataType]
+    public DataBase this[string dataType]
         {
             get
             {

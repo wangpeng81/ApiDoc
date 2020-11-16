@@ -10,10 +10,10 @@
         <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">授权中心</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">数据库</a>
+        <a class="nav-link" id="pills-database-tab" data-toggle="pill" href="#pills-database" role="tab" aria-controls="pills-database" aria-selected="false">数据库</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">分布式</a>
+        <a class="nav-link" id="pills-jms-tab" data-toggle="pill" href="#pills-jms" role="tab" aria-controls="pills-jms" aria-selected="false">分布式</a>
     </li>
 </ul>
 <div class="tab-content" id="pills-tabContent">
@@ -41,17 +41,17 @@
     </div>
 
     <!-- 数据库配置 -->
-    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+    <div class="tab-pane fade" id="pills-database" role="tabpanel" aria-labelledby="pills-database-tab">
         <div class="btn-toolbar ml-3 mb-3" role="toolbar" aria-label="Toolbar with button groups">
             <div class="btn-group btn-group-sm" role="group" aria-label="Second group">
                 <button type="button" class="btn btn-light">保存操作</button>
                 <button type="button" class="btn btn-info" data-toggle="tooltip" onclick="btnSaveDataBase()"><i class="fa fa-save"></i></button>
             </div>
         </div>
-        <div class="container-fluid px-3 no-gutters row"> 
+        <div class="container-fluid px-3 no-gutters row">
             <div class="bg-light px-3 border col-4">
 
-                <div class="col-form-labela">SqlServer</div>
+                <div class="col-form-label">SqlServer</div>
                 <div class="form-group row pr-2">
                     <label for="txtSqlServerApiDocConnStr" class="col-2 col-form-label fs-14 p-0 pl-2 pt-1">ConnStr:</label>
                     <input id="txtSqlServerApiDocConnStr" class="col-10 form-control" value="@Model.DataType.SqlServer.ApiDocConnStr" />
@@ -69,7 +69,7 @@
                             dataBase += dbName;
                         }
 
-                        <textarea id="txtSqlServerDataBases" wrap="hard" class="col-10 form-control" rows="20">@dataBase</textarea>
+                        <textarea id="txtSqlServerDataBases" wrap="hard" class="col-10 form-control" rows="15">@dataBase</textarea>
                     }
 
                 </div>
@@ -95,7 +95,7 @@
                             dataBase1 += dbName;
                         }
 
-                        <textarea id="txtMySqlDataBases" class="col-10 form-control" rows="20">@dataBase1</textarea>
+                        <textarea id="txtMySqlDataBases" class="col-10 form-control" rows="15">@dataBase1</textarea>
                     }
 
 
@@ -122,12 +122,67 @@
                             dataBase2 += dbName;
                         }
 
-                        <textarea id="txtOracleDataBases" class="col-10 form-control" rows="20">@dataBase2</textarea>
+                        <textarea id="txtOracleDataBases" class="col-10 form-control" rows="15">@dataBase2</textarea>
                     }
                 </div>
             </div>
-        </div>
-        <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>
+        </div> 
+    </div>
+
+    <div class="tab-pane fade" id="pills-jms" role="tabpanel" aria-labelledby="pills-profile-tab">
+        <div class="container-fluid">
+            <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Second group">
+                    <button type="button" class="btn btn-light">保存操作</button>
+                    <button type="button" class="btn btn-info" data-toggle="tooltip" onclick="btnSaveGateWay()"><i class="fa fa-save"></i></button>
+                    <button type="button" class="btn btn-info" data-toggle="tooltip" title="获取网关" onclick="btnGetGateWay()"><i class="fa fa-bank"></i></button>
+                </div>
+            </div>
+            <div class="border pl-3 pt-1 pr-3 pb-3"> 
+                <div class="col-form-label">网关配置</div>
+                <div class="form-group row">
+                    <label for="txtGateWayAddress" class="col-form-label col-2">地址:</label>
+                    @if (Model.GatewayAddress != null)
+                    {
+                <input id="txtGateWayAddress" class="form-control col-5" value="@Model.GatewayAddress.Address" />
+                    }
+                    else
+                    {
+                <input id="txtGateWayAddress" class="form-control col-5" value="" />
+                    }
+                </div>
+                <div class="form-group row">
+                    <label for="txtGateWayPort" class="col-form-label col-2">端口:</label>
+
+                    @if (Model.GatewayAddress != null)
+                    {
+                        <input id="txtGateWayPort" class="form-control col-5" value="@Model.GatewayAddress.Port" />
+                    }
+                    else
+                    {
+                        <input id="txtGateWayPort" class="form-control col-5" value="" />
+                    } 
+                </div>
+
+                <div class="form-group">
+                    <label for="txtGateWayPort" class="col-form-label">服务列表:</label>
+
+                    @{
+
+                        var serviceNames = "";
+                        @foreach (string dbName in @Model.GatewayAddress.ServiceNames)
+                        {
+                            @if (serviceNames != "")
+                            {
+                                serviceNames += "\n";
+                            }
+                            serviceNames += dbName;
+                        }
+                        <textarea id="txtServices" class="form-control" rows="3">@serviceNames</textarea>
+                    }
+                </div>
+            </div>
+        </div> 
     </div>
 </div>
 

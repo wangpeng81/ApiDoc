@@ -1,6 +1,9 @@
-﻿using ApiDoc.Models.Components;
+﻿using ApiDoc.Middleware;
+using ApiDoc.Middleware.Author;
+using ApiDoc.Models.Components;
 using ApiDoc.Utility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -14,6 +17,18 @@ namespace ApiDoc
 {
     public static class ConfigureServicesExtensions
     {
+        public static void ConfigureApiDoc(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<MyCorsMiddleware>();
+            //app.UseMiddleware<JWTRSAuthorizeMiddleware>(); //验证
+            app.UseMiddleware<JWTHSAuthorizeMiddleware>();
+            //app.UseMiddleware<JWTMiddleware>();
+            //app.UseMiddleware<AuthorizeMiddleware>();//JWTMiddleware
+            app.UseMiddleware<DBMiddleware>();
+
+            app.UseAuthentication(); //鉴权：解析信息--就是读取token，解密token 
+        }
+
         public static void ConfigureServicesApiDoc(this IServiceCollection services)
         {
 

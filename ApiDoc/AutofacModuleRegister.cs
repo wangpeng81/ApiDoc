@@ -5,6 +5,7 @@ using ApiDoc.Middleware;
 using ApiDoc.Models.Components;
 using ApiDoc.Utility;
 using Autofac;
+using JMS;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -79,6 +80,7 @@ namespace ApiDoc
             //    As<IJWTService>().
             //    InstancePerLifetimeScope(); //非对等验证
             #endregion
+             
         }
     }
 

@@ -41,15 +41,20 @@ namespace ApiDoc.Controllers
         {
             if( FKSN > 0 )
             {
-                string DataBaseType = this.interfaceDAL.Get<InterfaceModel>(FKSN).DataType;
+                InterfaceModel interfaceModel = this.interfaceDAL.Get<InterfaceModel>(FKSN); 
+                ViewData["Jms"] = interfaceModel.IsJms;
+                ViewData["ServiceNames"] = this.myConfig.GatewayAddress.ServiceNames;
+                     
+                //数据库
+                string DataBaseType = interfaceModel.DataType; 
                 List<string> DataBases = this.myConfig[DataBaseType].DataBases;
-                ViewData["DataBase"] = DataBases;
+                ViewData["DataBase"] = DataBases; 
             }
 
             //数据库
             List<string> CommandType = configuration.GetSection("CommandType").Get<List<string>>();
             ViewData["CommandType"] = CommandType;
-
+             
             List <FlowStepModel> list = this.flowStepDAL.Query(FKSN);
             return PartialView("/Views/Interface/FlowStepList.cshtml", list);
         }
@@ -86,11 +91,10 @@ namespace ApiDoc.Controllers
         }
 
         [HttpPost]
-        public int SaveCmdText(int SN, string CommandType, string CommandText, string DataBase)
+        public int SaveCmdText(int SN, string CommandType, string CommandText, string DataBase, string ServiceName)
         {
-            return this.flowStepDAL.SaveCmdText(SN, CommandType, CommandText, DataBase);
-        }
-
+            return this.flowStepDAL.SaveCmdText(SN, CommandType, CommandText, DataBase, ServiceName);
+        } 
 
     }
 }

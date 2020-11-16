@@ -74,6 +74,36 @@ function btnSaveDataBase() {
     });
 }
 
+//保存网关
+function btnSaveGateWay() {
+
+    var txtGateWayAddress = $("#txtGateWayAddress");
+    var txtGateWayPort = $("#txtGateWayPort");
+    var txtServices = $("#txtServices");
+    var serviceNames = txtServices.val().split("\n"); ;
+
+    var data = {
+        Address: txtGateWayAddress.val(),
+        Port: txtGateWayPort.val(),
+        ServiceNames: serviceNames
+    };
+    $.post(urlMyConfigSaveGateWay, data, function (result) {
+        if (result > 0) {
+            popToastSuccess("保存成功!");
+        }
+    });
+}
+
+//获取网关
+function btnGetGateWay() {
+
+    $.get(urlMyConfigListMicroService, function (result) {
+         
+        var txtServices = $("#txtServices");
+        txtServices.val(result);
+    }); 
+}
+
 $(function () {
 
     //初始化提示信息

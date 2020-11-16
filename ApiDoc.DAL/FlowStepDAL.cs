@@ -34,16 +34,15 @@ namespace ApiDoc.DAL
         public List<FlowStepModel> Query(int fksn)
         {
             List<FlowStepModel> list = new List<FlowStepModel>();
-             
-                string strSql = string.Format("select * from {0} where FKSN= {1} order by StepOrder", tableName, fksn);
-                DataTable dt = db.FillTable(strSql);
 
-                foreach (DataRow dataRow in dt.Rows)
-                {
-                    FlowStepModel info = this.CreateModel<FlowStepModel>(dataRow);
-                    list.Add(info);
-                } 
-            
+            string strSql = string.Format("select * from {0} where FKSN= {1} order by StepOrder", tableName, fksn);
+            DataTable dt = db.FillTable(strSql);
+
+            foreach (DataRow dataRow in dt.Rows)
+            {
+                FlowStepModel info = this.CreateModel<FlowStepModel>(dataRow);
+                list.Add(info);
+            } 
             return list;
         }
 
@@ -102,23 +101,24 @@ namespace ApiDoc.DAL
             return list;
         }
 
-        public int SaveCmdText(int SN, string CommandType, string CommandText, string DataBase)
-        {
-            
-                if (CommandText == null)
-                {
-                    CommandText = "";
-                } 
-                string strSql = "update "+this.tableName+ "  set CommandType = @CommandType, CommandText =@CommandText, [DataBase] = @DataBase where SN = @SN";
+        public int SaveCmdText(int SN, string CommandType, string CommandText, string DataBase, string ServiceName)
+        { 
+            if (CommandText == null)
+            {
+                CommandText = "";
+            }
 
-                DbParameters p = new DbParameters();
-                p.Add("SN", SN);
-                p.Add("CommandType", CommandType);
-                p.Add("CommandText", CommandText);
-                p.Add("DataBase", DataBase);
-                int iResult = db.ExecuteSql(strSql, p);
-                return iResult;
-            
+            string strSql = "update " + this.tableName + "  set CommandType = @CommandType, CommandText =@CommandText, [DataBase] = @DataBase, ServiceName= @ServiceName where SN = @SN";
+
+            DbParameters p = new DbParameters();
+            p.Add("SN", SN);
+            p.Add("CommandType", CommandType);
+            p.Add("CommandText", CommandText);
+            p.Add("DataBase", DataBase);
+            p.Add("ServiceName", ServiceName);
+
+            int iResult = db.ExecuteSql(strSql, p);
+            return iResult; 
         }
  
     }

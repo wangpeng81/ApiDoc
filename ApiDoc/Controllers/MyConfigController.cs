@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ApiDoc.Models.Components;
 using ApiDoc.Utility;
+using JMS.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -46,6 +47,39 @@ namespace ApiDoc.Controllers
             jsonFileHelper.Write<DataBases>("DataType", DataType);
             myConfig.DataType = DataType;
             return 100;
+        }
+
+        [HttpPost]
+        public int SaveGateWay(NetAddress netAddress)
+        { 
+            jsonFileHelper.Write<NetAddress>("GatewayAddress", netAddress);
+            myConfig.GatewayAddress = netAddress;
+            return 100;
+        }
+
+        [HttpGet]
+        public string ListMicroService()
+        {
+            string Address = this.myConfig.GatewayAddress.Address;
+            int port = this.myConfig.GatewayAddress.Port;
+
+            string services = "";
+
+            JMS.JMSClient tran = new JMS.JMSClient(Address, port);
+            RegisterServiceRunningInfo[] registerServiceRunningInfos = tran.ListMicroService("");
+            if (registerServiceRunningInfos.Length > 0)
+            {
+                foreach (string serverName in registerServiceRunningInfos[0].ServiceNames)
+                {
+                    if (services != "")
+                    {
+                        services += "\n";
+                    } 
+                    services += serverName;
+                } 
+            }
+
+            return services;
         }
     }
 }

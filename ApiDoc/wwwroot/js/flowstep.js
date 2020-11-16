@@ -127,11 +127,13 @@ function btnSaveCmdText(SN) {
     var cmdType = $(stepID + ' #cbxCommandType').val();
     var cmdText = $(stepID + ' #txtCommandText').val();
     var cmdDataBase = $(stepID + ' #cbxDataBase').val();
+    var vServiceName = $(stepID + ' #cbxServiceName').val();
     var data = {
         SN: SN,
         CommandType: cmdType,
         CommandText: cmdText,
-        DataBase: cmdDataBase
+        DataBase: cmdDataBase,
+        ServiceName: vServiceName
     };
 
     $.post(urlFlowStepSaveCmdText, data,
