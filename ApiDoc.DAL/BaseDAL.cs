@@ -199,7 +199,10 @@ namespace ApiDoc.DAL
                 if (dt.Columns.Contains(pro.Name))
                 {
                     object value = dataRow[pro.Name];
-                    pro.SetValue(obj, value);
+                   if( value != null && value != System.DBNull.Value)
+                    { 
+                        pro.SetValue(obj, value);
+                    }
                 }
             }
             return obj;

@@ -1,4 +1,6 @@
 ﻿var urlRoot = document.getElementById("txtHost").value; 
+ 
+//urlRoot = window.location.protocol + "//" + window.location.host;
 var urlFolderAll = urlRoot + "/Folder/All";  
 
 //文件夹
@@ -15,6 +17,7 @@ var urlInterfaceBug = urlRoot + "/Interface/Bug";
 var urlParamList = urlRoot + "/Param/ParamList";
 var urlParamAdd = urlRoot + "/Param/ParamAdd";
 var urlParamDelete = urlRoot + "/Param/ParamDelete";
+var urlParamGetCSParam = urlRoot + "/Param/GetCSParam";
 
 //执行步骤
 var urlFlowStepSave = urlRoot + "/Step/StepSave";
@@ -44,6 +47,7 @@ var urlMyConfigSaveAuthorize = urlRoot + "/MyConfig/SaveAuthorize";
 var urlMyConfigSaveDataType = urlRoot + "/MyConfig/SaveDataType";
 var urlMyConfigSaveGateWay = urlRoot + "/MyConfig/SaveGateWay";
 var urlMyConfigListMicroService = urlRoot + "/MyConfig/ListMicroService";
+var urlMyConfigCreatePublickKey = urlRoot + "/MyConfig/CreatePublickKey";
 
 //Author
 var urlAuthorLogin = urlRoot + "/Author/Login";

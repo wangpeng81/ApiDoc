@@ -1,0 +1,61 @@
+﻿<!-- 测试 -->
+<div class="modal fade bd-example-modal-lg" id="myModalCS" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg modal-dialog-centered " style="max-width: 100% !important; width: 97%;"
+         role="document">
+        <div class="modal-content" style="max-height:100% !important; height:calc(100vh - 60px)">
+            <div class="modal-body">
+                <div class="form-inline pb-2">
+                    <label id="lblUseName" for="txtUserName" class="mr-2">用户名:</label>
+                    <input id="txtUserName" class="form-control form-control-sm mr-2" />
+
+                    <label id="lblPassword" for="txtPassword" class="mr-2">密码:</label>
+                    <input id="txtPassword" class="form-control form-control-sm mr-2" />
+
+                    <!--结果是否为Layui格式-->
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input ml-2" id="chkVersion" value="Layui" onchange="onVersion()">
+                        <label class="custom-control-label" for="chkVersion">Layui</label>
+                    </div>
+                     
+                    <input id="txtCSContentType" class="form-control form-control-sm ml-2" readonly="readonly" value="application/json" />
+                </div>
+
+                <div class="input-group input-group-sm">
+                    <input id="txtCSUrl" class="form-control form-control-sm bg-light" /> 
+                    
+                    <button type="button" class="btn btn-primary btn-sm ml-2" onclick="btnSendCS()">Send</button>
+                    <button type="button" class="btn btn-default btn-sm ml-2" data-dismiss="modal">Canel</button>
+                </div>
+
+                <ul class="nav nav-pills justify-content-center pt-2" id="pills-cs-tab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active px-2 py-1" id="pills-param-tab" data-toggle="pill" href="#pills-param" role="tab" aria-controls="pills-param" aria-selected="true">参数</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-2 py-1" id="pills-param-ajax-tab" data-toggle="pill" href="#pills-param-ajax" role="tab" aria-controls="pills-param-ajax" aria-selected="false">ajax</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-2 py-1" id="pills-result-list-tab" data-toggle="pill" href="#pills-result-list" role="tab" aria-controls="pills-result-list" aria-selected="false">列表</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-param" role="tabpanel" aria-labelledby="pills-param-tab">
+                        <div id="dgvCSParam" class="border p-0 mt-2 overflow-auto" style="height:calc(100vh / 3)">
+                        </div>
+                        <textarea id="txtJsonResult" class="form-control bg-light mt-2" style="height:calc(100vh / 3)"></textarea>
+                    </div>
+                    <div class="tab-pane fade" id="pills-param-ajax" role="tabpanel" aria-labelledby="pills-param-ajax-tab"> 
+                        <!--发送脚本-->
+                        <textarea id="txtAjax" class="form-control bg-light p-0 mt-2" style="height:calc(100vh - 220px)"></textarea>
+                    </div>
+                    <div class="tab-pane fade" id="pills-result-list" role="tabpanel" aria-labelledby="pills-result-list-tab">
+                        <!--datagrid-->
+                        <div id="dgvCS" class="overflow-auto bg-info mt-2" style="height: calc(100vh - 220px)">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -22,6 +22,10 @@ namespace JMS
             NetAddress compaire = (NetAddress)obj;
             return this.Equals(compaire.Address , compaire.Port);
         }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
         public bool Equals(string ip ,int port)
         {
             return Address == ip && Port == port;

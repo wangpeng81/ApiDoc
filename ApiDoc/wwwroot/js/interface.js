@@ -1,6 +1,5 @@
 ﻿var _SN = 0;
  
-
 //保存接口
 function btnSaveIntterface_Click() {
 
@@ -102,139 +101,10 @@ function btnDownLoad_Click() {
 
 }
 
-//弹出测试窗口
-function showCS() {
-
-    var url = window.location.protocol + "//" + window.location.host + urlRoot + $("#txtUrl").val(); 
-    $("#lblUrl").html(url); 
-
-    var method = $("#cbxMethod").val();
-
-    var paraList = document.getElementsByName("chkParam_");
-    var csJson = ""; 
-    for (var i = 0; i < paraList.length; i++) { 
-        json = paraList[i].value;
-        json = eval("(" + json + ")"); 
- 
-        if (method == "Get") {
-            if (csJson != "") {
-                csJson += "&";
-            }
-            if (json.DataType == "Varchar") {
-                csJson += json.ParamName + "=" + json.DefaultValue.replace("\'", "").trim();
-            }
-            else if (json.DataType == "Int") {
-                csJson += json.ParamName + "=" + json.DefaultValue.replace("\'", "").trim();
-            }
-            else if (json.dataType == "Decimal") {
-                csJson += json.ParamName + "=" + json.DefaultValue.replace("\'", "").trim();
-            }
-            else {
-                csJson += json.ParamName + "='" + json.DefaultValue + "'";
-            }
-        }
-        else if (method == "Post") {
-            if (csJson != "") {
-                csJson += ",";
-            }
-
-            var value1 = ''; 
-            if (json.DataType == "Varchar") {
-                value1 = json.DefaultValue.replace("\'", "").trim();
-            }
-            else if (json.DataType == "Int") {
-                value1 = json.DefaultValue.replace("\'", "").trim();
-            }
-            else if (json.dataType == "Decimal")
-            {
-                value1 = json.DefaultValue.replace("\'", "").trim();
-            }
-            else
-            {
-                csJson += json.ParamName + "='" + json.DefaultValue + "'";
-            }
-
-            csJson += json.ParamName + ":" + value1;
-        }
-    }
-
-    if (method == "Post")
-    {
-        csJson = "{" + csJson + "}";
-    }
-
-    $("#txtInput").val(csJson); 
-    $("#txtResult").val("");
-    var model = $("#myModalCS");
-    model.modal('show');
-        
-}
-//--------------------------------------------------测试
-function btnSendCS() {
-
-    var url = window.location.protocol + "//" + window.location.host + urlRoot + $("#txtUrl").val();
-    var vdata = $("#txtInput").val();
-    var txtResult = $("#txtResult");
-    var method = $("#cbxMethod").val();
-    if (method == "Get") { 
-        if (vdata != "") {
-            url = url + "?" + vdata; 
-        }
-    }
-
-    var strUserName = $("#myModalCS #txtUserName").val();
-    var strPassword = $("#myModalCS #txtPassword").val();
-
-    if (strUserName == "") {
-        return;
-    }
-    if (strPassword == "") {
-        return;
-    }
-
-    var data = {
-        UserName:strUserName,
-        Password:strPassword
-    };
-
-    $.ajax({
-        url: urlAuthorLogin,
-        dataType: 'json',
-        type: 'Post',
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        success: function (author) {
-
-            var version = "";
-            var chkVersion = document.getElementById("chkVersion");
-            if (chkVersion.checked) {
-                version = chkVersion.value;
-            }
-           
-            if (author.result == true) {
-                $.ajax({
-                    //headers: { 'Authorization': author.token },
-                    url: url,
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader("Authorization", "Bearer " + author.token);
-                        xhr.setRequestHeader("Version", version);
-                    }, 
-                    type: method, 
-                    contentType: "application/json",
-                    data: vdata, 
-                    success: function (result) {
-                        txtResult.val(result);
-                    }
-                })
-            } 
-        }
-    })
- 
-}
-
 //显示接口信息的完整性
-function showBugInfo(path) {
-     
+function showBugInfo() {
+
+    var path = $("#txtUrl").val();
     var url = urlInterfaceBug + "?path=" + path;
 
     $.get(url, function (html) {

@@ -60,6 +60,16 @@ namespace ApiDoc.Controllers
             return ParamList(FKSN);
         }
 
+
+        [HttpGet]
+        //获取测试参数
+        public IActionResult GetCSParam(int SN)
+        {
+            List < ParamModel > paramList = this.paramDAL.Query(SN); 
+            return PartialView("/Views/Interface/_PartialCSParam.cshtml", paramList);
+        }
+
+
         #endregion
 
 

@@ -1,11 +1,89 @@
 ﻿@model ApiDoc.Models.InterfaceModel
- 
-    <div class="container-fluid"> 
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="form-group row col-4">
+            <label for="txtAuth" class="col-sm-4 col-form-label bg-light">验证规则:</label>
+            <input type="text" class="form-control col-sm-6" id="txtAuth" value="@Model.Auth">
+
+            <i class="fa fa-check text-info col-sm-2 mt-2"></i>
+
+        </div>
+
+        <div class="form-group row col-4 ml-2">
+            <label for="txtUrl" class="col-sm-4 col-form-label bg-light">Url:</label>
+            <input type="text" class="form-control col-sm-6" id="txtUrl" value="@Model.Url">
+
+            @if (Model.Url != null && Model.Url != "")
+            {
+                <i class="fa fa-check text-success col-sm-2 mt-2"></i>
+            }
+            else
+            {
+                <i class="fa fa-close text-warning col-sm-2 mt-2"></i>
+            }
+        </div>
+
+        <div class="form-group row col-4 ml-2">
+            <label for="txtExecuteType" class="col-sm-4 col-form-label bg-light">结果集:</label>
+            <input type="text" class="form-control col-sm-6" id="txtExecuteType" value="@Model.ExecuteType">
+
+            @if (Model.ExecuteType != null && Model.ExecuteType != "")
+            {
+                <i class="fa fa-check text-success col-sm-2 mt-2"></i>
+            }
+            else
+            {
+                <i class="fa fa-close text-warning col-sm-2 mt-2"></i>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group row col-4">
+            <label for="txtMethod" class="col-sm-4 col-form-label bg-light">发送方法:</label>
+            <input type="text" class="form-control col-sm-6" id="txtMethod" value="@Model.Method">
+            @if (Model.Method != null && Model.Method != "")
+            {
+                <i class="fa fa-check text-success col-sm-2 mt-2"></i>
+            }
+            else
+            {
+                <i class="fa fa-close text-warning col-sm-2 mt-2"></i>
+            }
+        </div>
+
+        <div class="form-group row col-4 ml-2">
+            <label for="txtDataBaseType" class="col-sm-4 col-form-label bg-light">数据库类型:</label>
+            <input type="text" class="form-control col-sm-6" id="txtDataBaseType" value="@Model.DataType">
+            @if (Model.DataType != null && Model.DataType != "")
+            {
+                <i class="fa fa-check text-success col-sm-2 mt-2"></i>
+            }
+            else
+            {
+                <i class="fa fa-close text-warning col-sm-2 mt-2"></i>
+            }
+        </div>
+
+    </div>
+
+    <!-- 步骤 -->
+    @if (Model.Steps.Count == 0)
+    {
+<div class="row">
+    <label class="col-12 col-form-label bg-warning">没有步骤: <i class="fa fa-close text-info"></i></label> 
+</div>
+    }
+
+    @foreach (ApiDoc.Models.FlowStepModel step in Model.Steps)
+    {
+        <div class="col-form-label">步骤:@step.StepName</div>
         <div class="row">
             <div class="form-group row col-4">
-                <label for="txtAuth" class="col-sm-4 col-form-label bg-light">验证规则:</label>
-                <input type="text" class="form-control col-sm-6" id="txtAuth" value="@Model.Auth">
-                @if (Model.Auth != null && Model.Auth != "")
+                <label for="txtCommandText" class="col-sm-4 col-form-label bg-light">执行内容:</label>
+                <input type="text" class="form-control col-sm-6" id="txtCommandText" value="@step.CommandText">
+                @if (step.CommandText != null && step.CommandText != "")
                 {
                     <i class="fa fa-check text-success col-sm-2 mt-2"></i>
                 }
@@ -16,10 +94,9 @@
             </div>
 
             <div class="form-group row col-4 ml-2">
-                <label for="txtUrl" class="col-sm-4 col-form-label bg-light">Url:</label>
-                <input type="text" class="form-control col-sm-6" id="txtUrl" value="@Model.Url">
-
-                @if (Model.Url != null && Model.Url != "")
+                <label for="txtCommandType" class="col-sm-4 col-form-label bg-light">执行类型:</label>
+                <input type="text" class="form-control col-sm-6" id="txtCommandType" value="@step.CommandType">
+                @if (step.CommandType != null && step.CommandType != "")
                 {
                     <i class="fa fa-check text-success col-sm-2 mt-2"></i>
                 }
@@ -30,10 +107,9 @@
             </div>
 
             <div class="form-group row col-4 ml-2">
-                <label for="txtExecuteType" class="col-sm-4 col-form-label bg-light">结果集:</label>
-                <input type="text" class="form-control col-sm-6" id="txtExecuteType" value="@Model.ExecuteType">
-
-                @if (Model.ExecuteType != null && Model.ExecuteType != "")
+                <label for="txtCommandType" class="col-sm-4 col-form-label bg-light">数据库:</label>
+                <input type="text" class="form-control col-sm-6" id="txtCommandType" value="@step.DataBase">
+                @if (step.DataBase != null && step.DataBase != "")
                 {
                     <i class="fa fa-check text-success col-sm-2 mt-2"></i>
                 }
@@ -43,79 +119,5 @@
                 }
             </div>
         </div>
-            
-        <div class="row">
-            <div class="form-group row col-4">
-                <label for="txtMethod" class="col-sm-4 col-form-label bg-light">发送方法:</label>
-                <input type="text" class="form-control col-sm-6" id="txtMethod" value="@Model.Method">
-                @if (Model.Method != null && Model.Method != "")
-                {
-                    <i class="fa fa-check text-success col-sm-2 mt-2"></i>
-                }
-                else
-                {
-                    <i class="fa fa-close text-warning col-sm-2 mt-2"></i>
-                }
-            </div>
-
-            <div class="form-group row col-4 ml-2">
-                <label for="txtDataBaseType" class="col-sm-4 col-form-label bg-light">数据库类型:</label>
-                <input type="text" class="form-control col-sm-6" id="txtDataBaseType" value="@Model.DataType"> 
-                @if (Model.DataType != null && Model.DataType != "")
-                {
-                    <i class="fa fa-check text-success col-sm-2 mt-2"></i>
-                }
-                else
-                {
-                    <i class="fa fa-close text-warning col-sm-2 mt-2"></i>
-                }
-            </div>
-             
-        </div>
-
-        <!-- 步骤 -->
-        @foreach (ApiDoc.Models.FlowStepModel step in Model.Steps)
-        {
-            <div class="col-form-label">步骤:@step.StepName</div>
-            <div class="row">
-                <div class="form-group row col-4">
-                    <label for="txtCommandText" class="col-sm-4 col-form-label bg-light">执行内容:</label>
-                    <input type="text" class="form-control col-sm-6" id="txtCommandText" value="@step.CommandText">
-                    @if (step.CommandText != null && step.CommandText != "")
-                    {
-                        <i class="fa fa-check text-success col-sm-2 mt-2"></i>
-                    }
-                    else
-                    {
-                        <i class="fa fa-close text-warning col-sm-2 mt-2"></i>
-                    }
-                </div>
-
-                <div class="form-group row col-4 ml-2">
-                    <label for="txtCommandType" class="col-sm-4 col-form-label bg-light">执行类型:</label>
-                    <input type="text" class="form-control col-sm-6" id="txtCommandType" value="@step.CommandType">
-                    @if (step.CommandType != null && step.CommandType != "")
-                    {
-                        <i class="fa fa-check text-success col-sm-2 mt-2"></i>
-                    }
-                    else
-                    {
-                        <i class="fa fa-close text-warning col-sm-2 mt-2"></i>
-                    }
-                </div>
-
-                <div class="form-group row col-4 ml-2">
-                    <label for="txtCommandType" class="col-sm-4 col-form-label bg-light">数据库:</label>
-                    <input type="text" class="form-control col-sm-6" id="txtCommandType" value="@step.DataBase">
-                    @if (step.DataBase != null && step.DataBase != "")
-                    {
-                        <i class="fa fa-check text-success col-sm-2 mt-2"></i>
-                    }
-                    else
-                    {
-                        <i class="fa fa-close text-warning col-sm-2 mt-2"></i>
-                    }
-                </div>
-            </div>
-        }
-    </div> 
+    }
+</div> 

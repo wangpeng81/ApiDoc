@@ -19,7 +19,8 @@ namespace ApiDoc
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args)
-        { 
+        {
+           
             IHostBuilder hostBilder = Host.CreateDefaultBuilder(args); 
             hostBilder.ConfigureLogging((context, loggingBuilder)=> {
 

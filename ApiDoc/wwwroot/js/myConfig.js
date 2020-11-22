@@ -27,10 +27,13 @@ function btnSaveAuthorize_Click() {
     return;
 }
 
-function btnCreateAuthorize_Click() {
-    var txtAuthorize = $("#txtAuthorize");
-    var vguid = guid();
-    txtAuthorize.val(vguid);
+function btnCreatePublickKey_Click() {
+    var txtSecurityKey = $("#txtSecurityKey");
+
+    $.get(urlMyConfigCreatePublickKey,
+        function (result) { 
+            txtSecurityKey.val(result);
+        }); 
 }
 
 //数据库保存

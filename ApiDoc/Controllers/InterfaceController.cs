@@ -171,12 +171,12 @@ namespace ApiDoc.Controllers
         }
 
         [HttpGet]
+        //查看内存中的接口数据是否完整
         public IActionResult Bug(string path)
         {
             InterfaceModel model = this.routeDict[path]; 
             return PartialView("/Views/Interface/Bug.cshtml", model);
         }
-
 
     }
 }

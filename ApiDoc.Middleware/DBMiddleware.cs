@@ -20,6 +20,7 @@ using System.IO;
 using ApiDoc.Models.Components;
 using Newtonsoft.Json.Linq;
 using JMS;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace ApiDoc.Middleware
 {
@@ -89,16 +90,7 @@ namespace ApiDoc.Middleware
             {
                 //加载步骤
                 int SN = model.SN;
-                string Url = model.Url;
-                //InterfaceModel dbInter = new InterfaceModel();
-                //dbInter.SerializeType = model.SerializeType;
-                //dbInter.Method = model.Method; 
-                //dbInter.IsTransaction = model.IsTransaction;
-                //dbInter.ExecuteType = model.ExecuteType;
-                //dbInter.DataType = model.DataType;
-                //dbInter.Url = Url;
-                //dbInter.IsJms = model.IsJms;
-
+                string Url = model.Url;  
                 model.Steps = flowStepDAL.QueryOfParam(SN);
 
                 //接口参数
@@ -124,6 +116,37 @@ namespace ApiDoc.Middleware
 
         }
 
+        /// <summary>
+        /// 获取响应内容
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        public async Task<string> GetResponse()
+        {
+            //读流
+            context.Request.EnableBuffering();
+            var requestReader = new StreamReader(context.Request.Body);
+            var requestContent = requestReader.ReadToEnd();
+            context.Request.Body.Position = 0;
+
+            using (var ms = new MemoryStream())
+            {
+                context.Response.Body = ms;
+                RequestDelegate task = new RequestDelegate((context) => {
+
+                    var form = context.Request.Form;
+                    return null;
+                });
+                await next(context);
+
+                ms.Position = 0;
+                var responseReader = new StreamReader(ms);
+                var responseContent = responseReader.ReadToEnd();
+                ms.Position = 0;
+            } 
+            return null;
+        }
+      
         public async Task Invoke(HttpContext context)
         {
             this.context = context;
@@ -136,29 +159,30 @@ namespace ApiDoc.Middleware
                 case "/CSDB":
                     return;
             }
-
+          
             if (this.routeDict.ContainsKey(path))
             {
-                InterfaceModel response = this.routeDict[path];
-                Dictionary<string, object> paramList = null; //接口参数
-                string msg;
-                bool bOK = this.CheckDataBase(response, out paramList, out msg);
-                if (!bOK) //如果验证失败
-                {
-                    await this.InvokeException(msg); 
-                }
-                else
-                {
-                    if (response.IsJms)
+ 
+                    InterfaceModel response = this.routeDict[path];
+                    Dictionary<string, object> paramList = null; //接口参数
+                    string msg;
+                    bool bOK = this.CheckDataBase(response, out paramList, out msg);
+                    if (!bOK) //如果验证失败
                     {
-                        await this.InvokeJms(context, paramList);
+                        await this.InvokeException(msg);
                     }
                     else
                     {
+                        if (response.IsJms)
+                        {
+                            await this.InvokeJms(context, paramList);
+                        }
+                        else
+                        {
 
-                        await InvokeDB(context, paramList);
-                    }
-                } 
+                            await InvokeDB(context, paramList);
+                        }
+                    } 
             }
             else
             {
@@ -282,7 +306,7 @@ namespace ApiDoc.Middleware
             Dictionary<string, object> dict = new Dictionary<string, object>();
             if (method == "post")
             {
-                if (context.Request.ContentType == "application/x-www-form-urlencoded")
+                if (context.Request.ContentType == "application/x-www-form-urlencoded") //纯表单
                 {
                     foreach (KeyValuePair<string, StringValues> kv in context.Request.Form)
                     {
@@ -301,12 +325,48 @@ namespace ApiDoc.Middleware
                         }
                     }
                 }
+                else if (context.Request.ContentType.Contains("multipart/form-data", StringComparison.OrdinalIgnoreCase)) //带附件的表单
+                { 
+                    FormFeature formFeature = new FormFeature(context.Request);
+                    IFormCollection iFormCollection = formFeature.ReadForm();
+
+                    foreach (string key in iFormCollection.Keys)
+                    { 
+                        if (!dict.ContainsKey(key))
+                        {
+                            if (auth != "")
+                            {
+                                auth += "_";
+                            }
+                            auth += key;
+
+                            StringValues stringValues = iFormCollection[key]; 
+                            dict.Add(key, stringValues[0]);
+                        }
+                    } 
+                    if (iFormCollection.Files.Count > 0)
+                    {
+                        IFormFile formFile = iFormCollection.Files[0];
+                        //var target = new System.IO.MemoryStream();
+                        //formFile.CopyTo(target);
+
+                        //byte[] buffer = target.ToArray();
+                        dict.Add(formFile.Name, formFile);
+
+                        if (auth != "")
+                        {
+                            auth += "_";
+                        } 
+                        auth += formFile.Name;
+                    }
+
+                }
                 else
                 {
                     var reader = new StreamReader(context.Request.Body);
                     var contentFromBody = reader.ReadToEnd();
                     if (contentFromBody != "")
-                    {
+                    { 
                         dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(contentFromBody); 
                     }
 
@@ -630,7 +690,32 @@ namespace ApiDoc.Middleware
                     {
                         if (dict.ContainsKey(paramName))
                         {
-                            value = dict[paramName]; 
+                            if (param.DataType == "Image")
+                            { 
+                                string directory = Directory.GetCurrentDirectory() + "\\wwwroot\\Image\\";
+                                if (!System.IO.Directory.Exists(directory))
+                                {
+                                    System.IO.Directory.CreateDirectory(directory);
+                                }
+
+                                string fileName =  DateTime.Now.ToString("yyyyMMddHHmmss") + "-" + Guid.NewGuid().ToString() + ".png";
+                                string path = directory + fileName;                                                               //硬盘文件名称　
+                                string imagePath = context.Request.Scheme + "://" + context.Request.Host + "/Image/" + fileName;　//网络路径
+                                value = imagePath; 
+                                object objFile = dict[paramName]; 
+                                if (objFile != null)
+                                {
+                                    IFormFile formFile = (IFormFile)dict[paramName];
+                                    using (var stream = System.IO.File.Create(path))
+                                    {
+                                        formFile.CopyTo(stream); 
+                                    }
+                                } 
+                            }
+                            else
+                            {
+                                value = dict[paramName];
+                            } 
                         }
                         else
                         {
@@ -693,8 +778,8 @@ namespace ApiDoc.Middleware
                     else //从Request中取值 
                     {
                         if (dict.ContainsKey(paramName))
-                        {
-                            value = dict[paramName];
+                        { 
+                           value = dict[paramName]; 
                         }
                         else
                         {
