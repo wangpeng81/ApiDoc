@@ -21,6 +21,8 @@ function showCS() {
 
     $("#txtResult").val("");
     $("#txtAjax").val("");
+    $("#txtJsonResult").val("");
+    $("#dgvCS").html("");
 
     url = urlParamGetCSParam + "?SN=" + _SN;
     $.get(url, function (innerHtml) {
@@ -70,8 +72,7 @@ function btnSendCS() {
 function CSCallBack(author) {
 
     var version = ""; //是否返回Layui的数据
-    var txtJsonResult = $("#txtJsonResult");
-
+    
     var chkVersion = document.getElementById("chkVersion");
     if (chkVersion.checked) {
         version = chkVersion.value;
@@ -79,7 +80,8 @@ function CSCallBack(author) {
     var method = $("#cbxMethod").val();
     var ContentType = $("#txtCSContentType").val(); 
     if (author.result == true) {
-         
+
+        var cbxExecuteType = $("#cbxExecuteType"); //结果集类型 
         var url = $("#txtCSUrl").val(); //地址  
         var vData = CreateData(method, ContentType); 
         if (ContentType == "multipart/form-data") {
@@ -95,15 +97,15 @@ function CSCallBack(author) {
                 contentType: false,
                 processData: false,
                 data: vData,
-                success: function (result) {
-                    txtJsonResult.val(result);
+                success: function (result) { 
+                    DrawTable(result);
                 },
                 error: function () {
 
                 }
             });
         }
-        else { 
+        else {  
             var method = $("#cbxMethod").val();
             if (method == "Get") {
                 if (vData != "") {
@@ -119,7 +121,7 @@ function CSCallBack(author) {
                     type: method,
                     contentType: "application/json", 
                     success: function (result) {
-                        txtJsonResult.val(result);
+                        DrawTable(result);
                     }
                 })
                
@@ -136,13 +138,104 @@ function CSCallBack(author) {
                     contentType: "application/json",
                     data: JSON.stringify( vData ),
                     success: function (result) {
-                        txtJsonResult.val(result);
+                        DrawTable(result);
                     }
                 })
             } 
         }
     }
 
+}
+
+function DrawTable(result) {
+
+    var txtJsonResult = $("#txtJsonResult"); 
+    txtJsonResult.val(result);
+
+    var cbxExecuteType = $("#cbxExecuteType");
+    var ExecuteType = cbxExecuteType.val();
+    if (ExecuteType == "DataSet") {
+
+        var dgvCS = $("#dgvCS");
+        var html = "<table class='table table-sm'>";
+        var serializeType = $("#cbxSerializeType").val();
+
+        var chkVersion = document.getElementById("chkVersion");
+
+        if (serializeType == "Json") {
+
+            var model = eval("(" + result + ")"); 
+            var length = 0;
+            if (chkVersion.checked) {
+
+                length = model.count;
+                if (length > 0) {
+
+                    //列
+                    html += "<tr>"; 
+                    var row = model.data[0];
+                    $.each(row, function (key) {
+                        html += "<th class='bg-light'>";
+                        html += key;
+                        html += "</th>";
+                    });
+                    html += "</tr>";
+
+                    //行
+                    for (var i = 0; i < length; i++) {
+
+                        html += "<tr>"; 
+                        var row = model.data[i];
+                        $.each(row, function (key) {
+                            html += "<td>";
+                            html += row[key];
+                            html += "</td>";
+                        });
+
+                        html += "</tr>";
+                    }
+                }
+            }
+            else {
+
+                length = model.Result.Table.length;
+
+                //列 
+                if (length > 0) {
+                    html += "<tr>"; 
+                    var row = model.Result.Table[0];
+                    $.each(row, function (key) {
+                        html += "<th class='bg-light'>";
+                        html += key;
+                        html += "</th>";
+                    });
+                    html += "</tr>";
+                }
+               
+                //行
+                for (var i = 0; i < length; i++) {
+
+                    html += "<tr>";
+
+                    var row = model.Result.Table[0];
+                    $.each(row, function (key) {
+                        html += "<td>";
+                        html += row[key];
+                        html += "</td>";
+                    });
+
+                    html += "</tr>";
+                }
+
+            } 
+           
+        }
+        else if (serializeType == "Xml") {
+
+        }
+        html += "</table>";
+        dgvCS.html(html);
+    }
 }
 
 //创建发送的数据
