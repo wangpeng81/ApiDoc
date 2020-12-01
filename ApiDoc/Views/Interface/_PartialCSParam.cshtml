@@ -2,36 +2,42 @@
 <table class="table table-sm no-gutters m-0">
     <thead class="bg-light">
         <tr>
-            <th class="border-top-0 border-bottom-0 py-2">Key</th>
-            <th class="border-top-0 border-bottom-0 py-2">Value</th>
-            <th class="border-top-0 border-bottom-0 py-2">DESCRIPTION</th>
+            <th class="border-top-0 border-bottom-0 " style="height: calc(2em);">Key</th>
+            <th class="border-top-0 border-bottom-0 " style="height: calc(2em);">Value</th>
+            <th class="border-top-0 border-bottom-0 " style="height: calc(2em);">DESCRIPTION</th>
         </tr>
     </thead>
     <tbody>
         @{ 
-            foreach (ParamModel param in Model)
+            var paraName = "";
+            var dataType = "";
+
+            @foreach (ParamModel param in Model)
             {
+                paraName = param.ParamName.Trim();
+                dataType = param.DataType.ToLower();
+
                 <tr class="border-bottom">
-                    <td>@param.ParamName</td>
-                    <td> 
-                        @if (param.DataType.ToLower() == "image")
+                    <td class="p-0 pl-1">@paraName</td>
+                    <td class="p-0">
+                        @if (dataType == "image")
                         {
-                            <input id="cs_@param.ParamName" type="file" class="form-control form-control-file form-control-sm"  />
+                            <input id="cs_@paraName" name="cs_" type="file" class="form-control form-control-file form-control-sm border-0" style="height: calc(2em);" />
                         }
-                        else if (param.DataType.ToLower() == "int")
+                        else if (dataType == "int")
                         {
-                            <input id="cs_@param.ParamName" type="text" class="form-control form-control-sm" onkeyup="this.value=this.value.replace(/\D/g,'')" value="@param.DefaultValue">
+                            <input id="cs_@paraName" name="cs_" type="text" class="form-control form-control-sm border-0" style="height: calc(2em);" onkeyup="this.value=this.value.replace(/\D/g,'')" value="@param.DefaultValue">
                         }
-                        else if (param.DataType.ToLower() == "decimal")
+                        else if (dataType == "decimal")
                         {
-                            <input id="cs_@param.ParamName" type="text" class="form-control form-control-sm"  onkeyup="value=value.replace(/[^\d.]/g,'')" value="@param.DefaultValue">
+                            <input id="cs_@paraName" name="cs_" type="text" class="form-control form-control-sm border-0" style="height: calc(2em);" onkeyup="value=value.replace(/[^\d.]/g,'')" value="@param.DefaultValue">
                         }
                         else
-                        { 
-                            <input id="cs_@param.ParamName" class="form-control form-control-sm" value="@param.DefaultValue"  />
+                        {
+                            <input id="cs_@paraName" name="cs_" type="text" class="form-control form-control-sm border-0" style="height: calc(2em);" value="@param.DefaultValue" />
                         }
                     </td>
-                    <td>@param.Remark</td>
+                    <td class="p-0">@param.Remark</td>
                 </tr> 
             }
         }

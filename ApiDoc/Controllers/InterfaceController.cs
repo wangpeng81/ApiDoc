@@ -15,6 +15,9 @@ using Microsoft.Extensions.Logging;
 
 namespace ApiDoc.Controllers
 { 
+    /// <summary>
+    /// 接口主表信息
+    /// </summary>
     public class InterfaceController : Controller
     {
         private readonly IInterfaceDAL infterfaceDAL; 

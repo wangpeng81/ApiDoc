@@ -21,6 +21,7 @@ using ApiDoc.Models.Components;
 using Newtonsoft.Json.Linq;
 using JMS;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc; 
 
 namespace ApiDoc.Middleware
 {
@@ -30,8 +31,7 @@ namespace ApiDoc.Middleware
         private const string _ReqFilter = "SQLTEXT_"; //接收的是复杂语句
 
         private readonly RequestDelegate next;
-        private readonly IParamDAL paramDAL;
-        private readonly IDbHelper dbHelp;
+        private readonly IParamDAL paramDAL; 
         private readonly DBRouteValueDictionary routeDict;
         private readonly MyConfig myConfig;
         private readonly ILogger<DBMiddleware> logger;
@@ -41,23 +41,21 @@ namespace ApiDoc.Middleware
         public DBMiddleware(RequestDelegate _next,
                             IInterfaceDAL interfaceDAL,
                             IFlowStepDAL flowStepDAL,
-                            IParamDAL paramDAL,
-                            IDbHelper dbHelp,
+                            IParamDAL paramDAL, 
                             DBRouteValueDictionary _routeDict,
                             IConfiguration config,
                             MyConfig myConfig,
                             ILogger<DBMiddleware> logger,
-                            IComponentContext componentContext)
+                            IComponentContext componentContext )
         {
             this.next = _next;
-            this.paramDAL = paramDAL;
-            this.dbHelp = dbHelp;
+            this.paramDAL = paramDAL; 
             this.routeDict = _routeDict;
             this.myConfig = myConfig;
             this.logger = logger;
             this.componentContext = componentContext;
             string SqlConnStr = config.GetConnectionString("ApiDocConnStr");
-
+             
             //List<FilterCondition> filters = new List<FilterCondition>();
             //FilterCondition filter = new FilterCondition();
             //filter.BracketL = "(";
@@ -148,7 +146,7 @@ namespace ApiDoc.Middleware
         }
       
         public async Task Invoke(HttpContext context)
-        {
+        { 
             this.context = context;
             string path = context.Request.Path.ToString();
             switch (path)
@@ -157,6 +155,12 @@ namespace ApiDoc.Middleware
                     await this.WriteAsync("欢迎浏览ApiDoc");
                     return;
                 case "/CSDB":
+                    return;
+                case "/vir":
+                    var segment = new PathString("~".Substring(1));
+                    var applicationPath = context.Request.PathBase;
+                    string virpath = applicationPath.Add(segment).Value; 
+                    await this.WriteAsync(virpath);
                     return;
             }
           
@@ -498,161 +502,6 @@ namespace ApiDoc.Middleware
             } 
             return result;
         }
- 
-
-        //执行最后的sql
-        private string ExecSql(InterfaceModel response, IDbConnection connection, IDbDataAdapter sqlDA, IDbCommand cmd, List<FilterCondition> filters)
-        { 
-            XmlHelper xmlHelp = new XmlHelper(); 
-            string json = "";
-            object dataResult = new object();
-            object result = new object(); 
-            switch (response.ExecuteType)
-            {
-                case "Scalar":
-                    DataResult dataResult1 = new DataResult();
-                    dataResult1.DataType = 200;
-                    dataResult1.Result = cmd.ExecuteScalar();
-                    dataResult = dataResult1;
-                    result = dataResult1.Result;
-                    break;
-                case "Int":
-                    IntDataResult intDataResult = new IntDataResult();
-                    intDataResult.Result = cmd.ExecuteNonQuery();
-                    intDataResult.DataType = 200;
-                    dataResult = intDataResult;
-                    result = intDataResult.Result;
-                    break;
-                case "DataSet": 
-                    DataSet ds = new DataSet(); 
-                    DSDataResult dSDataResult = new DSDataResult();
-                    if (filters != null)
-                    {
-                        //复杂查询需要再过滤一下最后一个表
-                        int lastIndex = ds.Tables.Count - 1;
-                        string msg;
-                        string filter = this.CreateFileterString(filters, out msg);
-                        if (msg != "")
-                        {
-                            throw new Exception(msg); 
-                        }
-
-                        sqlDA.Fill(ds);
-                        if (ds.Tables.Count > 0 && ds.Tables[lastIndex].Rows.Count > 0)
-                        {
-                            DataTable table = ds.Tables[ds.Tables.Count - 1]; 
-                            table.DefaultView.RowFilter = filter;
-                            DataTable dtNew = table.DefaultView.ToTable();
-                            ds.Tables.RemoveAt(lastIndex);
-                            ds.Tables.Add(dtNew); 
-                            dSDataResult.Result = ds; 
-                        }
-                        else
-                        {
-                            dSDataResult.Result = ds;
-                        }
-                    }
-                    else
-                    {
-                        sqlDA.Fill(ds);
-                        dSDataResult.Result = ds;  
-                    }
-                    dataResult = dSDataResult;
-                    dSDataResult.DataType = 200;
-                    break;
-            }
-             
-            if (response.SerializeType == "Xml")
-            {
-                switch (response.ExecuteType)
-                {
-                    case "Scalar":
-                        json = xmlHelp.SerializeXML<DataResult>(dataResult);
-                        break;
-                    case "Int":
-                        json = xmlHelp.SerializeXML<IntDataResult>(dataResult);
-                        break;
-                    case "DataSet":
-                        json = xmlHelp.SerializeXML<DSDataResult>(dataResult);
-                        break;
-                } 
-            }
-            else if (response.SerializeType == "Json")
-            {
-                json = JsonConvert.SerializeObject(dataResult); 
-            }
-            else
-            {
-                json = result.ToString();
-            }
-            
-            return json;
-        }
-
-        //返因LayUI的结构
-        private string ExecSqlLayui(InterfaceModel response, IDbConnection connection, IDbDataAdapter sqlDA, IDbCommand cmd, List<FilterCondition> filters)
-        {
-            XmlHelper xmlHelp = new XmlHelper();
-            string json = "";
-            LayuiResult dataResult = new LayuiResult();
-            dataResult.code = 0;
-            dataResult.count = 0;
-            dataResult.msg = "";
-            dataResult.data = "{0}";
-
-            object result = new object(); 
-            switch (response.ExecuteType)
-            {
-                case "Scalar":
-                    result = cmd.ExecuteScalar(); 
-                    break;
-                case "Int": 
-                    result = cmd.ExecuteNonQuery();  
-                    break;
-                case "DataSet":
-                    DataSet ds = new DataSet();
-                    sqlDA.Fill(ds);
-                    DataTable table = new DataTable();
-                    if (filters != null)
-                    {
-                        //复杂查询需要再过滤一下最后一个表 
-                        string msg;
-                        string filter = this.CreateFileterString(filters, out msg);
-                        if (msg != "")
-                        {
-                            throw new Exception(msg);
-                        } 
-                        DataTable table0 = ds.Tables[0];
-                        table0.DefaultView.RowFilter = filter;
-                        DataTable dtNew = table0.DefaultView.ToTable();
-                        table = dtNew;
-                    }
-                    else
-                    { 
-                        table = ds.Tables[0];
-                    }
-
-                    dataResult.count = table.Rows.Count;
-                    result = table;
-                    break;
-            }
-
-            dataResult.data = result;
-            if (response.SerializeType == "Xml")
-            {
-                
-            }
-            else if (response.SerializeType == "Json")
-            {
-                json = JsonConvert.SerializeObject(dataResult); 
-            }
-            else
-            {
-                json = result.ToString();
-            }
-
-            return json;
-        }
 
         //创建参数
         private bool CreateParam(InterfaceModel response, IDbCommand cmd, DataRow dataPre, FlowStepModel step, Dictionary<string, object> dict,  out string exceMsg)
@@ -699,8 +548,15 @@ namespace ApiDoc.Middleware
                                 }
 
                                 string fileName =  DateTime.Now.ToString("yyyyMMddHHmmss") + "-" + Guid.NewGuid().ToString() + ".png";
+
+                                var segment = new PathString("~".Substring(1));
+                                var applicationPath = context.Request.PathBase; 
+                                string virpath = applicationPath.Add(segment).Value;
+                                  
+                                string vir = context.Request.PathBase.Add(new PathString("~".Substring(1))).Value;
+                                 
                                 string path = directory + fileName;                                                               //硬盘文件名称　
-                                string imagePath = context.Request.Scheme + "://" + context.Request.Host + "/Image/" + fileName;　//网络路径
+                                string imagePath = context.Request.Scheme + "://" + context.Request.Host + vir + "/Image/" + fileName;　//网络路径
                                 value = imagePath; 
                                 object objFile = dict[paramName]; 
                                 if (objFile != null)
@@ -1089,24 +945,202 @@ namespace ApiDoc.Middleware
 
         #endregion
 
+        #region 单机
 
-        private async Task InvokeException(string exception)
+        //执行最后的sql
+        private string ExecSql(InterfaceModel response, IDbConnection connection, IDbDataAdapter sqlDA, IDbCommand cmd, List<FilterCondition> filters)
         {
+            XmlHelper xmlHelp = new XmlHelper();
+            string json = "";
+            object dataResult = new object();
+            object result = new object();
+            switch (response.ExecuteType)
+            {
+                case "Scalar":
+                    DataResult dataResult1 = new DataResult();
+                    dataResult1.DataType = 200;
+                    dataResult1.Result = cmd.ExecuteScalar();
+                    dataResult = dataResult1;
+                    result = dataResult1.Result;
+                    break;
+                case "Int":
+                    IntDataResult intDataResult = new IntDataResult();
+                    intDataResult.Result = cmd.ExecuteNonQuery();
+                    intDataResult.DataType = 200;
+                    dataResult = intDataResult;
+                    result = intDataResult.Result;
+                    break;
+                case "DataSet":
+                    DataSet ds = new DataSet();
+                    DSDataResult dSDataResult = new DSDataResult();
+                    sqlDA.Fill(ds);
+                    int lastIndex = ds.Tables.Count - 1;
 
-            DataResult returnValue = new DataResult();
-            returnValue.DataType = -1;
-            returnValue.Exception = exception;
-            this.logger.LogError(exception);
-            string json = JsonConvert.SerializeObject(returnValue);
-            await this.WriteAsync(json);
+                    if (filters != null)
+                    {
+                        //复杂查询需要再过滤一下最后一个表
+
+                        string msg;
+                        string filter = this.CreateFileterString(filters, out msg);
+                        if (msg != "")
+                        {
+                            throw new Exception(msg);
+                        }
+
+                        if (ds.Tables.Count > 0 && ds.Tables[lastIndex].Rows.Count > 0)
+                        {
+                            //只过滤最后一个表
+                            DataTable table = ds.Tables[lastIndex];
+                            table.DefaultView.RowFilter = filter;
+                            DataTable dtNew = table.DefaultView.ToTable();
+                            ds.Tables.RemoveAt(lastIndex);
+                            ds.Tables.Add(dtNew);
+                        }
+
+                        dSDataResult.Result = ds;
+                    }
+                    else
+                    {
+                        int nCount = 0;
+                        if (this.context.Request.Headers.ContainsKey("NCS"))
+                        {
+                            bool bOK = context.Request.Headers.TryGetValue("NCS", out StringValues NCS);
+                            if (bOK)
+                            {
+                                nCount = int.Parse(NCS.ToString());
+                            }
+                        }
+
+                        if (nCount > 0 && lastIndex >= 0)
+                        {
+                            DataTable dtNew = DtSelectTop(nCount, ds.Tables[lastIndex]);
+                            ds.Tables.RemoveAt(lastIndex);
+                            ds.Tables.Add(dtNew);
+                        }
+                        dSDataResult.Result = ds;
+                    }
+                    dataResult = dSDataResult;
+                    dSDataResult.DataType = 200;
+                    break;
+            }
+
+            if (response.SerializeType == "Xml")
+            {
+                switch (response.ExecuteType)
+                {
+                    case "Scalar":
+                        json = xmlHelp.SerializeXML<DataResult>(dataResult);
+                        break;
+                    case "Int":
+                        json = xmlHelp.SerializeXML<IntDataResult>(dataResult);
+                        break;
+                    case "DataSet":
+                        json = xmlHelp.SerializeXML<DSDataResult>(dataResult);
+                        break;
+                }
+            }
+            else if (response.SerializeType == "Json")
+            {
+                json = JsonConvert.SerializeObject(dataResult);
+            }
+            else
+            {
+                json = result.ToString();
+            }
+
+            return json;
         }
 
-        private async Task WriteAsync(string text)
+        //返因LayUI的结构
+        private string ExecSqlLayui(InterfaceModel response, IDbConnection connection, IDbDataAdapter sqlDA, IDbCommand cmd, List<FilterCondition> filters)
         {
-            // await this.context.Response.WriteAsync(text, Encoding.UTF8);  , Encoding.GetEncoding("GB2312")
-            this.context.Response.ContentType = "text/plain;charset=utf-8";
-            await this.context.Response.WriteAsync(text);
+            XmlHelper xmlHelp = new XmlHelper();
+            string json = "";
+            LayuiResult dataResult = new LayuiResult();
+            dataResult.code = 0;
+            dataResult.count = 0;
+            dataResult.msg = "";
+            dataResult.data = "{0}";
+
+            object result = new object();
+            switch (response.ExecuteType)
+            {
+                case "Scalar":
+                    result = cmd.ExecuteScalar();
+                    break;
+                case "Int":
+                    result = cmd.ExecuteNonQuery();
+                    break;
+                case "DataSet":
+                    DataSet ds = new DataSet();
+                    sqlDA.Fill(ds);
+                    DataTable table = new DataTable();
+                    if (ds.Tables.Count > 0)
+                    {
+                        if (filters != null)
+                        {
+                            //复杂查询需要再过滤一下最后一个表 
+                            string msg;
+                            string filter = this.CreateFileterString(filters, out msg);
+                            if (msg != "")
+                            {
+                                throw new Exception(msg);
+                            }
+
+                            //只过滤最后一个表 
+                            DataTable table0 = ds.Tables[ds.Tables.Count - 1];
+                            table0.DefaultView.RowFilter = filter;
+                            DataTable dtNew = table0.DefaultView.ToTable();
+                            table = dtNew;
+                        }
+                        else
+                        {
+                            table = ds.Tables[0];
+                        }
+
+                        //测试数据最返最后10行
+                        int nCount = 0;
+                        if (this.context.Request.Headers.ContainsKey("NCS"))
+                        {
+                            bool bOK = context.Request.Headers.TryGetValue("NCS", out StringValues NCS);
+                            if (bOK)
+                            {
+                                nCount = int.Parse(NCS.ToString());
+                            }
+                        }
+
+                        if (nCount > 0)
+                        {
+                            table = DtSelectTop(nCount, table);
+                        }
+
+                    }
+
+                    dataResult.count = table.Rows.Count;
+                    result = table;
+                    break;
+            }
+
+            dataResult.data = result;
+            if (response.SerializeType == "Xml")
+            {
+
+            }
+            else if (response.SerializeType == "Json")
+            {
+                json = JsonConvert.SerializeObject(dataResult);
+            }
+            else
+            {
+                json = result.ToString();
+            }
+
+            return json;
         }
+
+        #endregion
+       
+        #region 复杂语句过滤条件
 
         private string CreateFileterString(List<FilterCondition> filters, out string msg)
         {
@@ -1291,6 +1325,42 @@ namespace ApiDoc.Middleware
 
             return tempFilterStr.ToString();
         }
+
+        #endregion
+
+        //测试的时候获取前多少条数据
+        private DataTable DtSelectTop(int TopItem, DataTable oDT)
+        {
+            if (oDT.Rows.Count < TopItem) return oDT;
+
+            DataTable NewTable = oDT.Clone();
+            DataRow[] rows = oDT.Select("1=1");
+            for (int i = 0; i < TopItem; i++)
+            {
+                NewTable.ImportRow((DataRow)rows[i]);
+            }
+            return NewTable;
+        }
+
+
+        private async Task InvokeException(string exception)
+        {
+
+            DataResult returnValue = new DataResult();
+            returnValue.DataType = -1;
+            returnValue.Exception = exception;
+            this.logger.LogError(exception);
+            string json = JsonConvert.SerializeObject(returnValue);
+            await this.WriteAsync(json);
+        }
+
+        private async Task WriteAsync(string text)
+        {
+            // await this.context.Response.WriteAsync(text, Encoding.UTF8);  , Encoding.GetEncoding("GB2312")
+            this.context.Response.ContentType = "text/plain;charset=utf-8";
+            await this.context.Response.WriteAsync(text);
+        }
+
 
     }
 }

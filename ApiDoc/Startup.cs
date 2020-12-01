@@ -77,7 +77,8 @@ namespace ApiDoc
         {  
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
+                app.UseExceptionMiddleware();
             }
             else
             {
@@ -90,8 +91,7 @@ namespace ApiDoc
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot"))
             });
-
-            
+             
             app.ConfigureApiDoc();
               
             app.UseRouting(); 

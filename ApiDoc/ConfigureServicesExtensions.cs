@@ -20,10 +20,7 @@ namespace ApiDoc
         public static void ConfigureApiDoc(this IApplicationBuilder app)
         {
             app.UseMiddleware<MyCorsMiddleware>();
-            //app.UseMiddleware<JWTRSAuthorizeMiddleware>(); //验证
             app.UseMiddleware<JWTHSAuthorizeMiddleware>();
-            //app.UseMiddleware<JWTMiddleware>();
-            //app.UseMiddleware<AuthorizeMiddleware>();//JWTMiddleware
             app.UseMiddleware<DBMiddleware>();
 
             app.UseAuthentication(); //鉴权：解析信息--就是读取token，解密token 
@@ -40,8 +37,7 @@ namespace ApiDoc
             //string key = File.ReadAllText(path1);
             //var keyParams = JsonConvert.DeserializeObject<RSAParameters>(key);
             //SecurityKey issuerSigningKey = new RsaSecurityKey(keyParams);
-
-
+             
             string path = Assembly.GetExecutingAssembly().Location;
             var basePath = path.Replace("ApiDoc.dll", "");
             string jsonName = basePath + "MyConfig";

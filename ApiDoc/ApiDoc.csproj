@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>b6f6948d-3a43-46b4-9299-a0d23b630f43</UserSecretsId>
+    <SatelliteResourceLanguages>zh-Hans</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,7 +40,6 @@
     <ProjectReference Include="..\ApiDoc.DAL\ApiDoc.DAL.csproj" />
     <ProjectReference Include="..\ApiDoc.Middleware\ApiDoc.Middleware.csproj" />
     <ProjectReference Include="..\ApiDoc.Models\ApiDoc.Models.csproj" />
-    <ProjectReference Include="..\JMS.Invoker\JMS.Invoker.csproj" />
   </ItemGroup>  
 
   <ItemGroup>

@@ -1,4 +1,16 @@
-﻿ 
+﻿
+var strAjaxId = "v-pills-home-tab"  
+
+$(function () {
+
+    var tabSteps = $("#v-pills-tab");
+    tabSteps.on("shown.bs.tab", function (e) {
+
+        strAjaxId = e.target.id;
+        
+    }); 
+});
+
 //弹出测试窗口
 function showCS() {
 
@@ -23,6 +35,7 @@ function showCS() {
     $("#txtAjax").val("");
     $("#txtJsonResult").val("");
     $("#dgvCS").html("");
+    $('#v-pills-tab li:first-child a').tab('show')
 
     url = urlParamGetCSParam + "?SN=" + _SN;
     $.get(url, function (innerHtml) {
@@ -64,12 +77,17 @@ function btnSendCS() {
         contentType: 'application/json',
         data: JSON.stringify(data),
         success: function (author) {
-            CSCallBack(author);
+            SendData(author);
         }
     })
 }
 
-function CSCallBack(author) {
+function BeforeSend(xhr, token, version) {
+    xhr.setRequestHeader("Authorization", "Bearer " + token);
+    xhr.setRequestHeader("Version", version);
+    xhr.setRequestHeader("NCS", 10);
+}
+function SendData(author) {
 
     var version = ""; //是否返回Layui的数据
     
@@ -87,8 +105,7 @@ function CSCallBack(author) {
         if (ContentType == "multipart/form-data") {
             $.ajax({
                 beforeSend: function (xhr) {
-                    xhr.setRequestHeader("Authorization", "Bearer " + author.token);
-                    xhr.setRequestHeader("Version", version);
+                    BeforeSend(xhr, author.token, version);
                 },
                 type: "POST",
                 url: url, 
@@ -115,8 +132,7 @@ function CSCallBack(author) {
                 $.ajax({
                     url: url,
                     beforeSend: function (xhr) {
-                        xhr.setRequestHeader("Authorization", "Bearer " + author.token);
-                        xhr.setRequestHeader("Version", version);
+                        BeforeSend(xhr, author.token, version);
                     },
                     type: method,
                     contentType: "application/json", 
@@ -131,8 +147,7 @@ function CSCallBack(author) {
                 $.ajax({
                     url: url,
                     beforeSend: function (xhr) {
-                        xhr.setRequestHeader("Authorization", "Bearer " + author.token);
-                        xhr.setRequestHeader("Version", version);
+                        BeforeSend(xhr, author.token, version);
                     },
                     type: method,
                     contentType: "application/json",
@@ -147,6 +162,96 @@ function CSCallBack(author) {
 
 }
 
+//创建发送的数据
+function CreateData(method, ContentType) {
+     
+    if (strAjaxId == "v-pills-home-tab") {
+
+        var paraList = document.getElementsByName("chkParam_");
+        var csJson = "";
+        var value = "";
+
+        var data = new FormData();
+        for (var i = 0; i < paraList.length; i++) {
+            json = paraList[i].value;
+            json = eval("(" + json + ")");
+            var paramName = json.ParamName;
+            var dataType = json.DataType;
+            var txtValue = $("#cs_" + paramName);
+            value = txtValue.val().trim().replace("\'", "");
+
+            if (ContentType == "multipart/form-data") {
+
+                if (dataType == "Image") {
+
+                    var file = txtValue.get(0);
+                    var files = file.files;
+                    if (files.length > 0) {
+                        data.append(paramName, files[0]);
+                    }
+                }
+                else {
+                    data.append(paramName, value);
+                }
+            }
+            else {
+
+                if (method == "Get") {
+                    if (csJson != "") {
+                        csJson += "&";
+                    }
+                    if (dataType == "Varchar" || dataType == "Int" || dataType == "Decimal") {
+                        csJson += paramName + "=" + value;
+                    }
+                    else {
+                        csJson += paramName + "='" + value + "'";
+                    }
+                }
+                else if (method == "Post") {
+                    if (csJson != "") {
+                        csJson += ",";
+                    }
+
+                    var value1 = '';
+                    if (dataType == "Varchar" || dataType == "Int" || dataType == "Decimal") {
+                        value1 = value.replace("\'", "");
+                    }
+                    else {
+                        value1 = "'" + value + "'";
+                    }
+
+                    csJson += paramName + ":" + value1;
+                }
+
+            }
+        }
+
+        if (ContentType == "multipart/form-data") {
+            return data;
+        }
+        else {
+
+            var jsonResult = csJson;
+
+            if (method == "Post") {
+                jsonResult = eval("({" + csJson + "})");
+            }
+        }
+    }
+    else if (strAjaxId == "v-pills-ajax-tab") { //如果以自定义json串
+
+        var txtAjaxData = $("#txtAjaxData");
+        var jsonValue = txtAjaxData.val().trim();
+        jsonResult = jsonValue;
+        if (method == "Post") {
+
+            jsonResult = eval("(" + jsonValue + ")");
+        } 
+    }
+
+    return jsonResult;
+}
+
 function DrawTable(result) {
 
     var txtJsonResult = $("#txtJsonResult"); 
@@ -158,17 +263,16 @@ function DrawTable(result) {
 
         var dgvCS = $("#dgvCS");
         var html = "<table class='table table-sm'>";
-        var serializeType = $("#cbxSerializeType").val();
-
-        var chkVersion = document.getElementById("chkVersion");
-
+        var serializeType = $("#cbxSerializeType").val(); 
+        var chkVersion = document.getElementById("chkVersion"); 
         if (serializeType == "Json") {
 
             var model = eval("(" + result + ")"); 
             var length = 0;
             if (chkVersion.checked) {
 
-                length = model.count;
+                //LayUI格式
+                length = model.count; 
                 if (length > 0) {
 
                     //列
@@ -187,7 +291,7 @@ function DrawTable(result) {
                         html += "<tr>"; 
                         var row = model.data[i];
                         $.each(row, function (key) {
-                            html += "<td>";
+                            html += "<td class='text-nowrap'>";
                             html += row[key];
                             html += "</td>";
                         });
@@ -198,8 +302,8 @@ function DrawTable(result) {
             }
             else {
 
-                length = model.Result.Table.length;
-
+                //DataSet 格式
+                length = model.Result.Table.length; 
                 //列 
                 if (length > 0) {
                     html += "<tr>"; 
@@ -217,9 +321,9 @@ function DrawTable(result) {
 
                     html += "<tr>";
 
-                    var row = model.Result.Table[0];
+                    row = model.Result.Table[i];
                     $.each(row, function (key) {
-                        html += "<td>";
+                        html += "<td class='text-nowrap'>";
                         html += row[key];
                         html += "</td>";
                     });
@@ -236,82 +340,6 @@ function DrawTable(result) {
         html += "</table>";
         dgvCS.html(html);
     }
-}
-
-//创建发送的数据
-function CreateData(method, ContentType) {
-     
-    var paraList = document.getElementsByName("chkParam_");
-    var csJson = "";
-    var value = "";
-  
-    var data = new FormData(); 
-    for (var i = 0; i < paraList.length; i++) {
-        json = paraList[i].value;
-        json = eval("(" + json + ")");
-        var paramName = json.ParamName;
-        var dataType = json.DataType; 
-        var txtValue = $("#cs_" + paramName);
-        value = txtValue.val().trim().replace("\'", "");
-
-        if (ContentType == "multipart/form-data") {
-
-            if (dataType == "Image") {
-
-                var file = txtValue.get(0);
-                var files = file.files;
-                if (files.length > 0) {
-                    data.append(paramName, files[0]);
-                }
-            }
-            else { 
-                data.append(paramName, value);
-            }
-        }
-        else {
-
-            if (method == "Get") {
-                if (csJson != "") {
-                    csJson += "&";
-                }
-                if (dataType == "Varchar" || dataType == "Int" || dataType == "Decimal") {
-                    csJson += paramName + "=" + value;
-                }  
-                else {
-                    csJson += paramName + "='" + value + "'";
-                }
-            }
-            else if (method == "Post") {
-                if (csJson != "") {
-                    csJson += ",";
-                }
-
-                var value1 = '';
-                if (dataType == "Varchar" || dataType == "Int" || dataType == "Decimal") {
-                    value1 = value.replace("\'", "");
-                } 
-                else {
-                    value1 = "'" + value + "'";
-                }
-
-                csJson += paramName + ":" + value1;
-            }
-        } 
-    }
-    
-    if (ContentType == "multipart/form-data") {
-        return data;
-    }
-    else {
-
-        var jsonResult = csJson;
-        if (method == "Post") {
-           
-            jsonResult = eval("({" + csJson + "})");
-        } 
-
-        return jsonResult;
-    }  
 }
 
 //发送脚本例子

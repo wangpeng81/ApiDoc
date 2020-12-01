@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ApiDoc.Controllers
 {
+    /// <summary>
+    /// 历史脚本
+    /// </summary>
     public class HisController : BaseController
     {
         private readonly IFlowStepDAL flowStepDAL;

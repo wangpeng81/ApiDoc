@@ -6,6 +6,8 @@ using ApiDoc.Models.Components;
 using ApiDoc.Utility;
 using Autofac;
 using JMS;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -67,10 +69,7 @@ namespace ApiDoc
             builder.RegisterType<MySqlConnection>().Named<IDbConnection>("MySql");
             builder.RegisterType<MySqlDataAdapter>().Named<IDbDataAdapter>("MySql");
             builder.RegisterType<MySqlParameter>().Named<DbParameter>("MySql");
-
-            //builder.RegisterType<Logger<BaseDAL>>();
-            //builder.RegisterType<BaseDAL>().PropertiesAutowired();
-
+  
             #region RS256 
             builder.RegisterType<JWTHSService>().
                 As<IJWTService>().

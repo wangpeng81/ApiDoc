@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ApiDoc.Controllers
 {
+    /// <summary>
+    /// 接口参数操作
+    /// </summary>
     public class ParamController : Controller
     {
         private readonly IParamDAL paramDAL;

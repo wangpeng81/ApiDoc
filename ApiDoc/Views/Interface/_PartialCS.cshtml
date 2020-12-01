@@ -16,13 +16,13 @@
                         <input type="checkbox" class="custom-control-input ml-2" id="chkVersion" value="Layui" onchange="onVersion()">
                         <label class="custom-control-label" for="chkVersion">Layui</label>
                     </div>
-                     
+
                     <input id="txtCSContentType" class="form-control form-control-sm ml-2" readonly="readonly" value="application/json" />
                 </div>
 
                 <div class="input-group input-group-sm">
-                    <input id="txtCSUrl" class="form-control form-control-sm bg-light" /> 
-                    
+                    <input id="txtCSUrl" class="form-control form-control-sm bg-light" />
+
                     <button type="button" class="btn btn-primary btn-sm ml-2" onclick="btnSendCS()">Send</button>
                     <button type="button" class="btn btn-default btn-sm ml-2" data-dismiss="modal">Canel</button>
                 </div>
@@ -39,16 +39,36 @@
                     </li>
                 </ul>
                 <div class="tab-content" id="pills-tabContent">
-                    <div class="tab-pane fade show active" id="pills-param" role="tabpanel" aria-labelledby="pills-param-tab">
-                        <div id="dgvCSParam" class="border p-0 mt-2 overflow-auto" style="height:calc(100vh / 3)">
+                    <div class="tab-pane show active" id="pills-param" role="tabpanel" aria-labelledby="pills-param-tab">
+                        <div class="row mt-1 ml-0 mr-0 border" style="height:calc(100vh / 3)">
+                            <div class="nav flex-column nav-pills bg-light col-1 p-0" id="v-pills-tab" role="tablist" aria-orientation="vertical" >
+                                <a class="nav-link active m-1" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">列表</a>
+                                <a class="nav-link m-1" id="v-pills-ajax-tab" data-toggle="pill" href="#v-pills-ajax" role="tab" aria-controls="v-pills-ajax" aria-selected="false">自定义</a>
+                            </div>
+                            <div class="tab-content col-11 p-0" id="v-pills-tabContent">
+
+                                <!--列表形式参数-->
+                                <div class="tab-pane show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+                                    <div id="dgvCSParam" class="border p-0 m-1 overflow-auto" style="height:calc(100vh / 3 - 10px)">
+
+                                    </div>
+                                </div>
+
+                                <!--纯脚本形式参数-->
+                                <div class="tab-pane m-0" id="v-pills-ajax" role="tabpanel" aria-labelledby="v-pills-ajax-tab">
+                                    <textarea id="txtAjaxData" class="form-control bg-light m-1" style="height: calc(100vh / 3 - 10px)"></textarea>
+                                </div>
+                            </div>
                         </div>
+                       
+
                         <textarea id="txtJsonResult" class="form-control bg-light mt-2" style="height:calc(100vh / 3)"></textarea>
                     </div>
-                    <div class="tab-pane fade" id="pills-param-ajax" role="tabpanel" aria-labelledby="pills-param-ajax-tab"> 
+                    <div class="tab-pane" id="pills-param-ajax" role="tabpanel" aria-labelledby="pills-param-ajax-tab">
                         <!--发送脚本-->
                         <textarea id="txtAjax" class="form-control bg-light p-0 mt-2" style="height:calc(100vh - 220px)"></textarea>
                     </div>
-                    <div class="tab-pane fade" id="pills-result-list" role="tabpanel" aria-labelledby="pills-result-list-tab">
+                    <div class="tab-pane" id="pills-result-list" role="tabpanel" aria-labelledby="pills-result-list-tab">
                         <!--datagrid-->
                         <div id="dgvCS" class="overflow-auto mt-2" style="height: calc(100vh - 220px)">
 

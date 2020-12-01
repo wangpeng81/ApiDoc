@@ -13,6 +13,9 @@ using Newtonsoft.Json;
 
 namespace ApiDoc.Controllers
 {
+    /// <summary>
+    /// 配置页相关操作
+    /// </summary>
     public class MyConfigController : BaseController
     {
         private readonly MyConfig myConfig;

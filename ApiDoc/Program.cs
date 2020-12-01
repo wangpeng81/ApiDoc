@@ -11,8 +11,7 @@ namespace ApiDoc
     public class Program
     {
         public static void Main(string[] args)
-        {
-           
+        { 
             IHostBuilder hostBilder = CreateHostBuilder(args);
             IHost host = hostBilder.Build();
             host.Run();
@@ -36,15 +35,7 @@ namespace ApiDoc
             {
                 webBuilder.UseStartup<Startup>();
             });
-            return hostBilder;
-
-            //return Host.CreateDefaultBuilder(args)
-                //.ConfigureLogging((context, loggingBuilder)=> {
-                //    loggingBuilder.AddFilter("System", LogLevel.Warning); //不写　System　类型的日志
-                //    loggingBuilder.AddFilter("Microsoft", LogLevel.Warning);
-                //    loggingBuilder.AddLog4Net();//使用log4Net
-                //})
-                
+            return hostBilder; 
         }
             
     }
