@@ -120,9 +120,13 @@ function btnDeleteStepParam() {
 function showSelectParam() {
 
     var fksn = selectFlowStep.FKSN; //接口SN
+    var sn = selectFlowStep.SN;
 
     $.post(urlFlowStepInterParamList,
-        { FKSN: fksn },
+        {
+            FKSN: fksn,
+            StepSN: sn
+        },
         function (innerHtml) {
 
             var dgvList = $("#myStepParamSelectModel #dgvList");

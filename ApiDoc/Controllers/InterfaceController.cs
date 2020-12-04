@@ -105,8 +105,11 @@ namespace ApiDoc.Controllers
         public InterfaceModel Save(InterfaceModel model)
         {
             int SN = model.SN;
+            InterfaceModel modelOld = null;
+
             if (model.SN > 0)
             {
+                modelOld = this.infterfaceDAL.Get<InterfaceModel>(model.SN);
                 this.infterfaceDAL.Update(model);
             }
             else
@@ -116,10 +119,19 @@ namespace ApiDoc.Controllers
             }
 
             //更新路由
+            string url = model.Url;
             if (!model.IsStop)
             {
-                InterfaceModel dbInter = this.interfaceBLL.GetInterfaceModel(SN);
-                string url = model.Url;
+                if (modelOld != null && url != modelOld.Url)
+                {
+                    //删除以前的接口
+                    if (this.routeDict.ContainsKey(modelOld.Url))
+                    {
+                        this.routeDict.Remove(url);
+                    }
+                }
+
+                InterfaceModel dbInter = this.interfaceBLL.GetInterfaceModel(SN); 
                 if (this.routeDict.ContainsKey(url))
                 {
                     this.routeDict[url] = dbInter;
@@ -127,6 +139,13 @@ namespace ApiDoc.Controllers
                 else
                 {
                     this.routeDict.Add(url, dbInter);
+                }
+            }
+            if (model.IsStop)
+            {
+                if (this.routeDict.ContainsKey(url))
+                {
+                    this.routeDict.Remove(url);
                 }
             }
 

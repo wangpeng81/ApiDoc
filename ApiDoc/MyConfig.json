@@ -1,7 +1,7 @@
 {
   "DataType": {
     "SqlServer": {
-      "ApiDocConnStr": "server=192.168.202.2;uid=sa;pwd=china_2020;database=ApiDoc;",
+      "ApiDocConnStr": "server=.;uid=sa;pwd=china_2020;database=ApiDoc;",
       "DataBases": [ "YZ_Med_InfoCenter", "YZ_Med_LMSystem", "YZ_Med_EleArchivesSystem", "YZRegistry", "YZ_Med_BPSystem", "YZ_Med_GSP", "YZ_Med_FMSystem", "ApiDoc" ]
     },
     "MySql": {

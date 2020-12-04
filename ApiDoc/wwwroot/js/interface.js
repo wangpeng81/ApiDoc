@@ -6,6 +6,9 @@ function btnSaveIntterface_Click() {
     var objSN = $("#txtSN");
     var vSN = objSN.val();
     var vTitle = $("#txtTitle").val();
+    if (vTitle.trim() == "") {
+        return;
+    }
     var vUrl = $("#txtUrl").val();
     var vSerializeType = $("#cbxSerializeType").val();
     var vMethod = $("#cbxMethod").val();

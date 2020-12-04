@@ -8,15 +8,16 @@ function LoadTreeView(result) {
         color: "var(--gray)",
         showBorder: false,
         enableLinks: false,
-        backColor: "#f8f9fa",
+        backColor: "##28a745",
         nodeIcon: '',
         selectedIcon: 'fa fa-check',
-        selectedBackColor: '#f8f9fa',
-        selectedColor: '#8cbe00', 
+        selectedBackColor: '#28a745',
+        selectedColor: '#FFF', 
         data: result
     });
 
     treeview.treeview("collapseAll");
+    treeview.treeview('selectNode', [0, { silent: true }]);
     treeview.on('nodeSelected', function (event, data) {
 
         selectedNode = data;

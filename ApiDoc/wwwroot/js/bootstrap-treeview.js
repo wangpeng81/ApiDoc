@@ -239,7 +239,7 @@
 			delete options.data;
 		}
 		this.options = $.extend({}, _default.settings, options);
-
+		this.selectedNode = {};
 		this.destroy();
 		this.subscribeEvents();
 		this.setInitialStates({ nodes: this.tree }, 0);
@@ -469,7 +469,9 @@
 
 	Tree.prototype.toggleSelectedState = function (node, options) {
 		if (!node) return;
-		this.setSelectedState(node, !node.state.selected, options);
+		if (this.selectedNode.nodeId != node.nodeId) {
+			this.setSelectedState(node, !node.state.selected, options);
+		}
 	};
 
 	Tree.prototype.setSelectedState = function (node, state, options) {
@@ -487,6 +489,7 @@
 
 			// Continue selecting node
 			node.state.selected = true;
+			this.selectedNode = node;
 			if (!options.silent) {
 				this.$element.trigger('nodeSelected', $.extend(true, {}, node));
 			}
@@ -494,7 +497,7 @@
 		else {
 
 			// Unselect node
-			node.state.selected = false;
+			node.state.selected = false; 
 			if (!options.silent) {
 				this.$element.trigger('nodeUnselected', $.extend(true, {}, node));
 			}

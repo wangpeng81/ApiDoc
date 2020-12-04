@@ -114,10 +114,23 @@ namespace ApiDoc.Controllers
         }
          
         [HttpPost]
-        public IActionResult InterParamList(int FKSN)
+        public IActionResult InterParamList(int FKSN, int StepSN)
         {
             List<ParamModel> list = this.paramDAL.Query(FKSN);
-            return PartialView("/Views/Interface/ParamSelectList.cshtml", list);
+
+            List<FlowStepParamModel> listStep = this.flowStepParamDAL.Query(StepSN);
+            //如果已经存在，不显示
+
+            List<ParamModel> listnew = new List<ParamModel>();
+            foreach (ParamModel param in list)
+            {
+                int count = listStep.Where(t => t.ParamName == param.ParamName).Count();
+                if (count == 0)
+                {
+                    listnew.Add(param);
+                }
+            }
+            return PartialView("/Views/Interface/ParamSelectList.cshtml", listnew);
         }
 
         [HttpPost]
